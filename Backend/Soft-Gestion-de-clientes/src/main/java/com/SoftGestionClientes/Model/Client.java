@@ -1,5 +1,6 @@
 package com.SoftGestionClientes.Model;
 
+import com.SoftGestionClientes.Enums.ECategoryPrice;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
@@ -8,26 +9,32 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
+
 
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "payments")
-public class Payment {
+@Table(name = "clients")
+public class Client {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "payment_date")
-    private LocalDate paymentDate;
-
-    @ManyToOne
-    @JoinColumn(name = "customer_id")
-    private Client client;
+    @Column(name = "register_date")
+    private LocalDate registerDate;
 
     @NotBlank
-    private Float amount;
+    private String name;
+    @NotBlank
+    private String phone;
+    @NotBlank
+    private ECategoryPrice categoryPrice;
+    private Set<Sale> sales = new HashSet<>();
+    private Set<Payment> payments = new HashSet<>();
+
 }
