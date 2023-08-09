@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class UserEntityDto {
     private Long id;
-    private String name;
+    private String username;
     private String password;
     private ERole role;
 }

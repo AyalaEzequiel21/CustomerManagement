@@ -20,7 +20,7 @@ public class UserEntity {
     private Long id;
 
     @NotBlank
-    private String name;
+    private String username;
 
     @NotBlank
     private String password;
