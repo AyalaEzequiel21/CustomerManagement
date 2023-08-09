@@ -32,9 +32,17 @@ public class Client {
     private String name;
     @NotBlank
     private String phone;
+
     @NotBlank
+    @Enumerated(EnumType.STRING)
     private ECategoryPrice categoryPrice;
+
+    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Sale> sales = new HashSet<>();
+
+    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Payment> payments = new HashSet<>();
+
+    private Double balance;
 
 }
