@@ -14,6 +14,6 @@ import java.util.Set;
 @NoArgsConstructor
 public class OrderListDto {
     private Long id;
-    private LocalDate orderdate;
+    private LocalDate orderDate;
     private Set<SaleDto> sales;
 }

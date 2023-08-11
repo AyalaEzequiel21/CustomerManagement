@@ -15,5 +15,6 @@ public class PaymentDto {
     private Long id;
     private LocalDate paymentDate;
     private ClientDto client;
+    private ReportDto report;
     private Double amount;
 }

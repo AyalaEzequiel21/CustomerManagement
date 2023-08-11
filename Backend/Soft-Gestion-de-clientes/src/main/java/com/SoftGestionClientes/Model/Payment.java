@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDate;
 
@@ -20,13 +21,17 @@ public class Payment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Temporal(TemporalType.TIMESTAMP)
+    @CreationTimestamp
     @Column(name = "payment_date")
     private LocalDate paymentDate;
 
     @ManyToOne
     @JoinColumn(name = "customer_id")
     private Client client;
+
+    @ManyToOne
+    @JoinColumn(name = "report_id")
+    private Report report;
 
     @NotBlank
     private Float amount;
