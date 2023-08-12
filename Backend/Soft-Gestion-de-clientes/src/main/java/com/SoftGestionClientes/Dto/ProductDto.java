@@ -15,4 +15,5 @@ public class ProductDto {
     private String description;
     private Double priceClient;
     private Double priceNoClient;
+    private boolean isActive;
 }

@@ -46,4 +46,6 @@ public class Client {
 
     private Double balance;
 
+    private boolean isActive;
+
 }

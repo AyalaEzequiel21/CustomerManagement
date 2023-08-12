@@ -22,4 +22,5 @@ public class ClientDto {
     private Set<SaleDto> sales;
     private Set<PaymentDto> payments;
     private Double balance;
+    private boolean isActive;
 }
