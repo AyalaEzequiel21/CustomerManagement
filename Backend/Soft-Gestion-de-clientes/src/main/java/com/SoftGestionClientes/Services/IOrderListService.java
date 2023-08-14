@@ -9,7 +9,7 @@ public interface IOrderListService {
     List<OrderListDto> getOrdersListByDate(LocalDate orderDate);
     List<OrderListDto> getAllOrdersList();
     OrderListDto createOrderList(OrderListDto orderList);
-    OrderListDto updateOrderList(OrderListDto oderList);
+    OrderListDto updateOrderList(OrderListDto orderList);
     OrderListDto getOrderListById(Long id);
     void deleteOrderListById(Long id);
 }
