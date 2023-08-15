@@ -12,6 +12,7 @@ import com.SoftGestionClientes.Utils.Converts.PaymentConverter;
 import com.SoftGestionClientes.Utils.DateValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -80,35 +81,111 @@ public class PaymentServiceImpl implements IPaymentService {
     /**
      * Create a payment
      * @param payment to register
-     * @return PaymentDto objects.
+     * @return PaymentDto object.
      */
+    @Transactional
     @Override
     public PaymentDto createPayment(PaymentDto payment) {
+        //validate that amount is positive
         if (payment.getAmount() < 0){
             throw new BadRequestException("Amount cannot be less that zero");
         }
-        Client clientSaved = clientRepository.findById(payment.getClient().getId()).orElseThrow(()-> new NotFoundException("The client are not registered or is inactive"));
-        if (!clientSaved.isActive()){
-             throw new NotFoundException("The client are not registered or is inactive");
-        }
-        clientSaved.setBalance(clientSaved.getBalance() - payment.getAmount());
-        clientRepository.save(clientSaved);
+        // get client registered and active
+        Client clientSaved = getClientAndValidate(payment.getClient().getId());
+        // update client balance
+        updateClientBalance(clientSaved, payment.getAmount(), false);
+        // save payment
         Payment paymentSaved = paymentRepository.save(paymentConverter.convertToEntity(payment, Payment.class));
+        // return dto of payment
         return paymentConverter.convertToDto(paymentSaved, PaymentDto.class);
     }
 
+    /**
+     * Update payment
+     * @param payment to update
+     * @return PaymentDto object.
+     */
+    @Transactional
     @Override
     public PaymentDto updatePayment(PaymentDto payment) {
-        return null;
+        //validate that amount is positive
+        if (payment.getAmount() < 0){
+            throw new BadRequestException("Amount cannot be less that zero");
+        }
+        // get existing payment or run a exception
+        Payment paymentSaved = paymentRepository.findById(payment.getId()).orElseThrow(()-> new NotFoundException("Payment not found"));
+        // get client registered and active
+        Client clientSaved = getClientAndValidate(payment.getClient().getId());
+        // Add the original amount from the customer's balance
+        updateClientBalance(clientSaved, paymentSaved.getAmount(), true);
+        // Subtract the new amount from the customer's balance
+        updateClientBalance(clientSaved, payment.getAmount(), false);
+        // update client balance
+        clientRepository.save(clientSaved);
+        // update the new amount on payment saved
+        paymentSaved.setAmount(payment.getAmount());
+        // save the payment with new amount
+        Payment newPayment = paymentRepository.save(paymentConverter.convertToEntity(payment, Payment.class));
+        // return dto of payment
+        return paymentConverter.convertToDto(newPayment, PaymentDto.class);
     }
 
+    /**
+     * get a payment by id
+     * @param id of payment
+     * @return PaymentDto object.
+     */
     @Override
     public PaymentDto getPaymentById(Long id) {
-        return null;
+        // find payment saved
+        Payment paymentSaved = paymentRepository.findById(id).orElseThrow(()-> new NotFoundException("Payment with id: " + id +" not found"));
+        //return dto of payment
+        return paymentConverter.convertToDto(paymentSaved, PaymentDto.class);
     }
 
+    /**
+     * delete a payment by id
+     * @param id of payment
+     *
+     */
     @Override
     public void deletePaymentById(Long id) {
+        // validate if exists a payment with that id
+        if (paymentRepository.existsById(id)){
+            // if exists then delete payment
+            paymentRepository.deleteById(id);
+        }
+    }
 
+    /**
+     * get a client by id and validate if is active and register
+     * receive the id client
+     *
+     */
+    private Client getClientAndValidate(Long id){
+        Client clientSaved = clientRepository.findById(id)
+                .orElseThrow(()-> new NotFoundException("The client are not registered or is inactive"));
+
+        if (!clientSaved.isActive()){
+            throw new NotFoundException("Client not found or is inactive");
+        }
+        return clientSaved;
+    }
+
+
+    /**
+     * update client balance
+     * receive a client a payment, amount and whether to add or subtract
+     *
+     */
+    private void updateClientBalance(Client client, double paymentAmount, boolean isAddition){
+        double newBalance;
+        if (isAddition){
+            newBalance = client.getBalance() + paymentAmount;
+        } else{
+            newBalance = client.getBalance() - paymentAmount;
+        }
+        client.setBalance(newBalance);
+        clientRepository.save(client);
     }
 }

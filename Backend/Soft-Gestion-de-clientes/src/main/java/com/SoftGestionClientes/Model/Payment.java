@@ -34,5 +34,5 @@ public class Payment {
     private Report report;
 
     @NotBlank
-    private Float amount;
+    private Double amount;
 }
