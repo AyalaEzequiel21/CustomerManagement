@@ -34,13 +34,17 @@ public class OrderListServiceImpl implements IOrderListService {
      */
     @Override
     public List<OrderListDto> getOrdersListByDate(LocalDate orderDate) {
+        // verify if the date is valid or run an exception
         if (!dateValidator.isDateBeforeToday(orderDate)){
             throw new BadRequestException("The date is not valid");
         }
+        // get orders by date
         List<OrderList> ordersSaved = orderListRepository.findByOrderDate(orderDate);
+        // if list is empty run an exception
         if (ordersSaved.isEmpty()){
             throw new NotFoundException("No order list found on that date");
         }
+        // returns a list with dtos of all orders
         return ordersSaved.stream().map(orderList -> orderListConverter.convertToDto(orderList, OrderListDto.class))
                 .collect(Collectors.toList());
     }
@@ -52,7 +56,9 @@ public class OrderListServiceImpl implements IOrderListService {
      */
     @Override
     public List<OrderListDto> getAllOrdersList() {
+        // get all orders
         List<OrderList> ordersSaved = orderListRepository.findAll();
+        // return a list with dtos of all orders
         return ordersSaved.stream().map(orderList -> orderListConverter.convertToDto(orderList, OrderListDto.class))
                 .collect(Collectors.toList());
     }
@@ -64,7 +70,9 @@ public class OrderListServiceImpl implements IOrderListService {
      */
     @Override
     public OrderListDto createOrderList(OrderListDto orderList) {
+        // save the order list
         OrderList orderListSaved = orderListRepository.save(orderListConverter.convertToEntity(orderList, OrderList.class));
+        // return the dto of order created
         return orderListConverter.convertToDto(orderListSaved, OrderListDto.class);
     }
 
@@ -75,13 +83,17 @@ public class OrderListServiceImpl implements IOrderListService {
      */
     @Override
     public OrderListDto updateOrderList(OrderListDto orderList) {
+        // if not exists an order with that id run an exception
         if (!orderListRepository.existsById(orderList.getId())){
             throw new NotFoundException("Order list not found with id: " + orderList.getId());
         }
+        // if date not valid run an exception
         if (!dateValidator.isDateBeforeToday(orderList.getOrderDate())){
             throw new BadRequestException("The date entered is not valid");
         }
+        // save the order updated
         OrderList orderListUpdated = orderListRepository.save(orderListConverter.convertToEntity(orderList, OrderList.class));
+        // return the dto of order updated
         return orderListConverter.convertToDto(orderListUpdated, OrderListDto.class);
     }
 
@@ -92,7 +104,9 @@ public class OrderListServiceImpl implements IOrderListService {
      */
     @Override
     public OrderListDto getOrderListById(Long id) {
+        // get order by id or run an exception if not exists
         OrderList orderSaved = orderListRepository.findById(id).orElseThrow(() -> new NotFoundException("Order list not found with id: " + id));
+        // return the dto of order found
         return orderListConverter.convertToDto(orderSaved, OrderListDto.class);
     }
 

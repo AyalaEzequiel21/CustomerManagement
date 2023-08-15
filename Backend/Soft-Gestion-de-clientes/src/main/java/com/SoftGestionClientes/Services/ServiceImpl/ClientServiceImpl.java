@@ -29,14 +29,16 @@ public class ClientServiceImpl implements IClientService {
      */
     @Override
     public List<ClientDto> getClientByName(String name) {
+        // get a list with clients with that name
         List<Client> clientsSaved = clientRepository.findByName(name);
-
+        // if the list is empty return an error
         if (clientsSaved.isEmpty()){
-            return clientsSaved.stream().filter(client -> client.isActive())
-                    .map(client -> clientConverter.convertToDto(client, ClientDto.class))
-                    .collect(Collectors.toList());
+            throw new NotFoundException("No clients found with that name.");
         }
-        throw new NotFoundException("No clients found with that name.");
+        // returns a list with dtos of all active clients filtered by her name
+        return clientsSaved.stream().filter(Client::isActive)
+                .map(client -> clientConverter.convertToDto(client, ClientDto.class))
+                .collect(Collectors.toList());
     }
 
     /**
@@ -46,8 +48,11 @@ public class ClientServiceImpl implements IClientService {
      */
     @Override
     public List<ClientDto> getAllClients() {
+        // get all clients saved
         List<Client> clientsSaved = clientRepository.findAll();
-        return clientsSaved.stream().filter(client -> client.isActive())
+
+        // returns a list with dtos of all active clients
+        return clientsSaved.stream().filter(Client::isActive)
                 .map(client -> clientConverter.convertToDto(client, ClientDto.class))
                 .collect(Collectors.toList());
     }
@@ -59,7 +64,9 @@ public class ClientServiceImpl implements IClientService {
      */
     @Override
     public List<ClientDto> getAllClientsInactive() {
+        // get all clients inactive
         List<Client> clientsInactive = clientRepository.findAllByIsActiveFalse();
+        // returns dtos of all clients inactive
         return clientsInactive.stream()
                 .map(client -> clientConverter.convertToDto(client, ClientDto.class))
                 .collect(Collectors.toList());
@@ -72,10 +79,13 @@ public class ClientServiceImpl implements IClientService {
      */
     @Override
     public ClientDto getClientById(Long id) {
+        // get a client by id or run an exception
         Client clientSaved = clientRepository.findById(id).orElseThrow(() -> new NotFoundException("No client found with id: " + id));
+        // validate if client is active
         if (!clientSaved.isActive()){
             throw new NotFoundException("Client with id: " + id +" is inactive");
         }
+        // return the dto of client found
         return clientConverter.convertToDto(clientSaved, ClientDto.class);
 
     }
@@ -87,11 +97,16 @@ public class ClientServiceImpl implements IClientService {
      */
     @Override
     public ClientDto createClient(ClientDto client) {
+        // create future client
         Client clientSaved;
+        // validate if the name has already been registered
         if (clientRepository.existsByName(client.getName())){
+            // if has been registered run an exception
             throw new AlreadyRegisterException("Name has already been registered");
         }
+        // the client created is saved
         clientSaved = clientRepository.save(clientConverter.convertToEntity(client, Client.class));
+        // return a dto of client created
         return clientConverter.convertToDto(clientSaved, ClientDto.class);
     }
 
@@ -102,12 +117,17 @@ public class ClientServiceImpl implements IClientService {
      */
     @Override
     public ClientDto updateClient(ClientDto client) {
+        // create future client updated
         Client clientUpdated;
-        if (clientRepository.existsById(client.getId())){
-            clientUpdated = clientRepository.save(clientConverter.convertToEntity(client, Client.class));
-            return clientConverter.convertToDto(clientUpdated, ClientDto.class);
+        // validate if client exists
+        if (!clientRepository.existsById(client.getId())){
+            // if not exists run an exception
+            throw new NotFoundException("No client found");
         }
-        throw new NotFoundException("No client found");
+        // if client exists then save the new client
+        clientUpdated = clientRepository.save(clientConverter.convertToEntity(client, Client.class));
+        // return the dto of client updated
+        return clientConverter.convertToDto(clientUpdated, ClientDto.class);
     }
 
     /**
@@ -117,8 +137,12 @@ public class ClientServiceImpl implements IClientService {
      */
     @Override
     public void deleteClientById(Long id) {
-        Client clientSaved = clientRepository.findById(id).orElseThrow(() -> new NotFoundException("No client found with id: " + id));
+        // get the client by id, if not exists run an exception
+        Client clientSaved = clientRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("No client found with id: " + id));
+        // modify client as inactive
         clientSaved.setActive(false);
+        // save client modified
         clientRepository.save(clientSaved);
     }
 }
