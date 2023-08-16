@@ -20,7 +20,6 @@ import java.util.stream.Collectors;
 
 @Service
 public class PaymentServiceImpl implements IPaymentService {
-
     @Autowired
     IClientRepository clientRepository;
 
@@ -164,7 +163,7 @@ public class PaymentServiceImpl implements IPaymentService {
      */
     private Client getClientAndValidate(Long id){
         Client clientSaved = clientRepository.findById(id)
-                .orElseThrow(()-> new NotFoundException("The client are not registered or is inactive"));
+                .orElseThrow(()-> new NotFoundException("Client not found or is inactive"));
 
         if (!clientSaved.isActive()){
             throw new NotFoundException("Client not found or is inactive");

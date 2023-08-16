@@ -50,7 +50,10 @@ public class ClientServiceImpl implements IClientService {
     public List<ClientDto> getAllClients() {
         // get all clients saved
         List<Client> clientsSaved = clientRepository.findAll();
-
+        //validate if the list is empty run an exception
+        if (clientsSaved.isEmpty()){
+            throw new NotFoundException("Clients not found");
+        }
         // returns a list with dtos of all active clients
         return clientsSaved.stream().filter(Client::isActive)
                 .map(client -> clientConverter.convertToDto(client, ClientDto.class))
