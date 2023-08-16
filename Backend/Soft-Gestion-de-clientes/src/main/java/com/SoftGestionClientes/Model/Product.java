@@ -28,5 +28,5 @@ public class Product {
     @NotBlank
     @Column(name = "price_no_client")
     private Double priceNoClient;
-    private boolean isActive;
+    private boolean isActive = true;
 }

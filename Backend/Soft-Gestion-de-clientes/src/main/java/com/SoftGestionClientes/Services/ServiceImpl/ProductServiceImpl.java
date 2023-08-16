@@ -1,11 +1,14 @@
 package com.SoftGestionClientes.Services.ServiceImpl;
 
 import com.SoftGestionClientes.Dto.ProductDto;
+import com.SoftGestionClientes.Exception.AlreadyRegisterException;
+import com.SoftGestionClientes.Exception.BadRequestException;
 import com.SoftGestionClientes.Exception.NotFoundException;
 import com.SoftGestionClientes.Model.Product;
 import com.SoftGestionClientes.Repository.IProductRepository;
 import com.SoftGestionClientes.Services.IProductService;
 import com.SoftGestionClientes.Utils.Converts.ProductConverter;
+import com.SoftGestionClientes.Utils.ProductUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +17,9 @@ import java.util.stream.Collectors;
 
 @Service
 public class ProductServiceImpl implements IProductService {
+    @Autowired
+    ProductUtils productUtils;
+
     @Autowired
     IProductRepository productRepository;
 
@@ -60,31 +66,78 @@ public class ProductServiceImpl implements IProductService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Retrieves an active product as DTO.
+     * @param id product
+     * @return ProductDto object representing active products.
+     */
     @Override
     public ProductDto getProductById(Long id) {
-        return null;
+        // get the product saved by id or run an exception if the product is not found or inactive
+        Product productSaved = productUtils.getProductAndValidate(id);
+        //return dto of product saved
+        return productConverter.convertToDto(productSaved, ProductDto.class);
     }
 
+    /**
+     * Create a product.
+     * @param product to save
+     * @return ProductDto object representing the product created.
+     */
     @Override
     public ProductDto registerProduct(ProductDto product) {
-        return null;
+        // Validates if a product with the same name already exists
+        if (productRepository.existsByName(product.getName())){
+            throw new AlreadyRegisterException("There is already a product with that name");
+        }
+        // Validates that the prices are greater than 0
+        if (!productUtils.validatePrices(product)){
+            throw new BadRequestException("The prices cannot be less that 0");
+        }
+        // Save the product
+        Product productSaved = productRepository.save(productConverter.convertToEntity(product, Product.class));
+        // return dto of product saved
+        return productConverter.convertToDto(productSaved, ProductDto.class);
     }
 
+    /**
+     * Update a product.
+     * @param product to update
+     * @return ProductDto object representing the product updated.
+     */
     @Override
     public ProductDto updateProduct(ProductDto product) {
-        return null;
+        // Validate if exists a product with id of product-param or run an exception
+        if (!productRepository.existsById(product.getId())){
+            throw new NotFoundException("Product not found");
+        }
+        // Validates if a product with the same name already exists
+        if (productRepository.existsByName(product.getName())){
+            throw new AlreadyRegisterException("There is already a product with that name");
+        }
+        // Validates that the prices are greater than 0
+        if (!productUtils.validatePrices(product)){
+            throw new BadRequestException("The prices cannot be less that 0");
+        }
+        // Save the product updated
+        Product productSaved = productRepository.save(productConverter.convertToEntity(product, Product.class));
+        // return dto of product saved
+        return productConverter.convertToDto(productSaved, ProductDto.class);
     }
 
+    /**
+     * Delete a product.
+     * @param id product to delete
+     *
+     */
     @Override
     public void deleteProductById(Long id) {
-
+        // get the product saved by id or run an exception if the product is not found or inactive
+        Product productSaved = productUtils.getProductAndValidate(id);
+        // modify status to inactive
+        productSaved.setActive(false);
+        // save the product modified
+        productRepository.save(productSaved);
     }
 
-    private Product getAndValidateProduct(Long id){
-        Product productSave = productRepository.findById(id).orElseThrow(()-> new NotFoundException("Product not found"));
-        if (!productSave.isActive()){
-            throw new NotFoundException("Product not found or inactive");
-        }
-        return productSave;
-    }
 }
