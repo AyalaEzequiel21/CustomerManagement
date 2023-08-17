@@ -8,6 +8,7 @@ import com.SoftGestionClientes.Model.Payment;
 import com.SoftGestionClientes.Repository.IClientRepository;
 import com.SoftGestionClientes.Repository.IPaymentRepository;
 import com.SoftGestionClientes.Services.IPaymentService;
+import com.SoftGestionClientes.Utils.ClientUtils;
 import com.SoftGestionClientes.Utils.Converts.PaymentConverter;
 import com.SoftGestionClientes.Utils.DateValidator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,9 @@ import java.util.stream.Collectors;
 public class PaymentServiceImpl implements IPaymentService {
     @Autowired
     IClientRepository clientRepository;
+
+    @Autowired
+    ClientUtils clientUtils;
 
     @Autowired
     IPaymentRepository paymentRepository;
@@ -90,9 +94,9 @@ public class PaymentServiceImpl implements IPaymentService {
             throw new BadRequestException("Amount cannot be less that zero");
         }
         // get client registered and active
-        Client clientSaved = getClientAndValidate(payment.getClient().getId());
+        Client clientSaved = clientUtils.getClientAndValidate(payment.getClient().getId());
         // update client balance
-        updateClientBalance(clientSaved, payment.getAmount(), false);
+        clientUtils.updateClientBalance(clientSaved, payment.getAmount(), false);
         // save payment
         Payment paymentSaved = paymentRepository.save(paymentConverter.convertToEntity(payment, Payment.class));
         // return dto of payment
@@ -114,11 +118,11 @@ public class PaymentServiceImpl implements IPaymentService {
         // get existing payment or run a exception
         Payment paymentSaved = paymentRepository.findById(payment.getId()).orElseThrow(()-> new NotFoundException("Payment not found"));
         // get client registered and active
-        Client clientSaved = getClientAndValidate(payment.getClient().getId());
+        Client clientSaved = clientUtils.getClientAndValidate(payment.getClient().getId());
         // Add the original amount from the customer's balance
-        updateClientBalance(clientSaved, paymentSaved.getAmount(), true);
+        clientUtils.updateClientBalance(clientSaved, paymentSaved.getAmount(), true);
         // Subtract the new amount from the customer's balance
-        updateClientBalance(clientSaved, payment.getAmount(), false);
+        clientUtils.updateClientBalance(clientSaved, payment.getAmount(), false);
         // update client balance
         clientRepository.save(clientSaved);
         // update the new amount on payment saved
@@ -154,37 +158,5 @@ public class PaymentServiceImpl implements IPaymentService {
             // if exists then delete payment
             paymentRepository.deleteById(id);
         }
-    }
-
-    /**
-     * get a client by id and validate if is active and register
-     * receive the id client
-     *
-     */
-    private Client getClientAndValidate(Long id){
-        Client clientSaved = clientRepository.findById(id)
-                .orElseThrow(()-> new NotFoundException("Client not found or is inactive"));
-
-        if (!clientSaved.isActive()){
-            throw new NotFoundException("Client not found or is inactive");
-        }
-        return clientSaved;
-    }
-
-
-    /**
-     * update client balance
-     * receive a client a payment, amount and whether to add or subtract
-     *
-     */
-    private void updateClientBalance(Client client, double paymentAmount, boolean isAddition){
-        double newBalance;
-        if (isAddition){
-            newBalance = client.getBalance() + paymentAmount;
-        } else{
-            newBalance = client.getBalance() - paymentAmount;
-        }
-        client.setBalance(newBalance);
-        clientRepository.save(client);
     }
 }

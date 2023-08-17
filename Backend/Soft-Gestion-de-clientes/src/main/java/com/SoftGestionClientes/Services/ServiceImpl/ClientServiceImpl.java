@@ -6,6 +6,7 @@ import com.SoftGestionClientes.Exception.NotFoundException;
 import com.SoftGestionClientes.Model.Client;
 import com.SoftGestionClientes.Repository.IClientRepository;
 import com.SoftGestionClientes.Services.IClientService;
+import com.SoftGestionClientes.Utils.ClientUtils;
 import com.SoftGestionClientes.Utils.Converts.ClientConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,9 @@ public class ClientServiceImpl implements IClientService {
 
     @Autowired
     IClientRepository clientRepository;
+
+    @Autowired
+    ClientUtils clientUtils;
 
     @Autowired
     ClientConverter clientConverter;
@@ -83,11 +87,7 @@ public class ClientServiceImpl implements IClientService {
     @Override
     public ClientDto getClientById(Long id) {
         // get a client by id or run an exception
-        Client clientSaved = clientRepository.findById(id).orElseThrow(() -> new NotFoundException("Client not found with id: " + id));
-        // validate if client is active
-        if (!clientSaved.isActive()){
-            throw new NotFoundException("Client with id: " + id +" is inactive");
-        }
+        Client clientSaved = clientUtils.getClientAndValidate(id);
         // return the dto of client found
         return clientConverter.convertToDto(clientSaved, ClientDto.class);
 
@@ -141,8 +141,7 @@ public class ClientServiceImpl implements IClientService {
     @Override
     public void deleteClientById(Long id) {
         // get the client by id, if not exists run an exception
-        Client clientSaved = clientRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Client not found with id: " + id));
+        Client clientSaved = clientUtils.getClientAndValidate(id);
         // modify client as inactive
         clientSaved.setActive(false);
         // save client modified
