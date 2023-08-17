@@ -1,5 +1,6 @@
 package com.SoftGestionClientes.Model;
 
+import com.SoftGestionClientes.Enums.EPaymentMethod;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
@@ -35,4 +36,7 @@ public class Payment {
 
     @NotBlank
     private Double amount;
+    
+    @NotBlank
+    private EPaymentMethod paymentMethod;
 }

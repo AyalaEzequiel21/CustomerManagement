@@ -1,6 +1,7 @@
 package com.SoftGestionClientes.Services.ServiceImpl;
 
 import com.SoftGestionClientes.Dto.PaymentDto;
+import com.SoftGestionClientes.Enums.EPaymentMethod;
 import com.SoftGestionClientes.Exception.BadRequestException;
 import com.SoftGestionClientes.Exception.NotFoundException;
 import com.SoftGestionClientes.Model.Client;
@@ -77,6 +78,24 @@ public class PaymentServiceImpl implements IPaymentService {
         if (paymentsSaved.isEmpty()){
             throw new NotFoundException("No payment found on that date");
         }
+        return paymentsSaved.stream().map(payment -> paymentConverter.convertToDto(payment, PaymentDto.class))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Retrieves a list of payments as DTOs for a specific payment method.
+     * @param paymentMethod of payment
+     * @return List of PaymentDto objects.
+     */
+    @Override
+    public List<PaymentDto> getPaymentsByPaymentMethod(EPaymentMethod paymentMethod) {
+        // get all payments by her payment method
+        List<Payment> paymentsSaved = paymentRepository.findByPaymentMethod(paymentMethod);
+        // validate if the list is empty or run an exception
+        if (paymentsSaved.isEmpty()){
+            throw new NotFoundException("No payment found on that payment method");
+        }
+        // returns a list with dtos of payments filtered by payment method
         return paymentsSaved.stream().map(payment -> paymentConverter.convertToDto(payment, PaymentDto.class))
                 .collect(Collectors.toList());
     }

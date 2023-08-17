@@ -1,5 +1,6 @@
 package com.SoftGestionClientes.Dto;
 
+import com.SoftGestionClientes.Enums.EPaymentMethod;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,4 +18,5 @@ public class PaymentDto {
     private ClientDto client;
     private ReportDto report;
     private Double amount;
+    private EPaymentMethod paymentMethod;
 }
