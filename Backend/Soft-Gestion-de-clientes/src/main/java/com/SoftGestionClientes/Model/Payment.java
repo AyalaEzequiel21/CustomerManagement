@@ -36,7 +36,7 @@ public class Payment {
 
     @NotBlank
     private Double amount;
-    
+
     @NotBlank
     private EPaymentMethod paymentMethod;
 }

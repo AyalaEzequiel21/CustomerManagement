@@ -1,0 +1,4 @@
+para implementar el report service
+
+la ultima idea fue agregar atributo status a report, cuando un delivery cree un reporte, dicho atributo sera inavalid y no cambiara hasta que un biller lo valide, la lista de pagos solo contendra date y amount pero no sera persistido.
+Una vez validado por el biller se crearan los pagos en la base de datos y se modificara los saldos en los clientes.
