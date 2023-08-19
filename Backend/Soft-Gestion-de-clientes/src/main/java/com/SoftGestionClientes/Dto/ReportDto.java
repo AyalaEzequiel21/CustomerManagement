@@ -1,5 +1,6 @@
 package com.SoftGestionClientes.Dto;
 
+import com.SoftGestionClientes.Enums.EReportStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,4 +17,5 @@ public class ReportDto {
     private Long id;
     private LocalDate reportDate;
     private Set<PaymentDto> payments;
+    private EReportStatus status;
 }
