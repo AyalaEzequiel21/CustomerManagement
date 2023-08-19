@@ -1,5 +1,6 @@
 package com.SoftGestionClientes.Model;
 
+import com.SoftGestionClientes.Enums.EReportStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -28,4 +29,7 @@ public class Report {
 
     @OneToMany(mappedBy = "report", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Payment> payments = new HashSet<>();
+
+    @Enumerated(EnumType.STRING)
+    private EReportStatus status;
 }
