@@ -3,7 +3,6 @@ package com.SoftGestionClientes.Services.ServiceImpl;
 import com.SoftGestionClientes.Dto.ReportDto;
 import com.SoftGestionClientes.Enums.EReportStatus;
 import com.SoftGestionClientes.Enums.ERole;
-import com.SoftGestionClientes.Exception.BadRequestException;
 import com.SoftGestionClientes.Exception.NotFoundException;
 import com.SoftGestionClientes.Model.Report;
 import com.SoftGestionClientes.Repository.IReportRepository;
@@ -101,6 +100,11 @@ public class ReportServiceImpl implements IReportService {
         return reportDto;
     }
 
+    /**
+     * update a report.
+     * @param report to update and userRole
+     * @return Dto of report updated.
+     */
     @Override
     public ReportDto updateReport(ReportDto report, ERole userRole) {
         // validate if the list of payments is empty, if it is an exception is executed
@@ -118,13 +122,32 @@ public class ReportServiceImpl implements IReportService {
         return reportConverter.convertToDto(reportUpdated, ReportDto.class);
     }
 
+    /**
+     * find a report.
+     * @param id of report
+     * @return Dto of report founded.
+     */
     @Override
     public ReportDto getReportById(Long id) {
-        return null;
+        // get a report by id or run an exception if report is not found
+        Report reportSaved = reportRepository.findById(id).orElseThrow(() -> new NotFoundException("Report not found"));
+        // return dto of payment
+        return reportConverter.convertToDto(reportSaved, ReportDto.class);
     }
 
+    /**
+     * delete a report.
+     * @param id of report to delete
+     *
+     */
     @Override
     public void deleteReportById(Long id) {
+        // verify if exists the report or run an exception
+        if (!reportRepository.existsById(id)){
+            throw new NotFoundException("Report not found");
+        }
+        // delete report by id
+        reportRepository.deleteById(id);
 
     }
 }

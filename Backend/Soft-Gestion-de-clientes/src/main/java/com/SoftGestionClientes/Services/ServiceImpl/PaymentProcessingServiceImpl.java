@@ -9,10 +9,12 @@ import com.SoftGestionClientes.Exception.PaymentProcessingException;
 import com.SoftGestionClientes.Repository.IClientRepository;
 import com.SoftGestionClientes.Services.IPaymentProcessingService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Set;
 
+@Service
 public class PaymentProcessingServiceImpl implements IPaymentProcessingService {
     @Autowired
     private PaymentServiceImpl paymentService;
