@@ -71,9 +71,7 @@ public class PaymentServiceImpl implements IPaymentService {
      */
     @Override
     public List<PaymentDto> getPaymentsByPaymentDate(LocalDate paymentDate) {
-        if (!dateValidator.isDateBeforeToday(paymentDate)){
-            throw new BadRequestException("The date is not valid");
-        }
+        dateValidator.isDateAfterToday(paymentDate);
         List<Payment> paymentsSaved = paymentRepository.findByPaymentDate(paymentDate);
         if (paymentsSaved.isEmpty()){
             throw new NotFoundException("No payment found on that date");

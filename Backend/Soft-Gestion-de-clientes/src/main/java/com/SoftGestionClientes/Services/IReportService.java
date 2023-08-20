@@ -10,7 +10,7 @@ public interface IReportService {
     List<ReportDto> getReportByDate(LocalDate reportDate);
     List<ReportDto> getAllReports();
     ReportDto createReport(ReportDto report, ERole userRole);
-    ReportDto updateReport(ReportDto report);
+    ReportDto updateReport(ReportDto report, ERole userRole);
     ReportDto getReportById(Long id);
     void deleteReportById(Long id);
 }
