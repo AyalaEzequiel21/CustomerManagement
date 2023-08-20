@@ -26,4 +26,11 @@ public class RestExceptionHandler {
         ErrorResponseException errorResponse = new ErrorResponseException(HttpStatus.NOT_FOUND, ex);
         return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
     }
+    @ExceptionHandler(PaymentProcessingException.class)
+    public ResponseEntity<ErrorResponseException> handlePaymentProcessingException(PaymentProcessingException ex){
+        ErrorResponseException errorResponse = new ErrorResponseException(HttpStatus.NOT_IMPLEMENTED, ex);
+        return new ResponseEntity<>(errorResponse, HttpStatus.NOT_IMPLEMENTED);
+    }
+
+
 }
