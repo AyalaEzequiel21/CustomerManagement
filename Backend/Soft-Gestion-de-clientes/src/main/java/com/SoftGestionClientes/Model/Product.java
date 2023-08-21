@@ -24,9 +24,9 @@ public class Product {
     private String description;
     @NotBlank
     @Column(name = "price_client")
-    private Double priceClient;
+    private double priceClient;
     @NotBlank
     @Column(name = "price_no_client")
-    private Double priceNoClient;
+    private double priceNoClient;
     private boolean isActive = true;
 }

@@ -13,5 +13,6 @@ public class SaleDetailDto {
     private Long id;
     private SaleDto sale;
     private ProductDto product;
-    private Double quantity;
+    private double quantity;
+    private double provisionalTotal;
 }

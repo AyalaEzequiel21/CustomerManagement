@@ -1,6 +1,5 @@
 package com.SoftGestionClientes.Services.ServiceImpl;
 
-import com.SoftGestionClientes.Dto.ClientDto;
 import com.SoftGestionClientes.Dto.PaymentDto;
 import com.SoftGestionClientes.Dto.ReportDto;
 import com.SoftGestionClientes.Enums.EReportStatus;

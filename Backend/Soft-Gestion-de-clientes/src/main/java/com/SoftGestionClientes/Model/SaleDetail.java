@@ -28,5 +28,8 @@ public class SaleDetail {
     private Product product;
 
     @NotBlank
-    private Double quantity;
+    private double quantity;
+
+    @Column(name = "provisional_total")
+    private double provisionalTotal;
 }

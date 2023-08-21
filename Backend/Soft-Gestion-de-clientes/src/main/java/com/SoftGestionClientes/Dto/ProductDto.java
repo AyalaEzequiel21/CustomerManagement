@@ -13,7 +13,7 @@ public class ProductDto {
     private Long id;
     private String name;
     private String description;
-    private Double priceClient;
-    private Double priceNoClient;
+    private double priceClient;
+    private double priceNoClient;
     private boolean isActive;
 }
