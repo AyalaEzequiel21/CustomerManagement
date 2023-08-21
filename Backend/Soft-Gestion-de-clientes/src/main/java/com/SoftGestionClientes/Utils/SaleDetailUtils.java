@@ -1,6 +1,7 @@
 package com.SoftGestionClientes.Utils;
 
 import com.SoftGestionClientes.Dto.ClientDto;
+import com.SoftGestionClientes.Dto.ProductDto;
 import com.SoftGestionClientes.Dto.SaleDetailDto;
 import com.SoftGestionClientes.Enums.ECategoryPrice;
 import com.SoftGestionClientes.Exception.BadRequestException;
@@ -22,6 +23,12 @@ public class SaleDetailUtils {
     public void validateQuantity(double quantity){
         if (quantity < 0.0){
             throw new BadRequestException("The quantity cannot be less that zero");
+        }
+    }
+
+    public void validateIfProductIsActive(ProductDto product){
+        if (!product.isActive()){
+            throw new BadRequestException("The product joined is inactive");
         }
     }
 

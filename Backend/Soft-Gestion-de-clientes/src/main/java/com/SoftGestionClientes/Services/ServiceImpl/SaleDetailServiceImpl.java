@@ -2,6 +2,8 @@ package com.SoftGestionClientes.Services.ServiceImpl;
 
 import com.SoftGestionClientes.Dto.SaleDetailDto;
 import com.SoftGestionClientes.Exception.AlreadyRegisterException;
+import com.SoftGestionClientes.Exception.BadRequestException;
+import com.SoftGestionClientes.Exception.NotFoundException;
 import com.SoftGestionClientes.Model.SaleDetail;
 import com.SoftGestionClientes.Repository.ISaleDetailRepository;
 import com.SoftGestionClientes.Services.ISaleDetailService;
@@ -9,6 +11,7 @@ import com.SoftGestionClientes.Utils.Converts.SaleDetailConverter;
 import com.SoftGestionClientes.Utils.SaleDetailUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -49,9 +52,12 @@ public class SaleDetailServiceImpl implements ISaleDetailService {
      * @return a saleDetailDto of saleDetail created
      */
     @Override
+    @Transactional
     public SaleDetailDto createSaleDetail(SaleDetailDto saleDetail) {
         // check if quantity is valid
         saleDetailUtils.validateQuantity(saleDetail.getQuantity());
+        // check that the product is active
+        saleDetailUtils.validateIfProductIsActive(saleDetail.getProduct());
         // check if exists the saleDetail and run an exception
         if (saleDetailRepository.existsById(saleDetail.getId())){
             throw new AlreadyRegisterException("Sale detail has been registered");
@@ -72,17 +78,53 @@ public class SaleDetailServiceImpl implements ISaleDetailService {
      * @return a saleDetailDto of saleDetail updated
      */
     @Override
+    @Transactional
     public SaleDetailDto updateSaleDetail(SaleDetailDto saleDetail) {
-        return null;
+        // check if quantity is valid
+        saleDetailUtils.validateQuantity(saleDetail.getQuantity());
+        // check that the product is active
+        saleDetailUtils.validateIfProductIsActive(saleDetail.getProduct());
+        // get saleDetail saved
+        SaleDetail saleDetailSaved = saleDetailRepository.findById(saleDetail.getId()).orElseThrow(()-> new NotFoundException("Sale detail not found"));
+        // check that the client match in both sale detail
+        if (saleDetailSaved.getSale().getClient() != saleDetailConverter.convertToEntity(saleDetail, SaleDetail.class).getSale().getClient()){
+            throw new BadRequestException("The client does not match");
+        }
+        // get the provisional total of sale detail
+        double newProvisionalTotal = saleDetailUtils.getProvisionalTotal(saleDetail);
+        // set the new provisional total
+        saleDetail.setProvisionalTotal(newProvisionalTotal);
+        // save th sale detail
+        SaleDetail newSaleDetailSaved = saleDetailRepository.save(saleDetailConverter.convertToEntity(saleDetail, SaleDetail.class));
+        // returns the dto of sale detail created
+        return saleDetailConverter.convertToDto(newSaleDetailSaved, SaleDetailDto.class);
     }
 
+    /**
+     * get a sale detail by id.
+     * @param id of sale detail to find
+     * @return a saleDetailDto of saleDetail found
+     */
     @Override
     public SaleDetailDto getSaleDetailById(Long id) {
-        return null;
+        // get sale detail by id or run an exception if is not found
+        SaleDetail saleDetailSaved = saleDetailRepository.findById(id).orElseThrow(()-> new NotFoundException("Sale detail is not found"));
+        //return a dto of sale detail saved
+        return saleDetailConverter.convertToDto(saleDetailSaved, SaleDetailDto.class);
     }
 
+    /**
+     * delete a sale detail by id.
+     * @param id of sale detail to delete
+     *
+     */
     @Override
     public void deleteSaleDetailById(Long id) {
-
+        // first check if exists the sale detail else run an exception
+        if (!saleDetailRepository.existsById(id)){
+            throw new NotFoundException("Sale detail is not found");
+        }
+        //delete sale detail
+        saleDetailRepository.deleteById(id);
     }
 }
