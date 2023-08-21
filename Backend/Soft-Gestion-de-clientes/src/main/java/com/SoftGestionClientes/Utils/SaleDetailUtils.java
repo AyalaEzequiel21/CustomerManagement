@@ -3,16 +3,21 @@ package com.SoftGestionClientes.Utils;
 import com.SoftGestionClientes.Dto.ClientDto;
 import com.SoftGestionClientes.Dto.ProductDto;
 import com.SoftGestionClientes.Dto.SaleDetailDto;
+import com.SoftGestionClientes.Dto.SaleDto;
 import com.SoftGestionClientes.Enums.ECategoryPrice;
 import com.SoftGestionClientes.Exception.BadRequestException;
 import com.SoftGestionClientes.Exception.NotFoundException;
 import com.SoftGestionClientes.Model.SaleDetail;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 @Component
 public class SaleDetailUtils {
+
+    @Autowired
+    SaleUtils saleUtils;
 
     public void validateList(List<SaleDetail> salesDetail){
         if (salesDetail.isEmpty()){
@@ -30,6 +35,10 @@ public class SaleDetailUtils {
         if (!product.isActive()){
             throw new BadRequestException("The product joined is inactive");
         }
+    }
+
+    public void validateIfExistsSale(SaleDto sale){
+        saleUtils.validateSale(sale);
     }
 
     public double getProvisionalTotal(SaleDetailDto saleDetail){

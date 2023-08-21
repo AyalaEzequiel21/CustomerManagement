@@ -32,4 +32,10 @@ public class Sale {
 
     @OneToMany(mappedBy = "sale", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<SaleDetail> detail = new HashSet<>();
+
+    private double totalSale;
+
+    @OneToOne(mappedBy = "sale", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Payment payment;
+
 }

@@ -17,4 +17,6 @@ public class SaleDto {
     private LocalDate saleDate;
     private ClientDto client;
     private Set<SaleDetailDto> detail;
+    private double totalSale;
+    private PaymentDto payment;
 }

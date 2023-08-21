@@ -62,6 +62,8 @@ public class SaleDetailServiceImpl implements ISaleDetailService {
         if (saleDetailRepository.existsById(saleDetail.getId())){
             throw new AlreadyRegisterException("Sale detail has been registered");
         }
+        //check if sale exists
+        saleDetailUtils.validateIfExistsSale(saleDetail.getSale());
         // get the provisional total of sale detail
         double newProvisionalTotal = saleDetailUtils.getProvisionalTotal(saleDetail);
         // set the new provisional total
@@ -89,6 +91,9 @@ public class SaleDetailServiceImpl implements ISaleDetailService {
         // check that the client match in both sale detail
         if (saleDetailSaved.getSale().getClient() != saleDetailConverter.convertToEntity(saleDetail, SaleDetail.class).getSale().getClient()){
             throw new BadRequestException("The client does not match");
+        }// check that the sale match in both sale detail
+        if (!saleDetailSaved.getSale().getId().equals(saleDetail.getId())){
+            throw new BadRequestException("The sale does not match");
         }
         // get the provisional total of sale detail
         double newProvisionalTotal = saleDetailUtils.getProvisionalTotal(saleDetail);

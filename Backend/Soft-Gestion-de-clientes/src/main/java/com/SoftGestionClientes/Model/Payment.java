@@ -39,4 +39,9 @@ public class Payment {
 
     @NotBlank
     private EPaymentMethod paymentMethod;
+
+    @OneToOne
+    @JoinColumn(name = "sale_id")
+    private Sale sale;
+
 }
