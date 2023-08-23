@@ -1,6 +1,8 @@
 package com.SoftGestionClientes.Services.ServiceImpl;
 
 import com.SoftGestionClientes.Dto.SaleDto;
+import com.SoftGestionClientes.Exception.BadRequestException;
+import com.SoftGestionClientes.Exception.NotFoundException;
 import com.SoftGestionClientes.Model.Sale;
 import com.SoftGestionClientes.Repository.ISaleRepository;
 import com.SoftGestionClientes.Services.ISaleService;
@@ -9,6 +11,7 @@ import com.SoftGestionClientes.Utils.DateValidator;
 import com.SoftGestionClientes.Utils.SaleUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -89,20 +92,75 @@ public class SaleServiceImpl implements ISaleService {
      * @return a dto of sale created.
      */
     @Override
+    @Transactional
     public SaleDto registerSale(SaleDto sale) {
-        return null;
+        // check if exists the client
+        saleUtils.validateClient(sale.getClient().getId());
+        // check if the saleDetails is not empty
+        saleUtils.validateSetDetails(sale.getDetail());
+        // get the total sale
+        double totalSale = saleUtils.getTotalSale(sale.getDetail());
+        //set the new totalSale
+        sale.setTotalSale(totalSale);
+        // save the sale
+        Sale saleSaved = saleRepository.save(saleConverter.convertToEntity(sale, Sale.class));
+        // add total sale to balance client
+        saleUtils.addTotalSaleToBalance(saleSaved);
+        // if exists any payment, process payment
+        if (sale.getPayment() != null){
+            saleUtils.processPayment(sale.getPayment());
+        }
+        //returns dto of sale created
+        return saleConverter.convertToDto(saleSaved, SaleDto.class);
     }
 
+    /**
+     * Update a sale.
+     * @param  sale to update
+     * @return a dto of sale updated.
+     */
     @Override
+    @Transactional
     public SaleDto updaterSale(SaleDto sale) {
-        return null;
+        // get the last version saved
+        Sale saleSaved = saleRepository.findById(sale.getId()).orElseThrow(() -> new NotFoundException("Sale not found"));
+        // check if match bot clients, the saved and the new
+        if (!sale.getClient().getId().equals(saleSaved.getClient().getId())){
+            throw new BadRequestException("The client does not match");
+        }
+        // check if the list is not empty
+        saleUtils.validateSetDetails(sale.getDetail());
+        // subtract the last total to balance client
+        saleUtils.subtractTotalSaleToBalance(saleSaved);
+        // get the total sale
+        double totalSale = saleUtils.getTotalSale(sale.getDetail());
+        // set the new total
+        sale.setTotalSale(totalSale);
+        // save the sale updated
+        Sale saleUpdatedSaved = saleRepository.save(saleConverter.convertToEntity(sale, Sale.class));
+        // add total sale to balance client
+        saleUtils.addTotalSaleToBalance(saleUpdatedSaved);
+        // returns a dto of sale updated
+        return saleConverter.convertToDto(saleUpdatedSaved, SaleDto.class);
     }
 
+    /**
+     * Retrieves a salle by id.
+     * @param  id of sale to find
+     * @return a dto of sale found.
+     */
     @Override
     public SaleDto getSaleById(Long id) {
-        return null;
+        // get the sale by id
+        Sale saleSaved = saleRepository.findById(id).orElseThrow(() -> new NotFoundException("Sale not found"));
+        // returns a dto ofm sale found
+        return saleConverter.convertToDto(saleSaved, SaleDto.class);
     }
 
+    /**
+     * Delete a salle by id.
+     * @param  id of sale to delete
+     */
     @Override
     public void deleteSaleById(Long id) {
 

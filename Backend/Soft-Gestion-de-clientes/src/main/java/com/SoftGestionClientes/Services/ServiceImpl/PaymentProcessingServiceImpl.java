@@ -36,6 +36,11 @@ public class PaymentProcessingServiceImpl implements IPaymentProcessingService {
         }
     }
 
+    @Override
+    public void precessAPayment(PaymentDto payment) {
+
+    }
+
     private void processingSinglePayment(PaymentDto payment){
         // validate if client exists
         validateClient(payment.getClient().getId());
