@@ -1,16 +1,22 @@
 package com.SoftGestionClientes.Utils;
 
+import com.SoftGestionClientes.Dto.ClientDto;
+import com.SoftGestionClientes.Exception.BadRequestException;
 import com.SoftGestionClientes.Exception.NotFoundException;
 import com.SoftGestionClientes.Model.Client;
 import com.SoftGestionClientes.Repository.IClientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Component
 public class ClientUtils {
 
     @Autowired
     IClientRepository clientRepository;
+
 
     /**
      * get a client by id and validate if is active and register
@@ -27,6 +33,20 @@ public class ClientUtils {
         return clientSaved;
     }
 
+    public List<Client> filterClientsActive(List<Client> clients){
+        return clients.stream().filter(Client::isActive)
+                .collect(Collectors.toList());
+    }
+
+    public void validateAttributesClient(ClientDto client){
+        if (client.getBalance() < 0.0){
+            throw new BadRequestException("The balance cannot be less that 0");
+        }
+        if (!client.isActive()){
+            throw new BadRequestException("Cannot create a client inactive");
+        }
+    }
+
     /**
      * update client balance
      * receive a client a payment, amount and whether to add or subtract
@@ -41,5 +61,11 @@ public class ClientUtils {
         }
         client.setBalance(newBalance);
         clientRepository.save(client);
+    }
+
+    public void validateList(List<Client> clients){
+        if (clients.isEmpty()){
+            throw new NotFoundException("Clients not found");
+        }
     }
 }

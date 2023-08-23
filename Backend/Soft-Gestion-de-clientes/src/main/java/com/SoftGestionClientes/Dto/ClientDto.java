@@ -21,6 +21,6 @@ public class ClientDto {
     private ECategoryPrice category;
     private Set<SaleDto> sales;
     private Set<PaymentDto> payments;
-    private Double balance;
+    private double balance;
     private boolean isActive;
 }

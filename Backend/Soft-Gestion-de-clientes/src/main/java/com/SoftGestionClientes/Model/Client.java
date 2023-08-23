@@ -44,8 +44,8 @@ public class Client {
     @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Payment> payments = new HashSet<>();
 
-    private Double balance;
+    private double balance = 0.0;
 
-    private boolean isActive;
+    private boolean isActive = true;
 
 }

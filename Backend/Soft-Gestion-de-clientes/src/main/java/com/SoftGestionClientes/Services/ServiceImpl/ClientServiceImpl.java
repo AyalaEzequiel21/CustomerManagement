@@ -35,12 +35,12 @@ public class ClientServiceImpl implements IClientService {
     public List<ClientDto> getClientByName(String name) {
         // get a list with clients with that name
         List<Client> clientsSaved = clientRepository.findByName(name);
-        // if the list is empty return an error
-        if (clientsSaved.isEmpty()){
-            throw new NotFoundException("Clients not found with that name.");
-        }
+        // check if the lis is not empty
+        clientUtils.validateList(clientsSaved);
+        //get clients active
+        List<Client> clientsActive = clientUtils.filterClientsActive(clientsSaved);
         // returns a list with dtos of all active clients filtered by her name
-        return clientsSaved.stream().filter(Client::isActive)
+        return clientsActive.stream()
                 .map(client -> clientConverter.convertToDto(client, ClientDto.class))
                 .collect(Collectors.toList());
     }
@@ -55,11 +55,11 @@ public class ClientServiceImpl implements IClientService {
         // get all clients saved
         List<Client> clientsSaved = clientRepository.findAll();
         //validate if the list is empty run an exception
-        if (clientsSaved.isEmpty()){
-            throw new NotFoundException("Clients not found");
-        }
+        clientUtils.validateList(clientsSaved);
+        //get the active clients
+        List<Client> clientsActive = clientUtils.filterClientsActive(clientsSaved);
         // returns a list with dtos of all active clients
-        return clientsSaved.stream().filter(Client::isActive)
+        return clientsActive.stream()
                 .map(client -> clientConverter.convertToDto(client, ClientDto.class))
                 .collect(Collectors.toList());
     }
@@ -100,15 +100,15 @@ public class ClientServiceImpl implements IClientService {
      */
     @Override
     public ClientDto createClient(ClientDto client) {
-        // create future client
-        Client clientSaved;
         // validate if the name has already been registered
         if (clientRepository.existsByName(client.getName())){
             // if has been registered run an exception
             throw new AlreadyRegisterException("The name has already been registered");
         }
+        //check attributes of client
+        clientUtils.validateAttributesClient(client);
         // the client created is saved
-        clientSaved = clientRepository.save(clientConverter.convertToEntity(client, Client.class));
+        Client clientSaved  = clientRepository.save(clientConverter.convertToEntity(client, Client.class));
         // return a dto of client created
         return clientConverter.convertToDto(clientSaved, ClientDto.class);
     }
@@ -120,15 +120,15 @@ public class ClientServiceImpl implements IClientService {
      */
     @Override
     public ClientDto updateClient(ClientDto client) {
-        // create future client updated
-        Client clientUpdated;
         // validate if client exists
         if (!clientRepository.existsById(client.getId())){
             // if not exists run an exception
             throw new NotFoundException("Client not found");
         }
+        //check attributes of client
+        clientUtils.validateAttributesClient(client);
         // if client exists then save the new client
-        clientUpdated = clientRepository.save(clientConverter.convertToEntity(client, Client.class));
+        Client clientUpdated = clientRepository.save(clientConverter.convertToEntity(client, Client.class));
         // return the dto of client updated
         return clientConverter.convertToDto(clientUpdated, ClientDto.class);
     }

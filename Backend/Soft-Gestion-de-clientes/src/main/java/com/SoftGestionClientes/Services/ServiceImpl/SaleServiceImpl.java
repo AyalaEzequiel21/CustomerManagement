@@ -163,6 +163,6 @@ public class SaleServiceImpl implements ISaleService {
      */
     @Override
     public void deleteSaleById(Long id) {
-
+        saleUtils.processDelete(id);
     }
 }
