@@ -19,4 +19,5 @@ public class PaymentDto {
     private ReportDto report;
     private Double amount;
     private EPaymentMethod paymentMethod;
+    private SaleDto sale;
 }
