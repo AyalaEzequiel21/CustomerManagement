@@ -70,10 +70,10 @@ public class ClientServiceImpl implements IClientService {
     public List<ClientDto> getAllClients() {
         // get all clients saved
         List<Client> clientsSaved = clientRepository.findAll();
-        //validate if the list is empty run an exception
-        clientUtils.validateList(clientsSaved);
         //get the active clients
         List<Client> clientsActive = clientUtils.filterClientsActive(clientsSaved);
+        //validate if the list is empty run an exception
+        clientUtils.validateList(clientsActive);
         // returns a list with dtos of all active clients
         return clientsActive.stream()
                 .map(client -> clientConverter.convertToDto(client, ClientDto.class))
@@ -137,9 +137,7 @@ public class ClientServiceImpl implements IClientService {
      * @return a ClientDto object representing active client.
      */
     @Override
-    public ClientDto updateClient(ClientDto client, ERole userRole) {
-        // check if role has authorization
-        clientUtils.validateRoleUser(userRole);
+    public ClientDto updateClient(ClientDto client) {
         // validate if client exists
         if (!clientRepository.existsById(client.getId())){
             // if not exists run an exception

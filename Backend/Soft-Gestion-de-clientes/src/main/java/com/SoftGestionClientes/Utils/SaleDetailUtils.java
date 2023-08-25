@@ -53,6 +53,6 @@ public class SaleDetailUtils {
     }
 
     private ECategoryPrice getCategory(ClientDto client){
-        return client.getCategory();
+        return client.getCategoryPrice();
     }
 }

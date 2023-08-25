@@ -35,9 +35,9 @@ public class SaleDetailServiceImpl implements ISaleDetailService {
      * @return a List of ReportDto objects representing all sales detail of a sale.
      */
     @Override
-    public List<SaleDetailDto> getAllSaleDetailsBySale(Long saleId) {
+    public List<SaleDetailDto> getAllSaleDetailsBySaleId(Long saleId) {
         // get all sale details of a sale
-        List<SaleDetail> saleDetailsSaved = saleDetailRepository.findBySale(saleId);
+        List<SaleDetail> saleDetailsSaved = saleDetailRepository.findBySaleId(saleId);
         // check if the list is empty and run an exception
         saleDetailUtils.validateList(saleDetailsSaved);
         // returns a list with dtos of all sale details

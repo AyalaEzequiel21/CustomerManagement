@@ -3,10 +3,7 @@ package com.SoftGestionClientes.Model;
 import com.SoftGestionClientes.Enums.ECategoryPrice;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDate;
@@ -19,7 +16,7 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "clients")
+@Table(name = "client")
 public class Client {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,7 +31,7 @@ public class Client {
     @NotBlank
     private String phone;
 
-    @NotBlank
+    @NonNull
     @Enumerated(EnumType.STRING)
     private ECategoryPrice categoryPrice;
 

@@ -14,6 +14,6 @@ public interface IClientService {
     List<ClientDto> getAllClientsInactive();
     ClientDto getClientById(Long id);
     ClientDto createClient(ClientDto client, ERole userRole);
-    ClientDto updateClient(ClientDto client, ERole userRole);
+    ClientDto updateClient(ClientDto client);
     void deleteClientById(Long id, ERole userRole);
 }

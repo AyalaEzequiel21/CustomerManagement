@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.Set;
 
 @Data
@@ -18,9 +19,9 @@ public class ClientDto {
     private LocalDate registerDate;
     private String name;
     private String phone;
-    private ECategoryPrice category;
-    private Set<SaleDto> sales;
-    private Set<PaymentDto> payments;
-    private double balance;
-    private boolean isActive;
+    private ECategoryPrice categoryPrice;
+    private Set<SaleDto> sales = new HashSet<>();
+    private Set<PaymentDto> payments = new HashSet<>();
+    private double balance = 0.0;
+    private boolean isActive = true;
 }
