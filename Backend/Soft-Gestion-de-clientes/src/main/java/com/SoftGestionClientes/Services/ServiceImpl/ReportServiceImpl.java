@@ -21,19 +21,19 @@ import java.util.stream.Collectors;
 public class ReportServiceImpl implements IReportService {
 
     @Autowired
-    DateValidator dateValidator;
+    private DateValidator dateValidator;
 
     @Autowired
-    IReportRepository reportRepository;
+    private IReportRepository reportRepository;
 
     @Autowired
-    ReportConverter reportConverter;
+    private ReportConverter reportConverter;
 
     @Autowired
-    ReportUtils reportUtils;
+    private ReportUtils reportUtils;
 
     @Autowired
-    PaymentProcessingServiceImpl paymentProcessingService;
+    private PaymentProcessingServiceImpl paymentProcessingService;
 
     /**
      * Retrieves a list of reports by a date.

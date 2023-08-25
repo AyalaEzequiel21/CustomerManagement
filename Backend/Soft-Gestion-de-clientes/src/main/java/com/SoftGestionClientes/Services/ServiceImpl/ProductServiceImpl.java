@@ -18,13 +18,13 @@ import java.util.stream.Collectors;
 @Service
 public class ProductServiceImpl implements IProductService {
     @Autowired
-    ProductUtils productUtils;
+    private ProductUtils productUtils;
 
     @Autowired
-    IProductRepository productRepository;
+    private IProductRepository productRepository;
 
     @Autowired
-    ProductConverter productConverter;
+    private ProductConverter productConverter;
 
     /**
      * Retrieves a list of active products filtered by name as DTOs.

@@ -24,22 +24,22 @@ import java.util.stream.Collectors;
 @Service
 public class PaymentServiceImpl implements IPaymentService {
     @Autowired
-    IClientRepository clientRepository;
+    private IClientRepository clientRepository;
 
     @Autowired
-    ClientUtils clientUtils;
+    private ClientUtils clientUtils;
 
     @Autowired
-    IPaymentRepository paymentRepository;
+    private IPaymentRepository paymentRepository;
 
     @Autowired
-    PaymentConverter paymentConverter;
+    private PaymentConverter paymentConverter;
 
     @Autowired
-    PaymentUtils paymentUtils;
+    private PaymentUtils paymentUtils;
 
     @Autowired
-    DateValidator dateValidator;
+    private DateValidator dateValidator;
 
     /**
      * Retrieves a list of payments as DTOs for a specific client.

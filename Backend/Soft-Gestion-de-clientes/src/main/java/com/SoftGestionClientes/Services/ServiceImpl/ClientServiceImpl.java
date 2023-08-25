@@ -1,6 +1,8 @@
 package com.SoftGestionClientes.Services.ServiceImpl;
 
 import com.SoftGestionClientes.Dto.ClientDto;
+import com.SoftGestionClientes.Enums.ECategoryPrice;
+import com.SoftGestionClientes.Enums.ERole;
 import com.SoftGestionClientes.Exception.AlreadyRegisterException;
 import com.SoftGestionClientes.Exception.NotFoundException;
 import com.SoftGestionClientes.Model.Client;
@@ -18,13 +20,13 @@ import java.util.stream.Collectors;
 public class ClientServiceImpl implements IClientService {
 
     @Autowired
-    IClientRepository clientRepository;
+    private IClientRepository clientRepository;
 
     @Autowired
-    ClientUtils clientUtils;
+    private ClientUtils clientUtils;
 
     @Autowired
-    ClientConverter clientConverter;
+    private ClientConverter clientConverter;
 
     /**
      * Retrieves a list of active clients as DTOs.
@@ -36,6 +38,20 @@ public class ClientServiceImpl implements IClientService {
         // get a list with clients with that name
         List<Client> clientsSaved = clientRepository.findByName(name);
         // check if the lis is not empty
+        clientUtils.validateList(clientsSaved);
+        //get clients active
+        List<Client> clientsActive = clientUtils.filterClientsActive(clientsSaved);
+        // returns a list with dtos of all active clients filtered by her name
+        return clientsActive.stream()
+                .map(client -> clientConverter.convertToDto(client, ClientDto.class))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ClientDto> getClientByCategoryPrice(ECategoryPrice categoryPrice) {
+        // get clients by category price
+        List<Client> clientsSaved = clientRepository.findByCategoryPrice(categoryPrice);
+        // validate if the list is not empty
         clientUtils.validateList(clientsSaved);
         //get clients active
         List<Client> clientsActive = clientUtils.filterClientsActive(clientsSaved);
@@ -99,7 +115,9 @@ public class ClientServiceImpl implements IClientService {
      * @return a ClientDto object representing active client.
      */
     @Override
-    public ClientDto createClient(ClientDto client) {
+    public ClientDto createClient(ClientDto client, ERole userRole) {
+        // check if role has authorization
+        clientUtils.validateRoleUser(userRole);
         // validate if the name has already been registered
         if (clientRepository.existsByName(client.getName())){
             // if has been registered run an exception
@@ -119,7 +137,9 @@ public class ClientServiceImpl implements IClientService {
      * @return a ClientDto object representing active client.
      */
     @Override
-    public ClientDto updateClient(ClientDto client) {
+    public ClientDto updateClient(ClientDto client, ERole userRole) {
+        // check if role has authorization
+        clientUtils.validateRoleUser(userRole);
         // validate if client exists
         if (!clientRepository.existsById(client.getId())){
             // if not exists run an exception
@@ -139,7 +159,9 @@ public class ClientServiceImpl implements IClientService {
      *
      */
     @Override
-    public void deleteClientById(Long id) {
+    public void deleteClientById(Long id, ERole userRole) {
+        // check if role has authorization
+        clientUtils.validateRoleUser(userRole);
         // get the client by id, if not exists run an exception
         Client clientSaved = clientUtils.getClientAndValidate(id);
         // modify client as inactive

@@ -20,16 +20,16 @@ import java.util.stream.Collectors;
 @Service
 public class SaleServiceImpl implements ISaleService {
     @Autowired
-    DateValidator dateValidator;
+    private DateValidator dateValidator;
 
     @Autowired
-    SaleConverter saleConverter;
+    private SaleConverter saleConverter;
 
     @Autowired
-    ISaleRepository saleRepository;
+    private ISaleRepository saleRepository;
 
     @Autowired
-    SaleUtils saleUtils;
+    private SaleUtils saleUtils;
 
     /**
      * Retrieves a list of sales by client id.

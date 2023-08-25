@@ -20,13 +20,13 @@ import java.util.stream.Collectors;
 public class SaleDetailServiceImpl implements ISaleDetailService {
 
     @Autowired
-    ISaleDetailRepository saleDetailRepository;
+    private ISaleDetailRepository saleDetailRepository;
 
     @Autowired
-    SaleDetailConverter saleDetailConverter;
+    private SaleDetailConverter saleDetailConverter;
 
     @Autowired
-    SaleDetailUtils saleDetailUtils;
+    private SaleDetailUtils saleDetailUtils;
 
 
     /**

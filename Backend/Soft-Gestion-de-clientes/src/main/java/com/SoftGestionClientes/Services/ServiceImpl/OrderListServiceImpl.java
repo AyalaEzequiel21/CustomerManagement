@@ -19,16 +19,16 @@ import java.util.stream.Collectors;
 public class OrderListServiceImpl implements IOrderListService {
 
     @Autowired
-    IOrderListRepository orderListRepository;
+    private IOrderListRepository orderListRepository;
 
     @Autowired
-    OrderListConverter orderListConverter;
+    private OrderListConverter orderListConverter;
 
     @Autowired
-    OrderListUtils orderListUtils;
+    private OrderListUtils orderListUtils;
 
     @Autowired
-    DateValidator dateValidator;
+    private DateValidator dateValidator;
 
     /**
      * Retrieves a list of orders list as DTOs by date.

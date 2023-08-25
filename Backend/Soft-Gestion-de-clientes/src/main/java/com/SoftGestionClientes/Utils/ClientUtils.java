@@ -1,13 +1,16 @@
 package com.SoftGestionClientes.Utils;
 
 import com.SoftGestionClientes.Dto.ClientDto;
+import com.SoftGestionClientes.Enums.ERole;
 import com.SoftGestionClientes.Exception.BadRequestException;
+import com.SoftGestionClientes.Exception.NotAuthorized;
 import com.SoftGestionClientes.Exception.NotFoundException;
 import com.SoftGestionClientes.Model.Client;
 import com.SoftGestionClientes.Repository.IClientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.naming.NoPermissionException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -66,6 +69,12 @@ public class ClientUtils {
     public void validateList(List<Client> clients){
         if (clients.isEmpty()){
             throw new NotFoundException("Clients not found");
+        }
+    }
+
+    public void validateRoleUser(ERole role) {
+        if (role == ERole.DELIVERY){
+            throw new NotAuthorized("You have not authorization");
         }
     }
 }
