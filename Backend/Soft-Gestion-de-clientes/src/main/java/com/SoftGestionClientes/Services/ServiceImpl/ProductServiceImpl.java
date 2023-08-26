@@ -91,9 +91,7 @@ public class ProductServiceImpl implements IProductService {
             throw new AlreadyRegisterException("There is already a product with that name");
         }
         // Validates that the prices are greater than 0
-        if (!productUtils.validatePrices(product)){
-            throw new BadRequestException("The prices cannot be less that 0");
-        }
+        productUtils.validatePrices(product);
         // Save the product
         Product productSaved = productRepository.save(productConverter.convertToEntity(product, Product.class));
         // return dto of product saved
@@ -116,9 +114,7 @@ public class ProductServiceImpl implements IProductService {
             throw new AlreadyRegisterException("There is already a product with that name");
         }
         // Validates that the prices are greater than 0
-        if (!productUtils.validatePrices(product)){
-            throw new BadRequestException("The prices cannot be less that 0");
-        }
+        productUtils.validatePrices(product);
         // Save the product updated
         Product productSaved = productRepository.save(productConverter.convertToEntity(product, Product.class));
         // return dto of product saved

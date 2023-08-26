@@ -22,6 +22,6 @@ public class ClientDto {
     private ECategoryPrice categoryPrice;
     private Set<SaleDto> sales = new HashSet<>();
     private Set<PaymentDto> payments = new HashSet<>();
-    private double balance = 0.0;
-    private boolean isActive = true;
+    private double balance;
+    private boolean isActive;
 }

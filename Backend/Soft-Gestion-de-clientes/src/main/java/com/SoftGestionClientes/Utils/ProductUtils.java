@@ -1,6 +1,7 @@
 package com.SoftGestionClientes.Utils;
 
 import com.SoftGestionClientes.Dto.ProductDto;
+import com.SoftGestionClientes.Exception.BadRequestException;
 import com.SoftGestionClientes.Exception.NotFoundException;
 import com.SoftGestionClientes.Model.Product;
 import com.SoftGestionClientes.Repository.IProductRepository;
@@ -22,11 +23,9 @@ public class ProductUtils {
         return productSaved;
     }
 
-    public boolean validatePrices(ProductDto product){
-        boolean response = false;
-        if (product.getPriceClient() > 0 && product.getPriceNoClient() > 0){
-            response = true;
-        }
-        return response;
+    public void validatePrices(ProductDto product){
+       if (product.getPriceNoClient() < 0 || product.getPriceClient() < 0){
+           throw new BadRequestException("The prices cannot be less that 0");
+       }
     }
 }
