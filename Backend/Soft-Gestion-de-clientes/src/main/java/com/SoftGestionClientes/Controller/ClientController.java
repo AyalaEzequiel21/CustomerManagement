@@ -3,6 +3,9 @@ package com.SoftGestionClientes.Controller;
 import com.SoftGestionClientes.Dto.ClientDto;
 import com.SoftGestionClientes.Enums.ECategoryPrice;
 import com.SoftGestionClientes.Enums.ERole;
+import com.SoftGestionClientes.Exception.AlreadyRegisterException;
+import com.SoftGestionClientes.Exception.BadRequestException;
+import com.SoftGestionClientes.Exception.NotFoundException;
 import com.SoftGestionClientes.Services.ServiceImpl.ClientServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -11,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/pradera/clients")
@@ -87,5 +91,32 @@ public class ClientController {
         return new ResponseEntity<>("Client has been deleted", HttpStatus.NO_CONTENT);
     }
 
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<Object> handleBadReqException(BadRequestException e){
+        // create a custom reponse to BadRequestException
+        data = new HashMap<>();
+        data.put("error", "Bad Request");
+        data.put("message", e.getMessage());
+
+        return new ResponseEntity<>(data, HttpStatus.BAD_REQUEST);
+    }
+    @ExceptionHandler(NotFoundException.class)
+    public ResponseEntity<Object> handleNotFoundException(NotFoundException e){
+        // create a custom reponse to BadRequestException
+        data = new HashMap<>();
+        data.put("error", "Not Found");
+        data.put("message", e.getMessage());
+
+        return new ResponseEntity<>(data, HttpStatus.NOT_FOUND);
+    }
+    @ExceptionHandler(AlreadyRegisterException.class)
+    public ResponseEntity<Object> handleAlreadyRegisterException(AlreadyRegisterException e){
+        // create a custom reponse to BadRequestException
+        data = new HashMap<>();
+        data.put("error", "Already Register");
+        data.put("message", e.getMessage());
+
+        return new ResponseEntity<>(data, HttpStatus.ALREADY_REPORTED);
+    }
 }
 
