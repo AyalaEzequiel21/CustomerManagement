@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/pradera/clients")
@@ -48,7 +47,19 @@ public class ClientController {
         return new ResponseEntity<>(data, HttpStatus.OK);
     }
 
-    @GetMapping("/{categoryPrice}")
+    @GetMapping("/id/{id}")
+    public ResponseEntity<Object> getClientById(@PathVariable Long id){
+        // initialize the data
+        data = new HashMap<>();
+        // get the client by id
+        ClientDto clientSaved = clientService.getClientById(id);
+        // add the client to data
+        data.put("data", clientSaved);
+        //return a reponse with status OK and the client
+        return new ResponseEntity<>(data, HttpStatus.OK);
+    }
+
+    @GetMapping("/categories/{categoryPrice}")
     public ResponseEntity<Object> getClientsByCategoryPrice(@PathVariable ECategoryPrice categoryPrice){
         // initialize the data
         data = new HashMap<>();
@@ -117,6 +128,15 @@ public class ClientController {
         data.put("message", e.getMessage());
 
         return new ResponseEntity<>(data, HttpStatus.ALREADY_REPORTED);
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<Object> hanldleGenericException(Exception e){
+        data = new HashMap<>();
+        data.put("error", "Internal Error");
+        data.put("message", e.getMessage());
+
+        return new ResponseEntity<>(data, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
 

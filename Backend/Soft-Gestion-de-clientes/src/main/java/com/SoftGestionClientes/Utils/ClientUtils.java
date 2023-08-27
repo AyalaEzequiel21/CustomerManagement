@@ -1,6 +1,7 @@
 package com.SoftGestionClientes.Utils;
 
 import com.SoftGestionClientes.Dto.ClientDto;
+import com.SoftGestionClientes.Enums.ECategoryPrice;
 import com.SoftGestionClientes.Enums.ERole;
 import com.SoftGestionClientes.Exception.BadRequestException;
 import com.SoftGestionClientes.Exception.NotAuthorized;
@@ -42,6 +43,9 @@ public class ClientUtils {
     }
 
     public void validateAttributesClient(ClientDto client){
+        if (client.getName() == null || client.getPhone() == null || client.getCategoryPrice() == null){
+            throw new BadRequestException("Need to enter some data");
+        }
         if (client.getBalance() < 0.0){
             throw new BadRequestException("The balance cannot be less that 0");
         }
@@ -49,6 +53,15 @@ public class ClientUtils {
             throw new BadRequestException("Cannot create a client inactive");
         }
     }
+
+//    public void validateCategory(ECategoryPrice category){
+//        for (ECategoryPrice validCategory : ECategoryPrice.values()){
+//            if (category == validCategory){
+//                return;
+//            }
+//        }
+//        throw new BadRequestException("The category is invalid");
+//    }
 
     /**
      * update client balance

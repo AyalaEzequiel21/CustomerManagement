@@ -36,7 +36,7 @@ public class ClientServiceImpl implements IClientService {
     @Override
     public List<ClientDto> getClientByName(String name) {
         // get a list with clients with that name
-        List<Client> clientsSaved = clientRepository.findByName(name);
+        List<Client> clientsSaved = clientRepository.findByNameContainingIgnoreCase(name);
         // check if the lis is not empty
         clientUtils.validateList(clientsSaved);
         //get clients active
