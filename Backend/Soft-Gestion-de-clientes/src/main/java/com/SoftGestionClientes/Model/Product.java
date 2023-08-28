@@ -22,10 +22,8 @@ public class Product {
     @NotBlank
     private String name;
     private String description;
-    @NotBlank
     @Column(name = "price_client")
     private double priceClient;
-    @NotBlank
     @Column(name = "price_no_client")
     private double priceNoClient;
     private boolean isActive = true;

@@ -24,8 +24,8 @@ public class ProductUtils {
     }
 
     public void validatePrices(ProductDto product){
-       if (product.getPriceNoClient() < 0 || product.getPriceClient() < 0){
-           throw new BadRequestException("The prices cannot be less that 0");
+       if (product.getPriceNoClient() <= 0 || product.getPriceClient() <= 0){
+           throw new BadRequestException("The prices cannot be less or equals that 0");
        }
     }
 }

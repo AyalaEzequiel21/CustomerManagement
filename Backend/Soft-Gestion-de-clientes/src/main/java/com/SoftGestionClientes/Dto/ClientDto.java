@@ -1,6 +1,8 @@
 package com.SoftGestionClientes.Dto;
 
 import com.SoftGestionClientes.Enums.ECategoryPrice;
+import com.SoftGestionClientes.Utils.Converts.ECategoryPriceDeserializer;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,6 +21,7 @@ public class ClientDto {
     private LocalDate registerDate;
     private String name;
     private String phone;
+    @JsonDeserialize(using = ECategoryPriceDeserializer.class)
     private ECategoryPrice categoryPrice;
     private Set<SaleDto> sales = new HashSet<>();
     private Set<PaymentDto> payments = new HashSet<>();

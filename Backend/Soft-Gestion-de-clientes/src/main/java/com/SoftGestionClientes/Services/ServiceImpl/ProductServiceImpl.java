@@ -109,10 +109,7 @@ public class ProductServiceImpl implements IProductService {
         if (!productRepository.existsById(product.getId())){
             throw new NotFoundException("Product not found");
         }
-        // Validates if a product with the same name already exists
-        if (productRepository.existsByName(product.getName())){
-            throw new AlreadyRegisterException("There is already a product with that name");
-        }
+
         // Validates that the prices are greater than 0
         productUtils.validatePrices(product);
         // Save the product updated
