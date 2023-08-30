@@ -36,7 +36,7 @@ public class ClientServiceImpl implements IClientService {
     @Override
     public List<ClientDto> getClientByName(String name) {
         // get a list with clients with that name
-        List<Client> clientsSaved = clientRepository.findByNameContainingIgnoreCase(name);
+        List<Client> clientsSaved = clientRepository.findByName(name);
         // check if the lis is not empty
         clientUtils.validateList(clientsSaved);
         //get clients active
@@ -89,6 +89,8 @@ public class ClientServiceImpl implements IClientService {
     public List<ClientDto> getAllClientsInactive() {
         // get all clients inactive
         List<Client> clientsInactive = clientRepository.findAllByIsActiveFalse();
+        // check if the list is empty
+        clientUtils.validateList(clientsInactive);
         // returns dtos of all clients inactive
         return clientsInactive.stream()
                 .map(client -> clientConverter.convertToDto(client, ClientDto.class))

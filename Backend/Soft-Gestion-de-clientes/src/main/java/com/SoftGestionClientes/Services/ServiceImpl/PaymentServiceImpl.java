@@ -131,6 +131,10 @@ public class PaymentServiceImpl implements IPaymentService {
         clientUtils.updateClientBalance(clientSaved, payment.getAmount(), false);
         // save payment
         Payment paymentSaved = paymentRepository.save(paymentConverter.convertToEntity(payment, Payment.class));
+        // add the payment to payments client
+        clientSaved.getPayments().add(paymentSaved);// ESTE TENGO QUE REVISAR. PODRIA CREAR UN METODO EN CLIENTUTILS
+        // update the client with the new payment
+        Client clientUpdated = clientRepository.save(clientSaved);
         // return dto of payment
         return paymentConverter.convertToDto(paymentSaved, PaymentDto.class);
     }

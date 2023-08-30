@@ -1,18 +1,18 @@
 package com.SoftGestionClientes.Utils;
 
 import com.SoftGestionClientes.Dto.ClientDto;
-import com.SoftGestionClientes.Enums.ECategoryPrice;
 import com.SoftGestionClientes.Enums.ERole;
 import com.SoftGestionClientes.Exception.BadRequestException;
 import com.SoftGestionClientes.Exception.NotAuthorized;
 import com.SoftGestionClientes.Exception.NotFoundException;
 import com.SoftGestionClientes.Model.Client;
+import com.SoftGestionClientes.Model.Payment;
 import com.SoftGestionClientes.Repository.IClientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.naming.NoPermissionException;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
@@ -37,11 +37,21 @@ public class ClientUtils {
         return clientSaved;
     }
 
+    /**
+     * Filter all active clients
+     * receive a list of clients
+     * return a list with active clients
+     */
     public List<Client> filterClientsActive(List<Client> clients){
         return clients.stream().filter(Client::isActive)
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Check if all arguments are valid
+     * receive a client
+     *
+     */
     public void validateAttributesClient(ClientDto client){
         if (client.getName() == null || client.getPhone() == null || client.getCategoryPrice() == null){
             throw new BadRequestException("Need to enter some data");
@@ -54,14 +64,6 @@ public class ClientUtils {
         }
     }
 
-//    public void validateCategory(ECategoryPrice category){
-//        for (ECategoryPrice validCategory : ECategoryPrice.values()){
-//            if (category == validCategory){
-//                return;
-//            }
-//        }
-//        throw new BadRequestException("The category is invalid");
-//    }
 
     /**
      * update client balance
@@ -79,16 +81,38 @@ public class ClientUtils {
         clientRepository.save(client);
     }
 
+    /**
+     * Check if the list is empty and run an exception
+     * receive a list with clients
+     *
+     */
     public void validateList(List<Client> clients){
         if (clients.isEmpty()){
             throw new NotFoundException("Clients not found");
         }
     }
 
+    /**
+     * Check if the role is valid and run an exception
+     * receive a role user
+     *
+     */
     public void validateRoleUser(ERole role) {
         if (role == ERole.DELIVERY){
             throw new NotAuthorized("You have not authorization");
         }
+    }
+
+    /**
+     * Add a payment to the list of clients payment
+     * receive a Client to add the payment and the payment to add.
+     *
+     */
+    public void addPayment(Client client, Payment payment){
+        Set<Payment> newPayments = client.getPayments();
+        newPayments.add(payment);
+        client.setPayments(newPayments);
+        clientRepository.save(client);
     }
 
 

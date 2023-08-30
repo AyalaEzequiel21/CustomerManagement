@@ -12,7 +12,7 @@ import java.util.List;
 public interface IClientRepository extends JpaRepository<Client, Long> {
 
     @Query("SELECT c FROM Client c WHERE LOWER(c.name) LIKE LOWER(CONCAT('%', :name, '%'))")
-    List<Client> findByNameContainingIgnoreCase(String name); // find clients by name
+    List<Client> findByName(String name); // find clients by name
     List<Client> findByCategoryPrice(ECategoryPrice categoryPrice); // find clients by category
     Boolean existsByName(String name); // verify if exists user by name
     List<Client> findAllByIsActiveFalse(); // find all clients inactive

@@ -24,6 +24,11 @@ public class ClientController {
 
     HashMap<String, Object> data;
 
+    /**
+     * Retrieves a list of active clients
+     *
+     * @return a response with the list of clients and status OK
+     */
     @GetMapping
     public ResponseEntity<Object> getAllClients(){
         // initialize the data
@@ -36,6 +41,11 @@ public class ClientController {
         return new ResponseEntity<>(data, HttpStatus.OK);
     }
 
+    /**
+     * Retrieves a list of inactive clients
+     *
+     * @return a response with the list of clients and status OK
+     */
     @GetMapping("/inactive")
     public ResponseEntity<Object> getAllInactiveProducts(){
         // initialize the data
@@ -48,6 +58,11 @@ public class ClientController {
         return new ResponseEntity<>(data, HttpStatus.OK);
     }
 
+    /**
+     * Retrieves a list of active clients by Name
+     * @param name for to search
+     * @return a response with the list of clients and status OK
+     */
     @GetMapping("/{name}")
     public ResponseEntity<Object> getClientsByName(@PathVariable String name){
         // initialize the data
@@ -60,6 +75,11 @@ public class ClientController {
         return new ResponseEntity<>(data, HttpStatus.OK);
     }
 
+    /**
+     * Retrieves an active client by id
+     * @param id for to search
+     * @return a response with the client and status OK
+     */
     @GetMapping("/id/{id}")
     public ResponseEntity<Object> getClientById(@PathVariable Long id){
         // initialize the data
@@ -72,6 +92,11 @@ public class ClientController {
         return new ResponseEntity<>(data, HttpStatus.OK);
     }
 
+    /**
+     * Retrieves a list of active clients by category price
+     * @param categoryPrice for to search
+     * @return a response with the list of clients and status OK
+     */
     @GetMapping("/categories/{categoryPrice}")
     public ResponseEntity<Object> getClientsByCategoryPrice(@PathVariable ECategoryPrice categoryPrice){
         // initialize the data
@@ -84,6 +109,11 @@ public class ClientController {
         return new ResponseEntity<>(data, HttpStatus.OK);
     }
 
+    /**
+     * Create a client
+     * @param client for to create
+     * @return a response with the client created and status CREATED
+     */
     @PostMapping("/register")
     public ResponseEntity<Object> createClient(@RequestBody ClientDto client){
         // initialize the data
@@ -96,6 +126,11 @@ public class ClientController {
         return new ResponseEntity<>(data, HttpStatus.CREATED);
     }
 
+    /**
+     * Update a client
+     * @param client for to update
+     * @return a response with the client updated and status OK
+     */
     @PutMapping("/update")
     public ResponseEntity<Object> updateClient(@RequestBody ClientDto client){
         // initialize the data
@@ -108,12 +143,21 @@ public class ClientController {
         return new ResponseEntity<>(data, HttpStatus.OK);
     }
 
+    /**
+     * Delete a client
+     * @param id for to delete
+     * @return a response with status NO CONTENT
+     */
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteClient(@PathVariable Long id){
         // delete client
         clientService.deleteClientById(id, ERole.BILLER);
         return new ResponseEntity<>("Client has been deleted", HttpStatus.NO_CONTENT);
     }
+
+    ////////////////////
+    // EXCEPTION HANDLERS
+    ////////////////////
 
     @ExceptionHandler(BadRequestException.class)
     public ResponseEntity<Object> handleBadReqException(BadRequestException e){

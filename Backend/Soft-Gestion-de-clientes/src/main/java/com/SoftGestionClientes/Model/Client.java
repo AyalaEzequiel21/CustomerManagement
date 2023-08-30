@@ -31,7 +31,6 @@ public class Client {
     @NotBlank
     private String phone;
 
-    @NonNull
     @Enumerated(EnumType.STRING)
     private ECategoryPrice categoryPrice;
 
