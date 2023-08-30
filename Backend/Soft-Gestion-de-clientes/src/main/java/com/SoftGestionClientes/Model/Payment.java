@@ -34,7 +34,6 @@ public class Payment {
     @JoinColumn(name = "report_id")
     private Report report;
 
-    @NotBlank
     private Double amount;
 
     private EPaymentMethod paymentMethod;

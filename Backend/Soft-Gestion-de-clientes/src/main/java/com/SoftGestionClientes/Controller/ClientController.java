@@ -32,18 +32,31 @@ public class ClientController {
         List<ClientDto> clients = clientService.getAllClients();
         // add clients to data
         data.put("data", clients);
-        // return a reponse entity with status OK and the data
+        // return a response entity with status OK and the data
         return new ResponseEntity<>(data, HttpStatus.OK);
     }
+
+    @GetMapping("/inactive")
+    public ResponseEntity<Object> getAllInactiveProducts(){
+        // initialize the data
+        data = new HashMap<>();
+        // get all clients inactive
+        List<ClientDto> inactiveClients = clientService.getAllClientsInactive();
+        // add the clients to data
+        data.put("data", inactiveClients);
+        // return a response with status OK and the list with inactive clients
+        return new ResponseEntity<>(data, HttpStatus.OK);
+    }
+
     @GetMapping("/{name}")
     public ResponseEntity<Object> getClientsByName(@PathVariable String name){
         // initialize the data
         data = new HashMap<>();
         // get clients by a name
-        List<ClientDto> clientsbyName = clientService.getClientByName(name);
+        List<ClientDto> clientsByName = clientService.getClientByName(name);
         // add clients to data
-        data.put("data", clientsbyName);
-        // return a reponse entity with status OK and the data
+        data.put("data", clientsByName);
+        // return a response entity with status OK and the data
         return new ResponseEntity<>(data, HttpStatus.OK);
     }
 
@@ -55,7 +68,7 @@ public class ClientController {
         ClientDto clientSaved = clientService.getClientById(id);
         // add the client to data
         data.put("data", clientSaved);
-        //return a reponse with status OK and the client
+        //return a response with status OK and the client
         return new ResponseEntity<>(data, HttpStatus.OK);
     }
 
@@ -67,7 +80,7 @@ public class ClientController {
         List<ClientDto> clientsByCategory = clientService.getClientByCategoryPrice(categoryPrice);
         // add clients to data
         data.put("data", clientsByCategory);
-        // returns a reponse entity with status OK and the data
+        // returns a response entity with status OK and the data
         return new ResponseEntity<>(data, HttpStatus.OK);
     }
 
@@ -78,8 +91,8 @@ public class ClientController {
         // create the client
         ClientDto clientCreated = clientService.createClient(client, ERole.BILLER);
         // add client created to data
-        data.put("sucessfull", clientCreated);
-        // returns a reponse entity with status CREATED and the data
+        data.put("successful", clientCreated);
+        // returns a response entity with status CREATED and the data
         return new ResponseEntity<>(data, HttpStatus.CREATED);
     }
 
@@ -91,7 +104,7 @@ public class ClientController {
         ClientDto clientUpdated = clientService.updateClient(client);
         // add the client updated to data
         data.put("Client updated", clientUpdated);
-        // returns  a reponse entity with status OK and the data
+        // returns  a response entity with status OK and the data
         return new ResponseEntity<>(data, HttpStatus.OK);
     }
 
@@ -104,7 +117,7 @@ public class ClientController {
 
     @ExceptionHandler(BadRequestException.class)
     public ResponseEntity<Object> handleBadReqException(BadRequestException e){
-        // create a custom reponse to BadRequestException
+        // create a custom response to BadRequestException
         data = new HashMap<>();
         data.put("error", "Bad Request");
         data.put("message", e.getMessage());
@@ -113,7 +126,7 @@ public class ClientController {
     }
     @ExceptionHandler(NotFoundException.class)
     public ResponseEntity<Object> handleNotFoundException(NotFoundException e){
-        // create a custom reponse to BadRequestException
+        // create a custom response to BadRequestException
         data = new HashMap<>();
         data.put("error", "Not Found");
         data.put("message", e.getMessage());
@@ -122,7 +135,7 @@ public class ClientController {
     }
     @ExceptionHandler(AlreadyRegisterException.class)
     public ResponseEntity<Object> handleAlreadyRegisterException(AlreadyRegisterException e){
-        // create a custom reponse to BadRequestException
+        // create a custom response to BadRequestException
         data = new HashMap<>();
         data.put("error", "Already Register");
         data.put("message", e.getMessage());
@@ -131,7 +144,7 @@ public class ClientController {
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<Object> hanldleGenericException(Exception e){
+    public ResponseEntity<Object> handleGenericException(Exception e){
         data = new HashMap<>();
         data.put("error", "Internal Error");
         data.put("message", e.getMessage());

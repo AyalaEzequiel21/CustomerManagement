@@ -30,7 +30,18 @@ public class ProductController {
         List<ProductDto> productsSaved = productService.getAllProducts();
         // add products to data
         data.put("data", productsSaved);
-        // return a reponse with the data and status OK
+        // return a response with the data and status OK
+        return new ResponseEntity<>(data, HttpStatus.OK);
+    }
+    @GetMapping("/inactive")
+    public ResponseEntity<Object> getAllInactiveProducts(){
+        // initialize the data
+        data = new HashMap<>();
+        // get all products inactive
+        List<ProductDto> inactiveProducts = productService.getAllInactiveProducts();
+        // add the products to data
+        data.put("data", inactiveProducts);
+        // return a response with status OK and the list with inactive products
         return new ResponseEntity<>(data, HttpStatus.OK);
     }
 
@@ -64,7 +75,7 @@ public class ProductController {
         // create the new product
         ProductDto productRegistered = productService.registerProduct(product);
         // add the new product to data
-        data.put("sucessfull", productRegistered);
+        data.put("successful", productRegistered);
         // returns a response with product registered and status CREATED
         return new ResponseEntity<>(data, HttpStatus.CREATED);
     }
@@ -93,7 +104,7 @@ public class ProductController {
 
     @ExceptionHandler(BadRequestException.class)
     public ResponseEntity<Object> handleBadReqException(BadRequestException e){
-        // create a custom reponse to BadRequestException
+        // create a custom response to BadRequestException
         data = new HashMap<>();
         data.put("error", "Bad Request");
         data.put("message", e.getMessage());
@@ -102,7 +113,7 @@ public class ProductController {
     }
     @ExceptionHandler(NotFoundException.class)
     public ResponseEntity<Object> handleNotFoundException(NotFoundException e){
-        // create a custom reponse to BadRequestException
+        // create a custom response to BadRequestException
         data = new HashMap<>();
         data.put("error", "Not Found");
         data.put("message", e.getMessage());
@@ -111,7 +122,7 @@ public class ProductController {
     }
     @ExceptionHandler(AlreadyRegisterException.class)
     public ResponseEntity<Object> handleAlreadyRegisterException(AlreadyRegisterException e){
-        // create a custom reponse to BadRequestException
+        // create a custom response to BadRequestException
         data = new HashMap<>();
         data.put("error", "Already Register");
         data.put("message", e.getMessage());
@@ -120,7 +131,7 @@ public class ProductController {
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<Object> hanldleGenericException(Exception e){
+    public ResponseEntity<Object> handleGenericException(Exception e){
         data = new HashMap<>();
         data.put("error", "Internal Error");
         data.put("message", e.getMessage());

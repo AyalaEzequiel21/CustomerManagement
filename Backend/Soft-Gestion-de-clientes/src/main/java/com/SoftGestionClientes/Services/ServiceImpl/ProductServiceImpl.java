@@ -67,6 +67,25 @@ public class ProductServiceImpl implements IProductService {
     }
 
     /**
+     * Retrieves a list of inactive products as DTOs.
+     *
+     * @return List of ProductDto objects representing inactive products.
+     */
+    public List<ProductDto> getAllInactiveProducts() {
+        // get all active products
+        List<Product> productsSaved = productRepository.findAll();
+        // validate if the list is empty run an exception
+        if (productsSaved.isEmpty()){
+            throw new NotFoundException("Products not found");
+        }
+        // return a list with dtos of all active products
+        return productsSaved.stream()
+                .filter(product -> !product.isActive())
+                .map(product ->productConverter.convertToDto(product, ProductDto.class))
+                .collect(Collectors.toList());
+    }
+
+    /**
      * Retrieves an active product as DTO.
      * @param id product
      * @return ProductDto object representing active products.
