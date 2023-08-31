@@ -79,7 +79,7 @@ public class ProductController {
      * @return a response with the client and status OK
      */
     @GetMapping("/id/{productId}")
-    public ResponseEntity<Object> getProductsById(@PathVariable Long productId){
+    public ResponseEntity<Object> getProductById(@PathVariable Long productId){
         // initialize the data
         data = new HashMap<>();
         // get the product by id

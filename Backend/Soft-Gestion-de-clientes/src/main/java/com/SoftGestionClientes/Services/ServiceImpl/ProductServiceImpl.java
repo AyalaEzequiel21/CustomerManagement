@@ -122,14 +122,15 @@ public class ProductServiceImpl implements IProductService {
     public ProductDto updateProduct(ProductDto product) {
         // Validates that the prices are greater than 0
         productUtils.validatePrices(product);
-        // Validate if exists a product with id of product-param or run an exception
-        if (!productRepository.existsById(product.getId())){
-            throw new NotFoundException("Product not found");
+        // get the product saved
+        Product productSaved = productUtils.getProductAndValidate(product.getId());
+        if (!productSaved.getName().equals(product.getName()) && productRepository.existsByName(product.getName())){
+            throw new AlreadyRegisterException("There is already a product with that name");
         } else {
             // Save the product updated
-            Product productSaved = productRepository.save(productConverter.convertToEntity(product, Product.class));
+            Product productUpdated = productRepository.save(productConverter.convertToEntity(product, Product.class));
             // return dto of product saved
-            return productConverter.convertToDto(productSaved, ProductDto.class);
+            return productConverter.convertToDto(productUpdated, ProductDto.class);
         }
     }
 
