@@ -144,16 +144,17 @@ public class ClientServiceImpl implements IClientService {
     @Transactional
     public ClientDto updateClient(ClientDto client) {
         // validate if client exists
-        if (!clientRepository.existsById(client.getId())){
+        if (!clientRepository.existsById(client.getId())) {
             // if not exists run an exception
             throw new NotFoundException("Client not found");
+        } else {
+            //check attributes of client
+            clientUtils.validateAttributesClient(client);
+            // if client exists then save the new client
+            Client clientUpdated = clientRepository.save(clientConverter.convertToEntity(client, Client.class));
+            // return the dto of client updated
+            return clientConverter.convertToDto(clientUpdated, ClientDto.class);
         }
-        //check attributes of client
-        clientUtils.validateAttributesClient(client);
-        // if client exists then save the new client
-        Client clientUpdated = clientRepository.save(clientConverter.convertToEntity(client, Client.class));
-        // return the dto of client updated
-        return clientConverter.convertToDto(clientUpdated, ClientDto.class);
     }
 
     /**

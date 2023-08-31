@@ -22,6 +22,11 @@ public class ProductController {
 
     HashMap<String, Object> data;
 
+    /**
+     * Retrieves a list of active products
+     *
+     * @return a response with the list of products and status OK
+     */
     @GetMapping
     public ResponseEntity<Object> getAllProducts(){
         // initialize the data
@@ -33,6 +38,12 @@ public class ProductController {
         // return a response with the data and status OK
         return new ResponseEntity<>(data, HttpStatus.OK);
     }
+
+    /**
+     * Retrieves a list of inactive products
+     *
+     * @return a response with the list of inactive products and status OK
+     */
     @GetMapping("/inactive")
     public ResponseEntity<Object> getAllInactiveProducts(){
         // initialize the data
@@ -45,29 +56,45 @@ public class ProductController {
         return new ResponseEntity<>(data, HttpStatus.OK);
     }
 
-    @GetMapping("/{name}")
-    public ResponseEntity<Object> getProductsByName(@PathVariable String name){
+    /**
+     * Retrieves a list of active clients filtered by a name
+     * @param productName to search the clients
+     * @return a response with the list of clients and status OK
+     */
+    @GetMapping("/{productName}")
+    public ResponseEntity<Object> getProductsByName(@PathVariable String productName){
         // initialize the data
         data = new HashMap<>();
         // get the products by name
-        List<ProductDto> productsSaved = productService.getProductByName(name);
+        List<ProductDto> productsSaved = productService.getProductByName(productName);
         // add products to data
         data.put("data", productsSaved);
         // return a response with status OK and products found
         return new ResponseEntity<>(data, HttpStatus.OK);
     }
-    @GetMapping("/id/{id}")
-    public ResponseEntity<Object> getProductsById(@PathVariable Long id){
+
+    /**
+     * Retrieves an active client by id
+     * @param productId to search the client
+     * @return a response with the client and status OK
+     */
+    @GetMapping("/id/{productId}")
+    public ResponseEntity<Object> getProductsById(@PathVariable Long productId){
         // initialize the data
         data = new HashMap<>();
         // get the product by id
-        ProductDto productsSaved = productService.getProductById(id);
+        ProductDto productsSaved = productService.getProductById(productId);
         // add product to data
         data.put("data", productsSaved);
         // return a response with status OK and product found
         return new ResponseEntity<>(data, HttpStatus.OK);
     }
 
+    /**
+     * Create a product
+     * @param product for to create
+     * @return a response with the product created and status CREATED
+     */
     @PostMapping("/register")
     public ResponseEntity<Object> registerProduct(@RequestBody ProductDto product){
         // initialize the data
@@ -80,6 +107,12 @@ public class ProductController {
         return new ResponseEntity<>(data, HttpStatus.CREATED);
     }
 
+
+    /**
+     * Update a product
+     * @param product for to update
+     * @return a response with the product updated and status OK
+     */
     @PutMapping("/update")
     public ResponseEntity<Object> updatedProduct(@RequestBody ProductDto product){
         // initialize the data
@@ -92,14 +125,24 @@ public class ProductController {
         return new ResponseEntity<>(data, HttpStatus.OK);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Object> deleteProductById(@PathVariable Long id){
+    /**
+     * Delete a product
+     * @param productId for to delete
+     * @return a response with status NO CONTENT
+     */
+    @DeleteMapping("/{productId}")
+    public ResponseEntity<Object> deleteProductById(@PathVariable Long productId){
 
         // delete product by id
-        productService.deleteProductById(id);
+        productService.deleteProductById(productId);
         // return a response
         return new ResponseEntity<>("Product deleted", HttpStatus.NO_CONTENT);
     }
+
+
+    ////////////////////
+    // EXCEPTION HANDLERS
+    ////////////////////
 
 
     @ExceptionHandler(BadRequestException.class)

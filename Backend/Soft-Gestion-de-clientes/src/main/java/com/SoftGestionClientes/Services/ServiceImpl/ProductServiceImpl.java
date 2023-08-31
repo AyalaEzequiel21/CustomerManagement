@@ -2,7 +2,6 @@ package com.SoftGestionClientes.Services.ServiceImpl;
 
 import com.SoftGestionClientes.Dto.ProductDto;
 import com.SoftGestionClientes.Exception.AlreadyRegisterException;
-import com.SoftGestionClientes.Exception.BadRequestException;
 import com.SoftGestionClientes.Exception.NotFoundException;
 import com.SoftGestionClientes.Model.Product;
 import com.SoftGestionClientes.Repository.IProductRepository;
@@ -35,13 +34,12 @@ public class ProductServiceImpl implements IProductService {
     public List<ProductDto> getProductByName(String name) {
         // get all products
         List<Product> productsSaved = productRepository.findByName(name);
+        // filter the active products
+        List<Product> activeProducts = productUtils.filterActiveProducts(productsSaved);
         // verify if list is empty, if empty run an exception
-        if (productsSaved.isEmpty()){
-            throw new NotFoundException("Products not found with the name: " + name);
-        }
+        productUtils.validateList(activeProducts);
         // return a list with dtos of all active products filtered by name
-        return productsSaved.stream()
-                .filter(Product::isActive)
+        return activeProducts.stream()
                 .map(product -> productConverter.convertToDto(product, ProductDto.class))
                 .collect(Collectors.toList());
     }
@@ -55,13 +53,12 @@ public class ProductServiceImpl implements IProductService {
     public List<ProductDto> getAllProducts() {
         // get all active products
         List<Product> productsSaved = productRepository.findAll();
+        // filter the active products
+        List<Product> activeProducts = productUtils.filterActiveProducts(productsSaved);
         // validate if the list is empty run an exception
-        if (productsSaved.isEmpty()){
-            throw new NotFoundException("Products not found");
-        }
+        productUtils.validateList(activeProducts);
         // return a list with dtos of all active products
-        return productsSaved.stream()
-                .filter(Product::isActive)
+        return activeProducts.stream()
                 .map(product ->productConverter.convertToDto(product, ProductDto.class))
                 .collect(Collectors.toList());
     }
@@ -74,13 +71,12 @@ public class ProductServiceImpl implements IProductService {
     public List<ProductDto> getAllInactiveProducts() {
         // get all active products
         List<Product> productsSaved = productRepository.findAll();
+        // filter all products inactive
+        List<Product> inactiveProducts = productUtils.filterInactiveProducts(productsSaved);
         // validate if the list is empty run an exception
-        if (productsSaved.isEmpty()){
-            throw new NotFoundException("Products not found");
-        }
+        productUtils.validateList(inactiveProducts);
         // return a list with dtos of all active products
-        return productsSaved.stream()
-                .filter(product -> !product.isActive())
+        return inactiveProducts.stream()
                 .map(product ->productConverter.convertToDto(product, ProductDto.class))
                 .collect(Collectors.toList());
     }
@@ -105,12 +101,12 @@ public class ProductServiceImpl implements IProductService {
      */
     @Override
     public ProductDto registerProduct(ProductDto product) {
+        // Validates that the prices are greater than 0
+        productUtils.validatePrices(product);
         // Validates if a product with the same name already exists
         if (productRepository.existsByName(product.getName())){
             throw new AlreadyRegisterException("There is already a product with that name");
         }
-        // Validates that the prices are greater than 0
-        productUtils.validatePrices(product);
         // Save the product
         Product productSaved = productRepository.save(productConverter.convertToEntity(product, Product.class));
         // return dto of product saved
@@ -124,17 +120,17 @@ public class ProductServiceImpl implements IProductService {
      */
     @Override
     public ProductDto updateProduct(ProductDto product) {
+        // Validates that the prices are greater than 0
+        productUtils.validatePrices(product);
         // Validate if exists a product with id of product-param or run an exception
         if (!productRepository.existsById(product.getId())){
             throw new NotFoundException("Product not found");
+        } else {
+            // Save the product updated
+            Product productSaved = productRepository.save(productConverter.convertToEntity(product, Product.class));
+            // return dto of product saved
+            return productConverter.convertToDto(productSaved, ProductDto.class);
         }
-
-        // Validates that the prices are greater than 0
-        productUtils.validatePrices(product);
-        // Save the product updated
-        Product productSaved = productRepository.save(productConverter.convertToEntity(product, Product.class));
-        // return dto of product saved
-        return productConverter.convertToDto(productSaved, ProductDto.class);
     }
 
     /**
