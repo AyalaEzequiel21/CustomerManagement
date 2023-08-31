@@ -114,6 +114,4 @@ public class ClientUtils {
         client.setPayments(newPayments);
         clientRepository.save(client);
     }
-
-
 }

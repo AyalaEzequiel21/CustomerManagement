@@ -2,7 +2,6 @@ package com.SoftGestionClientes.Model;
 
 import com.SoftGestionClientes.Enums.ECategoryPrice;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -26,9 +25,9 @@ public class Client {
     @Column(name = "register_date")
     private LocalDate registerDate;
 
-    @NotBlank
+    @NonNull
     private String name;
-    @NotBlank
+    @NonNull
     private String phone;
 
     @Enumerated(EnumType.STRING)
@@ -43,5 +42,4 @@ public class Client {
     private double balance = 0.0;
 
     private boolean isActive = true;
-
 }

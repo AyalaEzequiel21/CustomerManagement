@@ -23,8 +23,8 @@ public class ClientDto {
     private String phone;
     @JsonDeserialize(using = ECategoryPriceDeserializer.class)
     private ECategoryPrice categoryPrice;
-    private Set<SaleDto> sales;
-    private Set<PaymentDto> payments;
+    private Set<SaleDto> sales = new HashSet<>();
+    private Set<PaymentDto> payments = new HashSet<>();
     private double balance;
-    private boolean isActive;
+    private boolean isActive = true;
 }

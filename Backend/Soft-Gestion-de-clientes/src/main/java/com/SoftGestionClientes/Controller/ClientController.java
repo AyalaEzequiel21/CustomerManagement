@@ -60,15 +60,15 @@ public class ClientController {
 
     /**
      * Retrieves a list of active clients by Name
-     * @param name for to search
+     * @param clientName for to search
      * @return a response with the list of clients and status OK
      */
-    @GetMapping("/{name}")
-    public ResponseEntity<Object> getClientsByName(@PathVariable String name){
+    @GetMapping("/{clientName}")
+    public ResponseEntity<Object> getClientsByName(@PathVariable String clientName){
         // initialize the data
         data = new HashMap<>();
         // get clients by a name
-        List<ClientDto> clientsByName = clientService.getClientByName(name);
+        List<ClientDto> clientsByName = clientService.getClientByName(clientName);
         // add clients to data
         data.put("data", clientsByName);
         // return a response entity with status OK and the data
@@ -77,15 +77,15 @@ public class ClientController {
 
     /**
      * Retrieves an active client by id
-     * @param id for to search
+     * @param clientId for to search
      * @return a response with the client and status OK
      */
-    @GetMapping("/id/{id}")
-    public ResponseEntity<Object> getClientById(@PathVariable Long id){
+    @GetMapping("/id/{clientId}")
+    public ResponseEntity<Object> getClientById(@PathVariable Long clientId){
         // initialize the data
         data = new HashMap<>();
         // get the client by id
-        ClientDto clientSaved = clientService.getClientById(id);
+        ClientDto clientSaved = clientService.getClientById(clientId);
         // add the client to data
         data.put("data", clientSaved);
         //return a response with status OK and the client
@@ -145,13 +145,13 @@ public class ClientController {
 
     /**
      * Delete a client
-     * @param id for to delete
+     * @param clientId for to delete
      * @return a response with status NO CONTENT
      */
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteClient(@PathVariable Long id){
+    @DeleteMapping("/{clientId}")
+    public ResponseEntity<?> deleteClient(@PathVariable Long clientId){
         // delete client
-        clientService.deleteClientById(id, ERole.BILLER);
+        clientService.deleteClientById(clientId, ERole.BILLER);
         return new ResponseEntity<>("Client has been deleted", HttpStatus.NO_CONTENT);
     }
 

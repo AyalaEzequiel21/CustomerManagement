@@ -12,6 +12,7 @@ import com.SoftGestionClientes.Utils.ClientUtils;
 import com.SoftGestionClientes.Utils.Converts.ClientConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -37,10 +38,10 @@ public class ClientServiceImpl implements IClientService {
     public List<ClientDto> getClientByName(String name) {
         // get a list with clients with that name
         List<Client> clientsSaved = clientRepository.findByName(name);
-        // check if the lis is not empty
-        clientUtils.validateList(clientsSaved);
         //get clients active
         List<Client> clientsActive = clientUtils.filterClientsActive(clientsSaved);
+        // check if the lis is not empty
+        clientUtils.validateList(clientsActive);
         // returns a list with dtos of all active clients filtered by her name
         return clientsActive.stream()
                 .map(client -> clientConverter.convertToDto(client, ClientDto.class))
@@ -117,6 +118,7 @@ public class ClientServiceImpl implements IClientService {
      * @return a ClientDto object representing active client.
      */
     @Override
+    @Transactional
     public ClientDto createClient(ClientDto client, ERole userRole) {
         // check if role has authorization
         clientUtils.validateRoleUser(userRole);
@@ -139,6 +141,7 @@ public class ClientServiceImpl implements IClientService {
      * @return a ClientDto object representing active client.
      */
     @Override
+    @Transactional
     public ClientDto updateClient(ClientDto client) {
         // validate if client exists
         if (!clientRepository.existsById(client.getId())){
