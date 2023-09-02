@@ -2,16 +2,13 @@ package com.SoftGestionClientes.Services.ServiceImpl;
 
 import com.SoftGestionClientes.Dto.PaymentDto;
 import com.SoftGestionClientes.Enums.EPaymentMethod;
-import com.SoftGestionClientes.Exception.BadRequestException;
 import com.SoftGestionClientes.Exception.NotFoundException;
 import com.SoftGestionClientes.Model.Client;
 import com.SoftGestionClientes.Model.Payment;
-import com.SoftGestionClientes.Repository.IClientRepository;
 import com.SoftGestionClientes.Repository.IPaymentRepository;
 import com.SoftGestionClientes.Services.IPaymentService;
-import com.SoftGestionClientes.Utils.ClientUtils;
 import com.SoftGestionClientes.Utils.Converts.PaymentConverter;
-import com.SoftGestionClientes.Utils.Converts.PaymentUtils;
+import com.SoftGestionClientes.Utils.PaymentUtils;
 import com.SoftGestionClientes.Utils.DateValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,11 +20,6 @@ import java.util.stream.Collectors;
 
 @Service
 public class PaymentServiceImpl implements IPaymentService {
-    @Autowired
-    private IClientRepository clientRepository;
-
-    @Autowired
-    private ClientUtils clientUtils;
 
     @Autowired
     private IPaymentRepository paymentRepository;
@@ -47,9 +39,9 @@ public class PaymentServiceImpl implements IPaymentService {
      * @return List of PaymentDto objects.
      */
     @Override
-    public List<PaymentDto> getPaymentByClientId(Long clientId) {
+    public List<PaymentDto> getPaymentsByClientId(Long clientId) {
         // validate the client
-        paymentUtils.validateClient(clientId);
+        Client client  = paymentUtils.getAndValidateClient(clientId);
         // get the payments by client id
         List<Payment> paymentsSaved = paymentRepository.findByClientId(clientId);
         // check if the list is not empty
@@ -122,19 +114,15 @@ public class PaymentServiceImpl implements IPaymentService {
     @Override
     public PaymentDto createPayment(PaymentDto payment) {
         //validate that amount is positive
-        if (payment.getAmount() < 0){
-            throw new BadRequestException("Amount cannot be less that zero");
-        }
+        paymentUtils.validateAmount(payment);
         // get client registered and active
-        Client clientSaved = clientUtils.getClientAndValidate(payment.getClient().getId());
+        Client clientSaved = paymentUtils.getAndValidateClient(payment.getClient().getId());
         // update client balance
-        clientUtils.updateClientBalance(clientSaved, payment.getAmount(), false);
+        paymentUtils.subtractPaymentAmountToClientBalance(clientSaved, payment.getAmount());
         // save payment
         Payment paymentSaved = paymentRepository.save(paymentConverter.convertToEntity(payment, Payment.class));
-        // add the payment to payments client
-        clientSaved.getPayments().add(paymentSaved);// ESTE TENGO QUE REVISAR. PODRIA CREAR UN METODO EN CLIENTUTILS
         // update the client with the new payment
-        Client clientUpdated = clientRepository.save(clientSaved);
+        paymentUtils.addPaymentToClientList(clientSaved, paymentSaved);
         // return dto of payment
         return paymentConverter.convertToDto(paymentSaved, PaymentDto.class);
     }
@@ -148,23 +136,18 @@ public class PaymentServiceImpl implements IPaymentService {
     @Override
     public PaymentDto updatePayment(PaymentDto payment) {
         //validate that amount is positive
-        if (payment.getAmount() < 0){
-            throw new BadRequestException("Amount cannot be less that zero");
+        paymentUtils.validateAmount(payment);
+       // get the prev payment
+        Payment oldPayment = paymentUtils.getPaymentValidated(payment.getId());
+        // get client validated
+        Client clientSaved = paymentUtils.getAndValidateClient(payment.getClient().getId());
+        // check if both payments are not equals
+        if(!oldPayment.getAmount().equals(payment.getAmount())){
+            // Add previous payment amount
+            paymentUtils.addPaymentAmountToClientBalance(clientSaved, oldPayment.getAmount());
+            // Subtract the new amount to the client balance
+            paymentUtils.subtractPaymentAmountToClientBalance(clientSaved, payment.getAmount());
         }
-        // get existing payment or run a exception
-        Payment paymentSaved = paymentRepository.findById(payment.getId()).orElseThrow(()-> new NotFoundException("Payment not found"));
-        // get client registered and active
-        Client clientSaved = clientUtils.getClientAndValidate(payment.getClient().getId());
-        if(!paymentSaved.getAmount().equals(payment.getAmount())){
-            // Add the original amount from the customer's balance
-            clientUtils.updateClientBalance(clientSaved, paymentSaved.getAmount(), true);
-            // Subtract the new amount from the customer's balance
-            clientUtils.updateClientBalance(clientSaved, payment.getAmount(), false);
-        }
-        // update client balance
-        clientRepository.save(clientSaved);
-        // update the new amount on payment saved
-        paymentSaved.setAmount(payment.getAmount());
         // save the payment with new amount
         Payment newPayment = paymentRepository.save(paymentConverter.convertToEntity(payment, Payment.class));
         // return dto of payment
@@ -179,7 +162,7 @@ public class PaymentServiceImpl implements IPaymentService {
     @Override
     public PaymentDto getPaymentById(Long id) {
         // find payment saved
-        Payment paymentSaved = paymentRepository.findById(id).orElseThrow(()-> new NotFoundException("Payment with id: " + id +" not found"));
+        Payment paymentSaved = paymentUtils.getPaymentValidated(id);
         //return dto of payment
         return paymentConverter.convertToDto(paymentSaved, PaymentDto.class);
     }
@@ -193,11 +176,11 @@ public class PaymentServiceImpl implements IPaymentService {
     @Transactional
     public void deletePaymentById(Long id) {
         // get a payment or run an exception
-        Payment paymentSaved = paymentRepository.findById(id).orElseThrow(() -> new NotFoundException("Payment not found"));
+        Payment paymentSaved = paymentUtils.getPaymentValidated(id);
         // get the client of payment
-        Client client = paymentSaved.getClient();
+        Client client = paymentUtils.getAndValidateClient(paymentSaved.getClient().getId());
         // add the amount payment to balance client
-        clientUtils.updateClientBalance(client, paymentSaved.getAmount(), true);
+        paymentUtils.addPaymentAmountToClientBalance(client, paymentSaved.getAmount());
         // delete the payment
         paymentRepository.deleteById(id);
     }

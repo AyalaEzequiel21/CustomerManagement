@@ -34,9 +34,11 @@ public class Client {
     private ECategoryPrice categoryPrice;
 
     @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Column(name = "sales")
     private Set<Sale> sales = new HashSet<>();
 
     @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Column(name = "payments")
     private Set<Payment> payments = new HashSet<>();
 
     private double balance = 0.0;

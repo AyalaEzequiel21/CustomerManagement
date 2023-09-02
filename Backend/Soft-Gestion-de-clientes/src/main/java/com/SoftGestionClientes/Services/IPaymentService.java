@@ -7,7 +7,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 public interface IPaymentService {
-    List<PaymentDto> getPaymentByClientId(Long clientId);
+    List<PaymentDto> getPaymentsByClientId(Long clientId);
     List<PaymentDto> getPaymentsByPaymentDate(LocalDate paymentDate);
     List<PaymentDto> getPaymentsByPaymentMethod(EPaymentMethod paymentMethod);
     List<PaymentDto> getAllPayments();

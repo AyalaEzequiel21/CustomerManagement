@@ -3,10 +3,7 @@ package com.SoftGestionClientes.Model;
 import com.SoftGestionClientes.Enums.EPaymentMethod;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDate;
@@ -27,15 +24,17 @@ public class Payment {
     private LocalDate paymentDate;
 
     @ManyToOne
-    @JoinColumn(name = "customer_id")
+    @JoinColumn(name = "client_id")
     private Client client;
 
     @ManyToOne
     @JoinColumn(name = "report_id")
     private Report report;
 
+    @NonNull
     private Double amount;
 
+    @NonNull
     private EPaymentMethod paymentMethod;
 
     @OneToOne

@@ -11,6 +11,7 @@ import java.util.List;
 @Repository
 public interface IPaymentRepository extends JpaRepository<Payment, Long> {
     List<Payment> findByClientId(Long clientId); // find by client id;
-    List<Payment> findByPaymentDate(LocalDate paymentDate);
-    List<Payment> findByPaymentMethod(EPaymentMethod paymentMethod);
+    List<Payment> findByPaymentDate(LocalDate paymentDate); // find by date of payment
+    List<Payment> findByPaymentMethod(EPaymentMethod paymentMethod); // find by payment method
+
 }
