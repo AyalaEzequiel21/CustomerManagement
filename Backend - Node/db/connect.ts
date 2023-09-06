@@ -1,4 +1,9 @@
 import mongoose from 'mongoose'
+import dotenv from 'dotenv'
+import UserModel from '../models/user'
+
+// config dotenv
+dotenv.config()
 
 async function connectDB() {
     if(!process.env.MONGODB_URL){
@@ -6,7 +11,20 @@ async function connectDB() {
     }
     try {
         await mongoose.connect(process.env.MONGODB_URL)
+        // const newUser = new UserModel({
+        // username:"beybi",
+        // email: "beybi@mail.com",
+        // password: "daleboca",
+        // roles:{
+        //     admin: true,
+        //     biller: false,
+        //     delivery: false
+        // }
+        // })
         console.log("connection succesful");
+        // newUser.save()
+        // console.log(newUser);
+        
         
     } catch (error) {
         console.log("Error to connect Data Base, " + error);
