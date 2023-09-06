@@ -2,7 +2,6 @@ package com.SoftGestionClientes.Services.ServiceImpl;
 
 import com.SoftGestionClientes.Dto.PaymentDto;
 import com.SoftGestionClientes.Enums.EPaymentMethod;
-import com.SoftGestionClientes.Exception.NotFoundException;
 import com.SoftGestionClientes.Model.Client;
 import com.SoftGestionClientes.Model.Payment;
 import com.SoftGestionClientes.Repository.IPaymentRepository;
@@ -10,6 +9,7 @@ import com.SoftGestionClientes.Services.IPaymentService;
 import com.SoftGestionClientes.Utils.Converts.PaymentConverter;
 import com.SoftGestionClientes.Utils.PaymentUtils;
 import com.SoftGestionClientes.Utils.DateValidator;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +18,9 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static java.rmi.server.LogStream.log;
+
+@Slf4j
 @Service
 public class PaymentServiceImpl implements IPaymentService {
 
@@ -32,6 +35,8 @@ public class PaymentServiceImpl implements IPaymentService {
 
     @Autowired
     private DateValidator dateValidator;
+
+    private String tag = "Payment service";
 
     /**
      * Retrieves a list of payments as DTOs for a specific client.
@@ -115,14 +120,19 @@ public class PaymentServiceImpl implements IPaymentService {
     public PaymentDto createPayment(PaymentDto payment) {
         //validate that amount is positive
         paymentUtils.validateAmount(payment);
+        log.info("Amount validated from " + tag);
         // get client registered and active
         Client clientSaved = paymentUtils.getAndValidateClient(payment.getClient().getId());
+        log.info("Client obtained from " + tag);
         // update client balance
         paymentUtils.subtractPaymentAmountToClientBalance(clientSaved, payment.getAmount());
+        log.info("Payment subtracted from " + tag);
         // save payment
         Payment paymentSaved = paymentRepository.save(paymentConverter.convertToEntity(payment, Payment.class));
+        log.info("Payment saved from " + tag);
         // update the client with the new payment
         paymentUtils.addPaymentToClientList(clientSaved, paymentSaved);
+        log.info("Payment added to client set from " + tag);
         // return dto of payment
         return paymentConverter.convertToDto(paymentSaved, PaymentDto.class);
     }

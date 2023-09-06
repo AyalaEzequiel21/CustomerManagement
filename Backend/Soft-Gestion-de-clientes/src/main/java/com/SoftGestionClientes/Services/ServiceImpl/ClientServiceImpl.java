@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -129,8 +130,18 @@ public class ClientServiceImpl implements IClientService {
         }
         //check attributes of client
         clientUtils.validateAttributesClient(client);
+        // create a client with info to clientDto
+        Client clientEntity = Client.builder()
+                .name(client.getName())
+                .phone(client.getPhone())
+                .categoryPrice(client.getCategoryPrice())
+                .sales(new HashSet<>())
+                .payments(new HashSet<>())
+                .balance(0.00)
+                .isActive(true)
+                .build();
         // the client created is saved
-        Client clientSaved  = clientRepository.save(clientConverter.convertToEntity(client, Client.class));
+        Client clientSaved  = clientRepository.save(clientEntity);
         // return a dto of client created
         return clientConverter.convertToDto(clientSaved, ClientDto.class);
     }

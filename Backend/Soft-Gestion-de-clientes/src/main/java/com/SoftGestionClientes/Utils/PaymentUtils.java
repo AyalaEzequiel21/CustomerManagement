@@ -55,14 +55,7 @@ public class PaymentUtils {
 
     // add the new payment to the client list
     public void addPaymentToClientList(Client client, Payment payment){
-        // get all client payments
-        Set<Payment> clientPayments = client.getPayments();
-        // add the new payment to set clientPayments
-        clientPayments.add(payment);
-        // set the new Payments to the client
-        client.setPayments(clientPayments);
-        // update the client with the new payment
-        clientRepository.save(client);
+        clientUtils.addPayment(client, payment);
     }
 
     // get the payment if exists or run an exception

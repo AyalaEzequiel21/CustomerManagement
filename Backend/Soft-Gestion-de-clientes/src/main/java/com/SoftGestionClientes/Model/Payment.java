@@ -2,7 +2,6 @@ package com.SoftGestionClientes.Model;
 
 import com.SoftGestionClientes.Enums.EPaymentMethod;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -40,5 +39,4 @@ public class Payment {
     @OneToOne
     @JoinColumn(name = "sale_id")
     private Sale sale;
-
 }

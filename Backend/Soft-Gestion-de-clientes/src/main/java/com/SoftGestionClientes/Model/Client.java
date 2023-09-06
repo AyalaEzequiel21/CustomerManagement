@@ -35,13 +35,13 @@ public class Client {
 
     @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval = true)
     @Column(name = "sales")
-    private Set<Sale> sales = new HashSet<>();
+    private Set<Sale> sales;
 
     @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval = true)
     @Column(name = "payments")
-    private Set<Payment> payments = new HashSet<>();
+    private Set<Payment> payments;
 
-    private double balance = 0.0;
+    private double balance;
 
-    private boolean isActive = true;
+    private boolean isActive;
 }

@@ -59,9 +59,9 @@ public class ClientUtils {
         if (client.getBalance() < 0.0){
             throw new BadRequestException("The balance cannot be less that 0");
         }
-        if (!client.isActive()){
-            throw new BadRequestException("Cannot create a client inactive");
-        }
+//        if (!client.isActive()){
+//            throw new BadRequestException("Cannot create a client inactive");
+//        }
     }
 
 

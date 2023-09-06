@@ -1,0 +1,25 @@
+{
+  "name": "PraderaSoft-ClientManagement",
+  "version": "1.0.0",
+  "description": "It's an app to management the clients an his balance, the sales and the products of Pradera's business",
+  "main": "index.ts",
+  "author": "Ayala Ezequiel",
+  "license": "MIT",
+  "private": false,
+  "scripts": {
+    "dev": "nodemon index.ts",
+    "build": "tsc"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.17",
+    "nodemon": "^3.0.1",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.2.2"
+  },
+  "dependencies": {
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "mongodb": "^6.0.0",
+    "mongoose": "^7.5.0"
+  }
+}
