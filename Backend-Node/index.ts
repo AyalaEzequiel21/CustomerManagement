@@ -9,7 +9,7 @@ const app = express()
 // connect to Data Base
 connectDB()
 
-app.use('/pradera', routes)
+app.use('/praderaAPI', routes)
 
 const PORT = process.env.PORT || 4000
 
