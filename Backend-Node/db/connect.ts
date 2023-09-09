@@ -1,6 +1,8 @@
 import mongoose from 'mongoose'
 import dotenv from 'dotenv'
 import UserModel from '../models/user'
+import bcrypt from 'bcrypt'
+
 
 // config dotenv
 dotenv.config()
@@ -14,7 +16,7 @@ async function connectDB() {
         // const newUser = new UserModel({
         // username:"beybi",
         // email: "beybi@mail.com",
-        // password: "daleboca",
+        // password: await bcrypt.hash("daleboca", 8),
         // roles:{
         //     admin: true,
         //     biller: false,
