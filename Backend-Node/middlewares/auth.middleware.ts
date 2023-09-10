@@ -8,6 +8,8 @@ export const validateUser = () => {
             const token = req.cookies.jwt
             const user = jwt.verify(token, process.env.SECRET_KEY_SIGN as string )
             req.user = user
+            console.log(user);
+            
             next()
         } catch (error) {
             if(error instanceof JsonWebTokenError || error instanceof TokenExpiredError){

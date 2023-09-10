@@ -1,12 +1,12 @@
 import { Request, Response } from "express"
 import bcrypt from 'bcrypt'
-import UserSchema from '../models/user'
 import jwt from 'jsonwebtoken'
+import UserModel from "../models/user"
 
 export const login = async (req: Request, res: Response) => {
     const {email, password} = req.body
 
-    const user = await UserSchema.findOne({email: email})
+    const user = await UserModel.findOne({email: email})
     if(user){
         const passwordMatch = bcrypt.compareSync(password, user.password as string)
         if(passwordMatch){
