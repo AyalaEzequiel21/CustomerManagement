@@ -23,14 +23,22 @@ const Login: NextPage = () => {
 
     type fieldValues = z.infer<typeof schema>
 
-    const {register, getValues, handleSubmit, formState:{errors}} = useForm<fieldValues>({resolver: zodResolver(schema)})
+    const {
+        register, 
+        getValues, 
+        handleSubmit, 
+        formState:{errors}
+    } = useForm<fieldValues>({
+        resolver: zodResolver(schema), 
+        defaultValues: {email: "beybi@mail.com", password: "daleboca"}
+    })
     const router = useRouter()
 
     const onSubmit = () =>{
         const {email, password} = getValues()
         axios
-            .post(`${env.NEXT_PUBLIC_BACKEND_BASE_URL}/auth/login`, {email, password})
-            // .then(response => router.push("/"))
+            .post(`${env.NEXT_PUBLIC_BACKEND_BASE_URL}/auth/login`, {email, password}, {withCredentials: true})
+            .then(response => router.push("/"))
             .catch(error => console.log(error))
         
     }

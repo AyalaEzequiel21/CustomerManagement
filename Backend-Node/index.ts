@@ -2,6 +2,7 @@ import express from "express"
 import routes from './routes'
 import connectDB from "./db/connect"
 import cors from 'cors'
+import cookieParser from 'cookie-parser'
 
 // initialize the app
 
@@ -10,8 +11,9 @@ const app = express()
 // connect to Data Base
 connectDB()
 
+app.use(cookieParser())
 app.use(express.json())
-app.use(cors({origin: "http://localhost:3000"}))
+app.use(cors({origin: "http://localhost:3000", credentials: true}))
 app.use('/praderaAPI', routes)
 
 const PORT = process.env.PORT || 4000

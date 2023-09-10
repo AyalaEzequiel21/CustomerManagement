@@ -4,6 +4,8 @@ import Link from "next/link";
 import styles from "./index.module.css";
 import { Button, ButtonGroup } from '@chakra-ui/react'
 import { useRouter } from "next/router";
+import axios from "axios";
+import { env } from "~/env.mjs";
 
 
 export default function Home() {
@@ -46,15 +48,31 @@ export default function Home() {
               </div>
             </Link>
           </div>
-          <Button 
-            colorScheme='teal' 
-            variant='outline' 
-            onClick={() => {
-              router.push("/login")
-            }}
-            >
-            Login
-          </Button>
+          <ButtonGroup>
+            <Button 
+              colorScheme='teal' 
+              variant='outline' 
+              onClick={() => {
+                router.push("/login")
+              }}
+              >
+              Login
+            </Button>
+
+            <Button 
+              colorScheme='green' 
+              variant='outline' 
+              onClick={() => {
+                try{
+                  const data = axios.get(`${env.NEXT_PUBLIC_BACKEND_BASE_URL}/home`, {withCredentials: true})
+                }catch(error){
+                  console.log(error);
+                }
+              }}
+              >
+              Home
+            </Button>
+          </ButtonGroup>
         </div>
       </main>
     </>
