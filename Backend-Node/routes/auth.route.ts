@@ -11,6 +11,6 @@ router.post("/login", login)
 // USER REGISTER
 router.post("/register", register)
 // GET ALL USERS
-router.get("/", getAllUsers)
+router.get("/users", getAllUsers)
 
 export default router

@@ -13,6 +13,8 @@ import { useRouter } from "next/router";
 import { z } from "zod";
 import {zodResolver} from '@hookform/resolvers/zod'
 import { auto } from "@popperjs/core";
+import Image from "next/image";
+import img from '../assets/logo.png'
 
 
 const Login: NextPage = () => {
@@ -50,6 +52,8 @@ const Login: NextPage = () => {
 
     return (
         <Container marginTop={200}>
+            {/* <Image
+            src={logo}/> */}
             <Heading textAlign="center" className="cg">Iniciar sesión</Heading>
             <Card padding={8}>
                 <form onSubmit={handleSubmit(onSubmit, onError)}>
