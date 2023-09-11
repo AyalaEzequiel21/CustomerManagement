@@ -2,9 +2,9 @@ import { NextPage } from "next";
 import { 
     Container, 
     Heading,
-    Card, CardHeader, CardBody, CardFooter,
+    Card,
     FormControl, FormLabel, FormErrorMessage, Input,
-    Button
+    Button, ButtonGroup
 } from '@chakra-ui/react'
 import {useForm} from 'react-hook-form'
 import axios from 'axios'
@@ -12,6 +12,7 @@ import { env } from "~/env.mjs";
 import { useRouter } from "next/router";
 import { z } from "zod";
 import {zodResolver} from '@hookform/resolvers/zod'
+import { auto } from "@popperjs/core";
 
 
 const Login: NextPage = () => {
@@ -48,7 +49,7 @@ const Login: NextPage = () => {
     }
 
     return (
-        <Container marginTop={10}>
+        <Container marginTop={200}>
             <Heading textAlign="center" className="cg">Iniciar sesión</Heading>
             <Card padding={8}>
                 <form onSubmit={handleSubmit(onSubmit, onError)}>
@@ -57,6 +58,7 @@ const Login: NextPage = () => {
                         <Input 
                             type="text" 
                             placeholder="Ingresa tu email"
+                            focusBorderColor='green.500'
                             {...register("email")}
                         />
                         <FormErrorMessage>{errors.email?.message}</FormErrorMessage>
@@ -66,16 +68,23 @@ const Login: NextPage = () => {
                         <Input 
                             type="password" 
                             placeholder="Ingresa tu contraseña"
+                            focusBorderColor='green.500'
                             {...register("password")}
                         />
                         <FormErrorMessage>{errors.password?.message}</FormErrorMessage>
                     </FormControl>
-                    <Button 
-                        marginTop={4} 
-                        colorScheme='teal' 
-                        variant='outline'
-                        type="submit"
-                        >Login</Button>
+                    <ButtonGroup>
+                        <Button 
+                            width="200px"
+                            marginTop={4} 
+                            colorScheme='green' 
+                            variant='solid'
+                            type="submit"
+                            mx="auto"
+                        >
+                            Login
+                        </Button>
+                    </ButtonGroup>
                 </form>
             </Card>
         </Container>

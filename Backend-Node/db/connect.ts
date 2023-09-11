@@ -17,15 +17,11 @@ async function connectDB() {
         // username:"beybi",
         // email: "beybi@mail.com",
         // password: await bcrypt.hash("daleboca", 8),
-        // roles:{
-        //     admin: true,
-        //     biller: false,
-        //     delivery: false
-        // }
+        // role: "admin"
         // })
         console.log("connection succesful");
         // newUser.save()
-        // console.log(newUser);
+        // console.log("user created");
         
         
     } catch (error) {

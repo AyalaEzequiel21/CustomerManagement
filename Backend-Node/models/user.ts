@@ -5,7 +5,7 @@ const userSchema = new Schema({
     username: {type: String, unique: true, require: true},
     email: { type: String, unique: true, require: true},
     password: { type: String, require: true, length: 8},
-    roles: {type: String, enum: ERole, require: true}
+    role: {type: String, enum: ERole, require: true}
 })
 const UserModel = model("User", userSchema, "users")
 

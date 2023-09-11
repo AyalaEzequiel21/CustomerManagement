@@ -6,6 +6,7 @@ const clientSchema = new Schema({
     phone: {type: String, unique:true, require: true},
     register_date: {type: Date, default: Date.now()},
     category: {type: String, enum: ECategory, require: true},
+    balance: {type: Number, default: 0.0},
     sales: [{type: mongoose.Schema.Types.ObjectId, ref: "Sale"}],
     payments: [{type: mongoose.Schema.Types.ObjectId, ref: "Payment"}],
     is_active: {type: Boolean, default: true}
