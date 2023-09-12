@@ -2,7 +2,7 @@ import Head from "next/head";
 import Link from "next/link";
 
 import styles from "./index.module.css";
-import { Button, ButtonGroup, Card } from '@chakra-ui/react'
+import { Button, ButtonGroup, Card, Container } from '@chakra-ui/react'
 import { useRouter } from "next/router";
 import axios from "axios";
 import { env } from "~/env.mjs";
@@ -13,13 +13,12 @@ export default function Home() {
   const router = useRouter()
 
   return (
-    <>
-    <main>
-      <Card>
+    <Container mt={200}>
+      <Card p={10}>
         <ButtonGroup>
         <Button 
               colorScheme='teal' 
-              variant='outline' 
+              variant='solid' 
               onClick={() => {
                 router.push("/login")
               }}
@@ -27,17 +26,25 @@ export default function Home() {
               Login
             </Button>
             <Button 
-              colorScheme='teal' 
-              variant='outline' 
+              colorScheme='green' 
+              variant='solid' 
               onClick={() => {
                 router.push("/clients/ClientForm")
               }}
               >
-              Client
+              Registar Cliente
+            </Button>
+            <Button 
+              colorScheme='purple' 
+              variant='solid' 
+              onClick={() => {
+                router.push("/clients")
+              }}
+              >
+              Todos los clientes
             </Button>
         </ButtonGroup>
       </Card>
-    </main>
-    </>
+    </Container>
   );
 }

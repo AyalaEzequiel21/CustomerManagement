@@ -51,7 +51,7 @@ const Login: NextPage = () => {
     }
 
     return (
-        <Container marginTop={200}>
+        <Container mt={10}>
             {/* <Image
             src={logo}/> */}
             <Heading textAlign="center" className="cg">Iniciar sesión</Heading>
@@ -84,7 +84,6 @@ const Login: NextPage = () => {
                             colorScheme='green' 
                             variant='solid'
                             type="submit"
-                            mx="auto"
                         >
                             Login
                         </Button>

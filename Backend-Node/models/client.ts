@@ -7,8 +7,8 @@ const clientSchema = new Schema({
     register_date: {type: Date, default: Date.now()},
     category: {type: String, enum: ECategory, require: true},
     balance: {type: Number, default: 0.0},
-    sales: [{type: mongoose.Schema.Types.ObjectId, ref: "Sale"}],
-    payments: [{type: mongoose.Schema.Types.ObjectId, ref: "Payment"}],
+    sales: [{type: mongoose.Schema.Types.ObjectId, ref: "Sale", default: new Array}],
+    payments: [{type: mongoose.Schema.Types.ObjectId, ref: "Payment", default: new Array}],
     is_active: {type: Boolean, default: true}
 })
 
