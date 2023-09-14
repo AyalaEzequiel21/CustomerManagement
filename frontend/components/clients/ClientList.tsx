@@ -2,6 +2,7 @@ import { Container, Flex, Text } from "@chakra-ui/layout"
 import  {Client} from '../../src/pages/clients/ClientForm'
 import { Card } from "@chakra-ui/card"
 import { Button, ButtonGroup } from "@chakra-ui/button"
+import { useRouter } from "next/router"
 
 interface ClientDB extends Client {
     _id: string
@@ -12,6 +13,8 @@ interface Props {
 }
 
 const ClientList = ({clients}: Props) => {
+
+    const router = useRouter()
     
     return (
         <Flex flexDir={"column"} gap={2}>
@@ -29,6 +32,7 @@ const ClientList = ({clients}: Props) => {
                     </Flex>
                 </Card>
             ))}
+            <Button colorScheme={"blue"} onClick={()=> {router.back()}}>Volver</Button>
         </Flex>
     )
 }
