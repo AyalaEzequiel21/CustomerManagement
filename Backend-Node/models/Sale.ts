@@ -1,15 +1,15 @@
 import mongoose, { Schema, model } from "mongoose";
 
 const detailSaleSchema = new Schema({
-    product: {type: mongoose.Schema.Types.ObjectId, ref: "Product", require: true},
-    quantity: {type: Number, min: 0.01,  require: true}
+    product: {type: mongoose.Schema.Types.ObjectId, ref: "Product", required: true},
+    quantity: {type: Number, min: 0.01,  required: true}
 })
 
 const saleSchema = new Schema({
     sale_date: {type: Date, default: Date.now()},
-    client: {type: mongoose.Schema.Types.ObjectId, ref: "Client", require: true},
+    client: {type: mongoose.Schema.Types.ObjectId, ref: "Client", required: true},
     details: [detailSaleSchema],
-    totalSale: {type: Number, min: 0.01, require: true},
+    totalSale: {type: Number, min: 0.01, required: true},
     payment: {type: mongoose.Schema.Types.ObjectId, ref: "Payment"}
 })
 

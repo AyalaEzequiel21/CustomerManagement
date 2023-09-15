@@ -7,6 +7,6 @@ const reportSchema = new Schema({
     report_status: {type: String, enum: EReportStatus, default: EReportStatus.Pendiente}
 })
 
-const ReportModel = model("Reportd", reportSchema, "reports")
+const ReportModel = model("Report", reportSchema, "reports")
 
 export default ReportModel

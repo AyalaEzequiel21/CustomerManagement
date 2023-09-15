@@ -1,6 +1,9 @@
 import { Request, Response } from "express";
 import ClientModel from "../models/client";
 
+//
+    // CREATE THE NEW CLIENT
+//
 export const createClient = async (req: Request, res: Response) => {
     const {fullname, phone, category} = req.body
 
