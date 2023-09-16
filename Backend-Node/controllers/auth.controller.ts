@@ -6,26 +6,33 @@ export const login = async (req: Request, res: Response) => {
 
     const token = await authService.loginUser(email, password)
     if (token){
-        return res
-            .cookie("jwt", token)
+        res
+            .cookie("jwt", token,{
+                //       1s    1m   1h   1d
+                maxAge: 1000 * 60 * 60 * 24
+            })
             .status(200)
             .json({ok: true, message: "Login successful"})
     } else {
-        return res
+        res
             .status(404)
             .json({ok: false, message: "User not found"})
     }
-    
-    
+}
+
+export const logout = (req: Request, res: Response) => {
+    res.clearCookie("jwt")
+
+    res.status(200).json({ok: true, message: "Logout successful"})
 }
 
 export const register = async (req: Request, res: Response) => {
     const {username, email, password, role} = req.body
     try {
         const newUser = await authService.createUser({username, email, password, role})
-        return res.status(201).json({ok: true, data: newUser})
+        res.status(201).json({ok: true, data: newUser})
     }catch (error){
-         return res.status(400).json({ok: true, message: `Cannot create the new user, erro: ${error}`})
+        res.status(400).json({ok: true, message: `Cannot create the new user, erro: ${error}`})
     }
 }
 

@@ -26,6 +26,7 @@ export const loginUser = async (email: string, password: string) => {
     return null
 }
 
+
 export const createUser = async (newUser : User) => {
     const {username, email, password, role} = newUser
     validateEmail(email)
