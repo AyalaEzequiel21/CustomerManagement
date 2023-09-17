@@ -1,0 +1,8 @@
+export const UserNotFound = "User not found"
+export const NotAuthorized = "User not authorized"
+export const BadRequest = "Some data is incorrect or missing"
+export const UserAlreadyRegistered = "The email has already been registered"
+export const ProductAlreadyRegistered = "The product name has already been registered"
+export const ClientAlreadyRegistered = "The client name has already been registered"
+export const CheckCredentials = "Please check your credentials"
+export const InternalServer = "Internal Server Error"

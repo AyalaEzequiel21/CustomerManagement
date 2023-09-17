@@ -1,7 +1,9 @@
 import UserModel from "../models/user"
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
-import { User, UserMongo } from "../utils/interfaces/user.interface"
+import { CheckCredentials, UserAlreadyRegistered, UserNotFound } from "../errors/errorMessages"
+import { User, UserMongo } from "../schemas/authSchemas"
+import { AuthenticationError, ResourceAlreadyRegisteredError, ResourceNotFoundError } from "../errors/customErrorrs"
 
 
 /////////////////////////
@@ -20,18 +22,23 @@ const existsEmail = async (email: string) => {
 
 
 export const loginUser = async (email: string, password: string) => {
-    const user = await UserModel.findOne({email: email}) // GET THE USER SAVED 
-    if(user){
-        const passwordMatch = bcrypt.compareSync(password, user.password)  // CHECK IF THE PASSWORD IS MATCH
-        if(passwordMatch){ // IF THE PASSWORD IS MATCH THEN SIGN THE TOKEN AND SEND IT ELSE RETURN NULL
-            const token = jwt.sign(
-                { sub: user._id, email: user.email, role: user.role},
-                process.env.SECRET_KEY_SIGN as string
-            );
-            return token
+    try{
+        const user = await UserModel.findOne({email: email})
+        if(!user) { // IF CAN NOT FOUND THE USER RUN AN EXCEPTION
+            throw new ResourceNotFoundError(UserNotFound);
         }
+        const passwordMatch = await bcrypt.compare(password, user.password) // CHECK IF THE PASSWORD IS MATCH
+        if(!passwordMatch){ // IF THE PASSWORD IS NOT MATCH RUN AN EXCEPTION
+            throw new AuthenticationError(CheckCredentials)
+        }
+        const token = jwt.sign(
+            {sub: user._id, role: user.role}, 
+            process.env.SECRET_KEY_SIGN as string
+        )
+        return token
+    } catch (error){
+        throw error
     }
-    return null
 }
 
 
@@ -39,9 +46,9 @@ export const createUser = async (newUser : User) => {
     const {username, email, password, role} = newUser // GET THE ATTRIBUTES SENDED 
     
     if(await existsEmail(email)){ // IF EMAIL HAS ALREADY BEEN REGISTERED RUN AN EXCEPTION
-        throw new Error("The email has already been registered")
+        throw new ResourceAlreadyRegisteredError(UserAlreadyRegistered)
     } else{
-        const hashPassword = bcrypt.hashSync(password, 8) // PASSWORD TO HASH
+        const hashPassword = await bcrypt.hash(password, 8) // PASSWORD TO HASH
         try{
             const newUser = UserModel.create({ // CREATE THE NEW USER AND SEND IT
                 username: username, 
@@ -51,10 +58,9 @@ export const createUser = async (newUser : User) => {
             })  
             return newUser
         } catch (error){
-            throw new Error("A problem has occurred")
+            throw error
         }
-    }
-    
+    } 
 }
 
 export const updateUser = async (userUpdated: UserMongo) => {
@@ -72,10 +78,10 @@ export const updateUser = async (userUpdated: UserMongo) => {
             const updatedUser = await existingUser.save() // SAVE THE USER UPDATED AND SEND IT
             return updatedUser
         } catch (error){
-            throw new Error("A problem has occurred")
+            throw error
         }
     } else{
-        throw new Error("User not found")
+        throw new ResourceNotFoundError(UserNotFound)
     }
 }
 
@@ -84,7 +90,7 @@ export const getAllUsers = async () => {
     if (users.length != 0){
         return users
     } else {
-        throw new Error("Users not found")
+        throw new ResourceNotFoundError(UserNotFound)
     }
 }
 
@@ -92,6 +98,6 @@ export const removeUser = async (userId: string) => {
     try{
         await UserModel.findByIdAndDelete(userId) // FIND THE USER AND DELETE
     } catch (error){ 
-       throw new Error("User not found")
+       throw new ResourceNotFoundError(UserNotFound)
     }
 }
