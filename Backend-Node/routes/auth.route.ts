@@ -1,5 +1,5 @@
 import express from "express";
-import { getAllUsers, login, logout, register } from "../controllers/auth.controller";
+import { deleteUser, getAllUsers, login, logout, registerUser, updateUser } from "../controllers/auth.controller";
 import { validateRoleUser, validateUser } from "../middlewares/auth.middleware";
 import { ERole } from "../enums/ERole";
 
@@ -15,8 +15,12 @@ router.use(validateUser())
 router.post("/logout", logout)
 
 // USER REGISTER
-router.post("/register", validateRoleUser([ERole.Admin]), register)
+router.post("/user/register", validateRoleUser([ERole.Admin]), registerUser)
+// USER UPDATE
+router.put("/user/update", validateRoleUser([ERole.Admin]), updateUser)
 // GET ALL USERS
 router.get("/users", validateRoleUser([ERole.Admin]), getAllUsers)
+// USER DELETE 
+router.delete("/user/delete/:id", validateRoleUser([ERole.Admin]), deleteUser)
 
 export default router
