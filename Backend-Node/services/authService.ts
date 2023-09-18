@@ -3,7 +3,7 @@ import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 import { CheckCredentials, UserAlreadyRegistered, UserNotFound } from "../errors/errorMessages"
 import { User, UserMongo } from "../schemas/authSchemas"
-import { AuthenticationError, ResourceAlreadyRegisteredError, ResourceNotFoundError } from "../errors/customErrorrs"
+import { AuthenticationError, ResourceAlreadyRegisteredError, ResourceNotFoundError } from "../errors/customErrors"
 
 
 /////////////////////////
@@ -24,6 +24,7 @@ const existsEmail = async (email: string) => {
 export const loginUser = async (email: string, password: string) => {
     try{
         const user = await UserModel.findOne({email: email})
+
         if(!user) { // IF CAN NOT FOUND THE USER RUN AN EXCEPTION
             throw new ResourceNotFoundError(UserNotFound);
         }
@@ -35,6 +36,7 @@ export const loginUser = async (email: string, password: string) => {
             {sub: user._id, role: user.role}, 
             process.env.SECRET_KEY_SIGN as string
         )
+
         return token
     } catch (error){
         throw error

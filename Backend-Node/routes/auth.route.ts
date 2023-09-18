@@ -3,18 +3,17 @@ import { deleteUser, getAllUsers, login, logout, registerUser, updateUser } from
 import { validateRoleUser, validateSchemaRequest, validateUser } from "../middlewares/auth.middleware";
 import { ERole } from "../enums/ERole";
 import { userMongoSchema, userRegistrationSchema } from "../schemas/authSchemas";
-import { errorHandler } from "../middlewares/error.middleware";
 
 const router = express.Router()
 
 // USER LOGIN
 router.post("/login", login)
 
-// MIDDLEWARE FOR VALIDATE IF USER IS AUTHENTICATED
-router.use(validateUser())
-
 // USER LOGOUT
 router.post("/logout", logout)
+
+// MIDDLEWARE FOR VALIDATE IF USER IS AUTHENTICATED
+router.use(validateUser())
 
 // MIDDLEWARE FOR CHECK IF USER ROLE IS VALID
 router.use(validateRoleUser([ERole.Admin]))
@@ -27,8 +26,6 @@ router.put("/user/update", validateSchemaRequest(userMongoSchema), updateUser)
 router.get("/users", getAllUsers)
 // USER DELETE 
 router.delete("/user/delete/:id", deleteUser)
-
-router.use(errorHandler)
 
 
 export default router

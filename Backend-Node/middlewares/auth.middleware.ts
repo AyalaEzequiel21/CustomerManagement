@@ -4,7 +4,7 @@ import { ERole } from '../enums/ERole'
 import z from "zod"
 import { BadRequest, CheckCredentials, InternalServer, NotAuthorized } from '../errors/errorMessages'
 import { UserCookie } from '../schemas/authSchemas'
-import { AuthenticationError, BadRequestError, InternalServerError } from '../errors/customErrorrs'
+import { AuthenticationError, BadRequestError, InternalServerError } from '../errors/customErrors'
 
 
 interface CustomRequest extends Request {
@@ -34,6 +34,7 @@ export const validateUser = () => {
         } catch (error) {
             if(error instanceof JsonWebTokenError || error instanceof TokenExpiredError || error instanceof AuthenticationError){
                 throw new AuthenticationError(NotAuthorized)
+                
             }else {
                 throw new InternalServerError(InternalServer)
             }
@@ -50,7 +51,7 @@ export const validateRoleUser = (allowedRoles: ERole[] = []) => {
         const user = getCookiesUser(req)
 
         if(allowedRoles.length > 0 && !allowedRoles.includes(user.role)){
-            throw new AuthenticationError(CheckCredentials)
+            return next(new AuthenticationError(CheckCredentials));
         }
         next()
     }
@@ -65,8 +66,9 @@ export const validateSchemaRequest = (schema: z.ZodType<any>) => {
             req.body = validatedData
             next()
         } catch (error){
-            if (error instanceof z.ZodError)
-            throw new BadRequestError(BadRequest)
+            if (error instanceof z.ZodError){
+                throw new BadRequestError(BadRequest)
+            }
         }
     }
 }
