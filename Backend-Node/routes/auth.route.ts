@@ -2,13 +2,12 @@ import express from "express";
 import { deleteUser, getAllUsers, login, logout, registerUser, updateUser } from "../controllers/auth.controller";
 import { validateRoleUser, validateSchemaRequest, validateUser } from "../middlewares/auth.middleware";
 import { ERole } from "../enums/ERole";
-import { userMongoSchema, userRegistrationSchema } from "../schemas/authSchemas";
-
+import { loginDataSchema, userMongoSchema, userRegistrationSchema } from "../schemas/authSchemas";
+ 
 const router = express.Router()
 
 // USER LOGIN
-router.post("/login", login)
-
+router.post("/login", validateSchemaRequest(loginDataSchema), login)
 // USER LOGOUT
 router.post("/logout", logout)
 

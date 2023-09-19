@@ -1,7 +1,5 @@
 import mongoose from 'mongoose'
 import dotenv from 'dotenv'
-import UserModel from '../models/user'
-import bcrypt from 'bcrypt'
 
 
 // config dotenv
@@ -13,17 +11,8 @@ async function connectDB() {
     }
     try {
         await mongoose.connect(process.env.MONGODB_URL)
-        // const newUser = new UserModel({
-        // username:"beybi",
-        // email: "beybi@mail.com",
-        // password: await bcrypt.hash("daleboca", 8),
-        // role: "admin"
-        // })
-        console.log("connection succesful");
-        // newUser.save()
-        // console.log("user created");
-        
-        
+
+        console.log("connection succesful");  
     } catch (error) {
         console.log("Error to connect Data Base, " + error);
     }

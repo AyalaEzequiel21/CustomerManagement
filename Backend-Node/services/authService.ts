@@ -1,9 +1,9 @@
 import UserModel from "../models/user"
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
-import { CheckCredentials, UserAlreadyRegistered, UserNotFound } from "../errors/errorMessages"
+import { BadRequest, CheckCredentials, InternalServer, UserAlreadyRegistered, UserNotFound } from "../errors/errorMessages"
 import { User, UserMongo } from "../schemas/authSchemas"
-import { AuthenticationError, ResourceAlreadyRegisteredError, ResourceNotFoundError } from "../errors/customErrors"
+import { AuthenticationError, BadRequestError, InternalServerError, ResourceAlreadyRegisteredError, ResourceNotFoundError } from "../errors/customErrors"
 
 
 /////////////////////////
@@ -18,6 +18,17 @@ const existsEmail = async (email: string) => {
         response = true
     } 
     return response
+}
+
+// function to check if exists an user
+export const validateUserExists = async (userId: string) => {
+    try{
+        const userExists = await UserModel.exists({_id: userId})
+        userExists? userExists : new ResourceNotFoundError(UserNotFound)
+
+    } catch(error){
+        throw new InternalServerError(InternalServer)
+    }
 }
 
 
@@ -47,7 +58,7 @@ export const loginUser = async (email: string, password: string) => {
 export const createUser = async (newUser : User) => {
     const {username, email, password, role} = newUser // GET THE ATTRIBUTES SENDED 
     
-    if(await existsEmail(email)){ // IF EMAIL HAS ALREADY BEEN REGISTERED RUN AN EXCEPTION
+    if(await existsEmail(email)){ // IF EMAIL HAS ALREADY BEEN REGISTERED RUN AN EXCEPTION        
         throw new ResourceAlreadyRegisteredError(UserAlreadyRegistered)
     } else{
         const hashPassword = await bcrypt.hash(password, 8) // PASSWORD TO HASH
@@ -60,7 +71,7 @@ export const createUser = async (newUser : User) => {
             })  
             return newUser
         } catch (error){
-            throw error
+            throw new BadRequestError(BadRequest)
         }
     } 
 }
@@ -80,7 +91,7 @@ export const updateUser = async (userUpdated: UserMongo) => {
             const updatedUser = await existingUser.save() // SAVE THE USER UPDATED AND SEND IT
             return updatedUser
         } catch (error){
-            throw error
+            throw new BadRequestError(InternalServer)
         }
     } else{
         throw new ResourceNotFoundError(UserNotFound)
@@ -98,8 +109,12 @@ export const getAllUsers = async () => {
 
 export const removeUser = async (userId: string) => {
     try{
-        await UserModel.findByIdAndDelete(userId) // FIND THE USER AND DELETE
+        const userSaved = await UserModel.findById(userId)
+        if(!userSaved){
+            throw new ResourceNotFoundError(UserNotFound)
+        }
+        await UserModel.findByIdAndDelete(userId)
     } catch (error){ 
-       throw new ResourceNotFoundError(UserNotFound)
+       throw new InternalServerError(InternalServer)
     }
 }

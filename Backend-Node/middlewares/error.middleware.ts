@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { AuthenticationError, BadRequestError, ResourceNotFoundError, ResourceAlreadyRegisteredError } from "../errors/customErrors";
 import { InternalServer } from "../errors/errorMessages";
 
-export const errorHandler = (error: Error, res: Response) => {
+export const errorHandler = (error: Error, req: Request, res: Response, next: NextFunction) => {
         // console.error("Error occurred:", error); // Agrega esta línea para depurar
         switch (true) {
             case error instanceof AuthenticationError: 

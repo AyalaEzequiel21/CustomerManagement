@@ -16,12 +16,11 @@ app.use(cookieParser())
 app.use(express.json())
 app.use(cors({origin: "http://localhost:3000", credentials: true}))
 app.use('/praderaAPI', routes)
-// app.use(errorHandler)
+app.use(errorHandler)
 
 const PORT = process.env.PORT || 4000
 
 app.listen(PORT, ()=> {
-    console.log("App listening in port: ", PORT);
-    
+    console.log("App listening in port: ", PORT);    
 })
 

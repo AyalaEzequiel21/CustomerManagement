@@ -6,7 +6,7 @@ import { ERole } from "../enums/ERole";
 export const userRegistrationSchema = z.object({
     username: z.string().min(3),
     email: z.string().email(),
-    password: z.string().length(8),
+    password: z.string(),
     role: z.nativeEnum(ERole)
 })
 
@@ -29,3 +29,10 @@ export const userCookieSchema = z.object({
 })
 
 export type UserCookie = z.infer<typeof userCookieSchema>
+
+// LOGIN DATA
+
+export const loginDataSchema = z.object({
+    email: z.string().email(),
+    password: z.string()
+})
