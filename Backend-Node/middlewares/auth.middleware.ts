@@ -63,3 +63,21 @@ export const validateSchemaRequest = (schema: z.ZodType<any>) => {
         }
     }
 }
+
+// check the user role, if is delivery then filter all the clients 
+// and return only clients with in_delivery: true 
+export const authorizeGetAllClients = (allowedRoles: ERole[]) => {
+    return (req: any, res: Response, next: NextFunction) => {
+        const user = req.user 
+        if(allowedRoles.includes(user.role)){
+            if(user.role === ERole.Delivery){
+                req.filterClientsInDelivery = true
+            } else {
+                req.filterClientsInDelivery = false
+            }
+            next()
+        } else{
+            throw new AuthenticationError(NotAuthorized)
+        }
+    }
+}

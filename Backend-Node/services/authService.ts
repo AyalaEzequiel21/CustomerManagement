@@ -100,7 +100,7 @@ export const updateUser = async (userUpdated: UserMongo) => {
 
 export const getAllUsers = async () => {
     const users = await UserModel.find() // GET ALL USERS , IF ARRAY LENGTHS IF MORE THAT 0 RETURN USER ELSE RETURN ERROR
-    if (users.length != 0){
+    if (users.length > 0){
         return users
     } else {
         throw new ResourceNotFoundError(UserNotFound)
