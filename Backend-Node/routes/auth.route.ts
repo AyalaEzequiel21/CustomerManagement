@@ -24,7 +24,7 @@ router.put("/user/update", validateSchemaRequest(userMongoSchema), updateUser)
 // GET ALL USERS
 router.get("/users", getAllUsers)
 // USER DELETE 
-router.delete("/user/delete/:id", deleteUser)
+router.delete("/user/delete/:userId", deleteUser)
 
 
 export default router

@@ -9,7 +9,7 @@ export const UserAlreadyRegistered = "The email has already been registered"
 
 // CLIENT ////////////////
 export const ClientNotFound = "Client not found"
-export const ClientAlreadyRegistered = "The client name has already been registered"
+export const ClientAlreadyRegistered = "The client fullname has already been registered"
 
 // PRODUCT ///////////////
 export const ProductAlreadyRegistered = "The product name has already been registered"

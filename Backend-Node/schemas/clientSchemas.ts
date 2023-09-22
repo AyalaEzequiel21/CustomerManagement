@@ -22,7 +22,7 @@ export const clientMongoSchema = clientRegistrationSchema.extend({
     balance: z.number().optional(),
     sales: z.array(z.string()).optional(),
     payments: z.array(z.string()).optional(),
-    is_active: z.boolean().optional()
+    is_active: z.boolean()
 })
 
 export type ClientMongo = z.infer<typeof clientMongoSchema>

@@ -1,5 +1,5 @@
 import express from 'express'
-import { getAllClients } from '../controllers/client.controller'
+import { deleteClient, getAllClients, registerClient, updateClient } from '../controllers/client.controller'
 import { authorizeGetAllClients, validateRoleUser, validateSchemaRequest, validateUser } from '../middlewares/auth.middleware'
 import { ERole } from '../enums/ERole'
 import { clientMongoSchema, clientRegistrationSchema } from '../schemas/clientSchemas'
@@ -10,19 +10,21 @@ const router = express.Router()
 router.use(validateUser())
 
 // GET ALL CLIENTS
-router.get("/", authorizeGetAllClients([ERole.Admin, ERole.Biller]), getAllClients )
+router.get("/", authorizeGetAllClients([ERole.Admin, ERole.Biller, ERole.Delivery]), getAllClients )
 
 // MIDDLEWARE FOR CHECK IF USER ROLE IS VALID
 router.use(validateRoleUser([ERole.Admin, ERole.Biller]))
 
 // CLIENT REGISTER
-router.post("/register", validateSchemaRequest(clientRegistrationSchema))
+router.post("/register", validateSchemaRequest(clientRegistrationSchema), registerClient)
 // CLIENT UPDATE
-router.put("/update", validateSchemaRequest(clientMongoSchema))
+router.put("/update", validateSchemaRequest(clientMongoSchema), updateClient)
 // GET CLIENTS BY NAME
 router.get("/:name")
 // GET CLIENTS BY CATEGORY
 router.get("/category/:category", )
+// DELETE CLIENT BY ID 
+router.delete("/delete/:clientId", deleteClient)
 
 
 export default router

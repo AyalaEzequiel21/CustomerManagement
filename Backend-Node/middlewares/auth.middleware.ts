@@ -56,6 +56,8 @@ export const validateSchemaRequest = (schema: z.ZodType<any>) => {
             next()
         } catch (error){
 
+            console.log("error en el validateSchema", error)
+            
             if (error instanceof z.ZodError){
                 throw new BadRequestError(BadRequest)
             }

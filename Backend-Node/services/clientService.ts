@@ -2,12 +2,13 @@
 // CLIENT SERVICE
 ///////////////////////
 
-import { ResourceNotFoundError } from "../errors/customErrors"
-import { ClientNotFound } from "../errors/errorMessages"
+import { BadRequestError, InternalServerError, ResourceAlreadyRegisteredError, ResourceNotFoundError } from "../errors/customErrors"
+import { BadRequest, ClientAlreadyRegistered, ClientNotFound, InternalServer } from "../errors/errorMessages"
 import ClientModel from "../models/client"
+import { ClientMongo, ClientRegister } from "../schemas/clientSchemas"
 
 // function to validate that the same fullname is not registered twice
-export const isAnvailableName = async (clientFullname: string) => {
+export const isFullnameRegistered = async (clientFullname: string) => {
     let response = false 
     const clientId = await ClientModel.exists({fullname: clientFullname})
     if(clientId) {
@@ -19,12 +20,66 @@ export const isAnvailableName = async (clientFullname: string) => {
 export const getAllClients = async (inDelivery: boolean) => {
     const clients = await ClientModel.find() // GET ALL CLIENTS
     if(clients.length > 0 ){ // IF THE CLIENTS LENGTH IS LESS THAT 0 RN AN EXCEPTION
+        const clientsFiltered = clients.filter(client => client.is_active) // GET ALL ACTIVE CLIENTS
         if (inDelivery){  // IF INDELIVERY IS TRUE RETURN ONLY THE CLIENTS WITH IN_DELIVERY : TRUE 
-                return clients.filter(client => client.in_delivery)
+                return clientsFiltered.filter(client => client.in_delivery)
            }else {  // ELSE RETURN ALL CLIENTS 
-                return clients
+                return clientsFiltered
            }
     } else {
         throw new ResourceNotFoundError(ClientNotFound)
+    }
+}
+
+export const createClient = async (newClient: ClientRegister) => {
+    const {fullname, phone, category, in_delivery} = newClient
+
+    if(await isFullnameRegistered(newClient.fullname)){ // IF FULLNAME HAS ALREADY BEEN REGISTERED RUN AN EXCEPTION
+        throw new ResourceAlreadyRegisteredError(ClientAlreadyRegistered)
+    } else {
+        try {
+            const client = ClientModel.create({ // CREATE THE NEW CLIENT AND SEND IT
+                fullname: fullname, 
+                phone: phone, 
+                category: category, 
+                in_delivery: in_delivery
+            })
+            return client
+        } catch(error){
+            throw new BadRequestError(BadRequest)
+        }
+    }
+}
+
+export const updateClient = async (client: ClientMongo) => {
+    try{
+        const clientSaved = await ClientModel.findById(client._id) // GET THE CLIENT SAVED
+        if (clientSaved){ // IF THE CLIENT EXIS THEN UPDATE 
+            clientSaved.fullname = client.fullname
+            clientSaved.phone = client.phone
+            clientSaved.category = client.category
+            clientSaved.in_delivery = client.in_delivery
+            clientSaved.is_active = client.is_active
+        } else {
+            throw new ResourceNotFoundError(ClientNotFound)
+        }
+        const clientUpdated = await clientSaved.save() // SAVE THE UPDATE AND RETURN 
+        return clientUpdated
+    } catch (error){
+        throw new BadRequestError(BadRequest)
+    }
+}
+
+export const deleteClientById = async (clientId: string) => {
+    try {
+        const clientSaved = await ClientModel.findById(clientId)
+        if(clientSaved){
+            clientSaved.is_active = false
+        }else {
+            throw new ResourceNotFoundError(ClientNotFound)
+        }
+        clientSaved.save()
+    } catch(error){
+        throw new InternalServerError(InternalServer)
     }
 }
