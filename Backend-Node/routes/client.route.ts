@@ -1,5 +1,5 @@
 import express from 'express'
-import { deleteClient, getAllClients, registerClient, updateClient } from '../controllers/client.controller'
+import { deleteClient, getAllClients, getAllClientsWithName, getAllInactiveClients, registerClient, updateClient } from '../controllers/client.controller'
 import { authorizeGetAllClients, validateRoleUser, validateSchemaRequest, validateUser } from '../middlewares/auth.middleware'
 import { ERole } from '../enums/ERole'
 import { clientMongoSchema, clientRegistrationSchema } from '../schemas/clientSchemas'
@@ -20,9 +20,11 @@ router.post("/register", validateSchemaRequest(clientRegistrationSchema), regist
 // CLIENT UPDATE
 router.put("/update", validateSchemaRequest(clientMongoSchema), updateClient)
 // GET CLIENTS BY NAME
-router.get("/:name")
+router.get("/:name", getAllClientsWithName)
 // GET CLIENTS BY CATEGORY
 router.get("/category/:category", )
+// GET ALL INACTIVE CLIENTS
+router.get("/inactives", getAllInactiveClients)
 // DELETE CLIENT BY ID 
 router.delete("/delete/:clientId", deleteClient)
 

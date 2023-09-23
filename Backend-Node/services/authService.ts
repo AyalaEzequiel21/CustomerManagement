@@ -99,21 +99,26 @@ export const updateUser = async (userUpdated: UserMongo) => {
 }
 
 export const getAllUsers = async () => {
-    const users = await UserModel.find() // GET ALL USERS , IF ARRAY LENGTHS IF MORE THAT 0 RETURN USER ELSE RETURN ERROR
-    if (users.length > 0){
-        return users
-    } else {
-        throw new ResourceNotFoundError(UserNotFound)
+    try{
+        const users = await UserModel.find() // GET ALL USERS , IF ARRAY LENGTHS IF MORE THAT 0 RETURN USER ELSE RETURN ERROR
+        if (users.length > 0){
+            return users
+        } else {
+            throw new ResourceNotFoundError(UserNotFound)
+        }
+    } catch(error){
+        throw new InternalServerError(InternalServer)
     }
+    
 }
 
 export const removeUser = async (userId: string) => {
     try{
-        const userSaved = await UserModel.findById(userId)
+        const userSaved = await UserModel.findById(userId) // CHECK IF EXISTS TH CLIENT 
         if(!userSaved){
             throw new ResourceNotFoundError(UserNotFound)
         }
-        await UserModel.findByIdAndDelete(userId)
+        await UserModel.findByIdAndDelete(userId) // IF EXISTS, THEN DELETE IT
     } catch (error){ 
        throw new InternalServerError(InternalServer)
     }
