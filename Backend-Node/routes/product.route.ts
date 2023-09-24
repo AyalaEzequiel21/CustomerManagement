@@ -1,15 +1,29 @@
 import express from "express"
-import { registerProduct } from "../controllers/product.controller"
+import { deleteProduct, getAllInactivesProducts, getAllProducts, getAllProductsWithName, registerProduct, updateProduct } from "../controllers/productController"
+import { authorizeGetAll, validateRoleUser, validateSchemaRequest, validateUser } from "../middlewares/auth.middleware"
+import { ERole } from "../enums/ERole"
+import { productMongoSchema, productRegistrationSchema } from "../schemas/productSchema"
 
 const router = express.Router()
 
-// PRODUCT REGISTER
-router.post("/register", registerProduct)
-// PRODUCT UPDATE
-router.put("/update")
+// MIDDLEWARE FOR VALIDATE IF USER IS AUTHENTICATED
+router.use(validateUser())
+
 // GET ALL PRODUCT
-router.get("/" )
+router.get("/", authorizeGetAll(Object.values(ERole)), getAllProducts)
+
+// MIDDLEWARE FOR CHECK IF USER ROLE IS VALID
+router.use(validateRoleUser([ERole.Admin, ERole.Biller]))
+
 // GET PRODUCTS BY NAME
-router.get("/:name")
+router.get("/:productName", getAllProductsWithName)
+//GET ALL INACTIVE PRODUCTS
+router.get("/inactives", getAllInactivesProducts)
+// PRODUCT REGISTER
+router.post("/register", validateSchemaRequest(productRegistrationSchema), registerProduct)
+// PRODUCT UPDATE
+router.put("/update", validateSchemaRequest(productMongoSchema), updateProduct)
+// DELETE PRODUCT
+router.delete("/delete/:productId", deleteProduct)
 
 export default router

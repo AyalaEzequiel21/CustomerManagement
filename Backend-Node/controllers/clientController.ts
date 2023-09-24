@@ -28,7 +28,7 @@ export const updateClient = async (req: Request, res: Response, next: NextFuncti
 }
 
 export const getAllClients = async (req: any, res: Response, next: NextFunction) => {
-    const inDelivery: boolean = req.filterClientsInDelivery // CHECK IF THE FILTER IN_DELIVERY IS ACTIVE
+    const inDelivery: boolean = req.filterDelivery // CHECK IF THE FILTER IN_DELIVERY IS ACTIVE
     try{
         const clients = await clientService.getAllClients(inDelivery) // GET ALL CLIENTS AND VALIDATE WHO REQUESTS IT
         res.status(200).json({ok: true, data: clients}) // RETURN STATUS 200 AND THE DATA

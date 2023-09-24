@@ -1,6 +1,6 @@
 import express from 'express'
-import { deleteClient, getAllClients, getAllClientsWithCategory, getAllClientsWithName, getAllInactiveClients, registerClient, updateClient } from '../controllers/client.controller'
-import { authorizeGetAllClients, validateRoleUser, validateSchemaRequest, validateUser } from '../middlewares/auth.middleware'
+import { deleteClient, getAllClients, getAllClientsWithCategory, getAllClientsWithName, getAllInactiveClients, registerClient, updateClient } from '../controllers/clientController'
+import { authorizeGetAll, validateRoleUser, validateSchemaRequest, validateUser } from '../middlewares/auth.middleware'
 import { ERole } from '../enums/ERole'
 import { clientMongoSchema, clientRegistrationSchema } from '../schemas/clientSchemas'
 
@@ -10,7 +10,7 @@ const router = express.Router()
 router.use(validateUser())
 
 // GET ALL CLIENTS
-router.get("/", authorizeGetAllClients([ERole.Admin, ERole.Biller, ERole.Delivery]), getAllClients )
+router.get("/", authorizeGetAll(Object.values(ERole)), getAllClients )
 
 // MIDDLEWARE FOR CHECK IF USER ROLE IS VALID
 router.use(validateRoleUser([ERole.Admin, ERole.Biller]))

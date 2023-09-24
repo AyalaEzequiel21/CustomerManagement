@@ -1,9 +1,8 @@
+import { z } from "zod";
+import { ECategory } from "../enums/ECategory";
 
 
 // CLIENT 
-
-import { z } from "zod";
-import { ECategory } from "../enums/ECategory";
 
 export const clientRegistrationSchema = z.object({
     fullname: z.string().min(3).max(25),
@@ -18,7 +17,7 @@ export type ClientRegister = z.infer<typeof clientRegistrationSchema>
 
 export const clientMongoSchema = clientRegistrationSchema.extend({
     _id: z.string(),
-    register_date: z.date().optional(),
+    register_date: z.string().optional(),
     balance: z.number().optional(),
     sales: z.array(z.string()).optional(),
     payments: z.array(z.string()).optional(),

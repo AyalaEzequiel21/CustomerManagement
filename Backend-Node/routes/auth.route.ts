@@ -1,5 +1,5 @@
 import express from "express";
-import { deleteUser, getAllUsers, login, logout, registerUser, updateUser } from "../controllers/auth.controller";
+import { deleteUser, getAllUsers, login, logout, registerUser, updateUser } from "../controllers/authController";
 import { validateRoleUser, validateSchemaRequest, validateUser } from "../middlewares/auth.middleware";
 import { ERole } from "../enums/ERole";
 import { loginDataSchema, userMongoSchema, userRegistrationSchema } from "../schemas/authSchemas";

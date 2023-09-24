@@ -10,9 +10,11 @@ export const UserAlreadyRegistered = "The email has already been registered"
 // CLIENT ////////////////
 export const ClientNotFound = "Client not found"
 export const ClientAlreadyRegistered = "The client fullname has already been registered"
+export const PhoneAlreadyRegistered = "The client phone has already been registered"
 
 // PRODUCT ///////////////
 export const ProductAlreadyRegistered = "The product name has already been registered"
+export const ProductNotFound = "The product not found"
 
 // GENERAL ///////////////
 export const NotAuthorized = "User not authorized"

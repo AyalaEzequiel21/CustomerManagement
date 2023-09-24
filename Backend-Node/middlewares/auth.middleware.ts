@@ -55,12 +55,11 @@ export const validateSchemaRequest = (schema: z.ZodType<any>) => {
             req.body = validatedData
             next()
         } catch (error){
-
-            console.log("error en el validateSchema", error)
+            console.log(error);
             
             if (error instanceof z.ZodError){
                 throw new BadRequestError(BadRequest)
-            }
+            }            
             throw new InternalServerError(InternalServer)
         }
     }
@@ -68,14 +67,14 @@ export const validateSchemaRequest = (schema: z.ZodType<any>) => {
 
 // check the user role, if is delivery then filter all the clients 
 // and return only clients with in_delivery: true 
-export const authorizeGetAllClients = (allowedRoles: ERole[]) => {
+export const authorizeGetAll = (allowedRoles: ERole[]) => {
     return (req: any, res: Response, next: NextFunction) => {
         const user = req.user 
         if(allowedRoles.includes(user.role)){
             if(user.role === ERole.Delivery){
-                req.filterClientsInDelivery = true
+                req.filterDelivery = true
             } else {
-                req.filterClientsInDelivery = false
+                req.filterDelivery = false
             }
             next()
         } else{

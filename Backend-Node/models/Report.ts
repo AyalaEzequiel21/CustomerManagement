@@ -1,9 +1,9 @@
 import mongoose, { Schema, model } from "mongoose";
 import { EReportStatus } from "../enums/EReportStatus";
-import { formatDate } from "../utils/dateUtils";
+import { formatDateIso } from "../utils/dateUtils";
 
 const reportSchema = new Schema({
-    report_date: {type: Date, default: formatDate(new Date())},
+    report_date: {type: String, default: formatDateIso(new Date())},
     payments: [{type: mongoose.Schema.Types.ObjectId, ref: "Payment" }],
     report_status: {type: String, enum: EReportStatus, default: EReportStatus.Pendiente}
 })

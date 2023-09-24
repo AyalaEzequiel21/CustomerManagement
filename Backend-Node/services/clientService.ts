@@ -1,10 +1,11 @@
 
 import { ECategory } from "../enums/ECategory"
 import { BadRequestError, InternalServerError, ResourceAlreadyRegisteredError, ResourceNotFoundError } from "../errors/customErrors"
-import { BadRequest, ClientAlreadyRegistered, ClientNotFound, InternalServer } from "../errors/errorMessages"
+import { BadRequest, ClientAlreadyRegistered, ClientNotFound, InternalServer, PhoneAlreadyRegistered } from "../errors/errorMessages"
 import { errorsPitcher } from "../errors/errorsPitcher"
 import ClientModel from "../models/client"
 import { ClientMongo, ClientRegister } from "../schemas/clientSchemas"
+import { isEmptyList } from "../utils/emptyValidateUtils"
 
 /////////////////////////
 // CLIENT SERVICE
@@ -21,22 +22,16 @@ export const isFullnameRegistered = async (clientFullname: string) => {
     return response
 }
 
-// function to validate if a list is not empty
-export const isEmptyList = (value: any) => {
-    if (Array.isArray(value) || typeof value === 'string') {
-      return value.length === 0;
+// function to validate that the same phone is not registered twice
+export const isPhoneRegistered = async (phone: string) => {
+    let response = false 
+    const clientId = await ClientModel.exists({phone: phone})
+    if(clientId) {
+        response = true
     }
-      
-    if (value instanceof Map || value instanceof Set) {
-      return value.size === 0;
-    }
-      
-    if (typeof value === 'object') {
-      return Object.keys(value).length === 0;
-    }
-      
-    return value == null;   
+    return response
 }
+
 
 //////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////
@@ -44,17 +39,16 @@ export const isEmptyList = (value: any) => {
 
 export const getAllClients = async (inDelivery: boolean) => {
     try{
-        const clients = await ClientModel.find() // GET ALL CLIENTS
+        const clients = await ClientModel.find({is_active: true}) // GET ALL ACTIVE CLIENTS
         if(isEmptyList(clients)){ // IF THE CLIENTS IS EMPTY RUN AN EXCEPTION
             throw new ResourceNotFoundError(ClientNotFound)
-            
         } 
-        const clientsFiltered = clients.filter(client => client.is_active) // GET ALL ACTIVE CLIENTS
-            if (inDelivery){  // IF INDELIVERY IS TRUE RETURN ONLY THE CLIENTS WITH IN_DELIVERY : TRUE 
-                    return clientsFiltered.filter(client => client.in_delivery)
-            }else {  // ELSE RETURN ALL CLIENTS 
-                    return clientsFiltered
-            }
+
+        if (inDelivery){  // IF INDELIVERY IS TRUE RETURN ONLY THE CLIENTS WITH IN_DELIVERY : TRUE 
+                return clients.filter(client => client.in_delivery)
+        }
+
+        return clients
     } catch (error){
         errorsPitcher(error)
     }
@@ -64,10 +58,12 @@ export const getAllClients = async (inDelivery: boolean) => {
 export const createClient = async (newClient: ClientRegister) => {
     const {fullname, phone, category, in_delivery} = newClient
 
-    if(await isFullnameRegistered(newClient.fullname)){ // IF FULLNAME HAS ALREADY BEEN REGISTERED RUN AN EXCEPTION
+    if(await isFullnameRegistered(fullname)){ // IF FULLNAME HAS ALREADY BEEN REGISTERED RUN AN EXCEPTION
         throw new ResourceAlreadyRegisteredError(ClientAlreadyRegistered)
     } 
-
+    if(await isPhoneRegistered(phone)){
+        throw new ResourceAlreadyRegisteredError(PhoneAlreadyRegistered) // IF PHONE HAS ALREADY BEEN REGISTERED RUN AN EXCEPTION
+    }
     try {
         const client = ClientModel.create({ // CREATE THE NEW CLIENT AND SEND IT
             fullname: fullname, 
@@ -126,7 +122,7 @@ export const getClientsByName = async (clientName: string) => {
 }
 
 export const getClientsByCategory = async (category: string) => {
-    if(category in ECategory){ // CHECK IF CATEGORY IS VALID
+    if(Object.values(ECategory).some((enumCategory) => enumCategory === category)){ // CHECK IF CATEGORY IS VALID
         try{        
             const clientsFound = await ClientModel.find({category: category}) // GET ALL CLIENTS WITH THE SAME CATEGORY
             if (isEmptyList(clientsFound)){
@@ -137,16 +133,14 @@ export const getClientsByCategory = async (category: string) => {
             errorsPitcher(error)
         }
     }else{
-        console.log("no entro ")
         throw new BadRequestError(BadRequest)
     }
 }
 
-
 export const deleteClientById = async (clientId: string) => {
     try {
         const clientSaved = await ClientModel.findById(clientId) // GET THE CLIENT BY THE ID
-        if(clientSaved){ // IF EXISTS THE CLIENT THEN MODIFY HIS ATTRIBUTE IS_ACTIVE TO FALSE
+        if(clientSaved && clientSaved.is_active){ // IF EXISTS THE CLIENT THEN MODIFY HIS ATTRIBUTE IS_ACTIVE TO FALSE
             clientSaved.is_active = false
         }else {
             throw new ResourceNotFoundError(ClientNotFound)

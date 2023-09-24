@@ -1,5 +1,5 @@
 import mongoose, { Schema, model } from "mongoose";
-import { formatDate } from "../utils/dateUtils";
+import { formatDateIso } from "../utils/dateUtils";
 
 const detailSaleSchema = new Schema({
     product: {type: mongoose.Schema.Types.ObjectId, ref: "Product", required: true},
@@ -7,7 +7,7 @@ const detailSaleSchema = new Schema({
 })
 
 const saleSchema = new Schema({
-    sale_date: {type: Date, default: formatDate(new Date())},
+    sale_date: {type: String, default: formatDateIso(new Date())},
     client: {type: mongoose.Schema.Types.ObjectId, ref: "Client", required: true},
     details: [detailSaleSchema],
     totalSale: {type: Number, min: 0.01, required: true},
