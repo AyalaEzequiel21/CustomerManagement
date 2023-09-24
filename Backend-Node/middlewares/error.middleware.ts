@@ -3,7 +3,6 @@ import { AuthenticationError, BadRequestError, ResourceNotFoundError, ResourceAl
 import { InternalServer } from "../errors/errorMessages";
 
 export const errorHandler = (error: Error, req: Request, res: Response, next: NextFunction) => {
-        // console.error("Error occurred:", error); // Agrega esta línea para depurar
         switch (true) {
             case error instanceof AuthenticationError: 
                 res.status(401).json({ok:false, message: error.message})

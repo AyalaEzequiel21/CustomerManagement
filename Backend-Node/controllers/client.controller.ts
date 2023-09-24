@@ -57,6 +57,16 @@ export const getAllClientsWithName = async (req: Request, res: Response, next: N
     }
 }
 
+export const getAllClientsWithCategory = async (req: Request, res: Response, next: NextFunction) => {
+    const category = req.params.category // GET THE CATEGORY FROM THE PARAMS
+    try {
+        const clients = await clientService.getClientsByCategory(category)  // GET ALL CLIENTS WITH THE SAME CATEGORY
+        res.status(200).json({ok: true, data: clients}) // RETURN STATUS 200 AND THE CLIENTS
+    } catch(error){
+        next(error)
+    }
+}
+
 
 export const deleteClient = async (req: Request, res: Response, next: NextFunction) => {
     const clientId = req.params.id // GET THE CLIENT ID FROM THE PARAMS

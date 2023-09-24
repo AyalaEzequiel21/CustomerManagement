@@ -1,6 +1,8 @@
 
+import { ECategory } from "../enums/ECategory"
 import { BadRequestError, InternalServerError, ResourceAlreadyRegisteredError, ResourceNotFoundError } from "../errors/customErrors"
 import { BadRequest, ClientAlreadyRegistered, ClientNotFound, InternalServer } from "../errors/errorMessages"
+import { errorsPitcher } from "../errors/errorsPitcher"
 import ClientModel from "../models/client"
 import { ClientMongo, ClientRegister } from "../schemas/clientSchemas"
 
@@ -54,7 +56,7 @@ export const getAllClients = async (inDelivery: boolean) => {
                     return clientsFiltered
             }
     } catch (error){
-        throw new InternalServerError(InternalServer)
+        errorsPitcher(error)
     }
     
 }
@@ -107,7 +109,7 @@ export const getClientsInactives = async () => {
         } 
         return clientsInactive
     } catch (error){        
-        throw new InternalServerError(InternalServer)
+        errorsPitcher(error)
     }
 }
 
@@ -118,8 +120,25 @@ export const getClientsByName = async (clientName: string) => {
             throw new ResourceNotFoundError(ClientNotFound)
         }
         return clientsFound // RETURN THE CLIENTS FOUND
-    } catch (error){
-        throw new InternalServerError(InternalServer)
+    } catch (error){        
+        errorsPitcher(error)
+    }
+}
+
+export const getClientsByCategory = async (category: string) => {
+    if(category in ECategory){ // CHECK IF CATEGORY IS VALID
+        try{        
+            const clientsFound = await ClientModel.find({category: category}) // GET ALL CLIENTS WITH THE SAME CATEGORY
+            if (isEmptyList(clientsFound)){
+                throw new ResourceNotFoundError(ClientNotFound)
+            }
+            return clientsFound // RETURNS THE CLIENTS FOUND
+        } catch (error){
+            errorsPitcher(error)
+        }
+    }else{
+        console.log("no entro ")
+        throw new BadRequestError(BadRequest)
     }
 }
 
@@ -134,6 +153,6 @@ export const deleteClientById = async (clientId: string) => {
         }
         clientSaved.save()
     } catch(error){
-        throw new InternalServerError(InternalServer)
+        errorsPitcher(error)
     }
 }

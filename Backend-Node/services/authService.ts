@@ -4,6 +4,7 @@ import jwt from 'jsonwebtoken'
 import { BadRequest, CheckCredentials, InternalServer, UserAlreadyRegistered, UserNotFound } from "../errors/errorMessages"
 import { User, UserMongo } from "../schemas/authSchemas"
 import { AuthenticationError, BadRequestError, InternalServerError, ResourceAlreadyRegisteredError, ResourceNotFoundError } from "../errors/customErrors"
+import { errorsPitcher } from "../errors/errorsPitcher"
 
 
 /////////////////////////
@@ -27,7 +28,7 @@ export const validateUserExists = async (userId: string) => {
         userExists? userExists : new ResourceNotFoundError(UserNotFound)
 
     } catch(error){
-        throw new InternalServerError(InternalServer)
+        errorsPitcher(error)
     }
 }
 
@@ -50,7 +51,7 @@ export const loginUser = async (email: string, password: string) => {
 
         return token
     } catch (error){
-        throw error
+        errorsPitcher(error)
     }
 }
 
@@ -107,7 +108,7 @@ export const getAllUsers = async () => {
             throw new ResourceNotFoundError(UserNotFound)
         }
     } catch(error){
-        throw new InternalServerError(InternalServer)
+        errorsPitcher(error)
     }
     
 }
@@ -120,6 +121,6 @@ export const removeUser = async (userId: string) => {
         }
         await UserModel.findByIdAndDelete(userId) // IF EXISTS, THEN DELETE IT
     } catch (error){ 
-       throw new InternalServerError(InternalServer)
+        errorsPitcher(error)
     }
 }
