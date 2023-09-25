@@ -1,13 +1,15 @@
 import express from "express"
-import authRoutes from './auth.route'
-import clientRoutes from './client.route'
-import productRoutes from './product.route'
+import authRoutes from './authRoute'
+import clientRoutes from './clientRoute'
+import productRoutes from './productRoute'
+import paymentRoutes from './paymentRoute'
 
 const router = express.Router()
 
 router.use("/auth", authRoutes)
 router.use("/clients", clientRoutes)
 router.use("/products", productRoutes)
+router.use("payments", paymentRoutes)
 
 export default router
 

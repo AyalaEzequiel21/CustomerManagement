@@ -23,7 +23,7 @@ router.get("/inactives", getAllInactivesProducts)
 router.post("/register", validateSchemaRequest(productRegistrationSchema), registerProduct)
 // PRODUCT UPDATE
 router.put("/update", validateSchemaRequest(productMongoSchema), updateProduct)
-// DELETE PRODUCT
+//  PRODUCT DELETE
 router.delete("/delete/:productId", deleteProduct)
 
 export default router
