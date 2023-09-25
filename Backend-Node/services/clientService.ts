@@ -1,7 +1,7 @@
 
 import { ECategory } from "../enums/ECategory"
-import { BadRequestError, InternalServerError, ResourceAlreadyRegisteredError, ResourceNotFoundError } from "../errors/customErrors"
-import { BadRequest, ClientAlreadyRegistered, ClientNotFound, InternalServer, PhoneAlreadyRegistered } from "../errors/errorMessages"
+import { BadRequestError, ResourceAlreadyRegisteredError, ResourceNotFoundError } from "../errors/customErrors"
+import { BadRequest, ClientAlreadyRegistered, ClientNotFound, PhoneAlreadyRegistered } from "../errors/errorMessages"
 import { errorsPitcher } from "../errors/errorsPitcher"
 import ClientModel from "../models/client"
 import { ClientMongo, ClientRegister } from "../schemas/clientSchemas"
@@ -11,6 +11,14 @@ import { isEmptyList } from "../utils/emptyValidateUtils"
 // CLIENT SERVICE
 ///////////////////////
 
+export const existsClient = async (clientId: string) => {
+    let response = false
+    const client = await ClientModel.exists({_id: clientId})
+    if (client){
+        response = true
+    }
+    return response
+}
 
 // function to validate that the same fullname is not registered twice
 export const isFullnameRegistered = async (clientFullname: string) => {
@@ -83,6 +91,7 @@ export const updateClient = async (client: ClientMongo) => {
         if (clientSaved){ // IF THE CLIENT EXIS THEN UPDATE 
             clientSaved.fullname = client.fullname
             clientSaved.phone = client.phone
+            if(client.balance !== undefined) clientSaved.balance = client.balance
             clientSaved.category = client.category
             clientSaved.in_delivery = client.in_delivery
             clientSaved.is_active = client.is_active
@@ -134,6 +143,18 @@ export const getClientsByCategory = async (category: string) => {
         }
     }else{
         throw new BadRequestError(BadRequest)
+    }
+}
+
+export const getClientById = async (clientId: string) => {
+    try{
+        const client = ClientModel.findById(clientId) // FIND THE CLIENT BY HIS ID
+        if(!client) { // IF NOT EXISTS RUN AN EXECEPTION
+            throw new ResourceNotFoundError(ClientNotFound)
+        }
+        return client // ELSE RETURNS THE CLIENT
+    } catch (error) {
+        errorsPitcher(error)
     }
 }
 

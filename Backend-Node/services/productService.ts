@@ -11,7 +11,7 @@ import { isEmptyList } from "../utils/emptyValidateUtils";
 ///////////////////////
 
 // function to validate that the same productname is not registered twice
-export const isAProductNmaeRegistered = async (productName: string) => {
+export const isAProductNameRegistered = async (productName: string) => {
     let response = false
     const productId = await ProductModel.exists({productName: productName})
     if(productId){
@@ -27,7 +27,7 @@ export const isAProductNmaeRegistered = async (productName: string) => {
 
 export const createProduct = async (newProduct: ProductRegister) => {
     const {productName, price_cat_1, price_cat_2} = newProduct 
-    if(await isAProductNmaeRegistered(productName)){ // IF THE PRODUCTNAME HAS ALREADY REGISTERED RUN AN EXCEPTION
+    if(await isAProductNameRegistered(productName)){ // IF THE PRODUCTNAME HAS ALREADY REGISTERED RUN AN EXCEPTION
         throw new ResourceAlreadyRegisteredError(ProductAlreadyRegistered)
     }
     try{
