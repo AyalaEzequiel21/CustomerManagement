@@ -1,5 +1,5 @@
 export enum EPaymentMethod {
-    Efectivo = 'efectivo',
+    Efectivo = "efectivo",
     Transferencia = "transferencia",
     Cheque = "cheque"
 }

@@ -1,25 +1,12 @@
 import { errorsPitcher } from "../errors/errorsPitcher";
+import { DocumentClient } from "../models/client";
 import PaymentModel from "../models/payment";
 import { PaymentRegister } from "../schemas/paymentSchema";
-import { getClientById } from "./clientService";
+import { getClientById } from "../utils/modelUtils/paymentUtil";
 
 /////////////////////////
 // PAYMENT SERVICE
 ///////////////////////
-
-export const validateIds = async (clientId: string) => {
-    try{
-        // const client = await existsClient(clientId)
-    }    
-    catch(error){
-        errorsPitcher(error)
-    }
-}
-
-
-//////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////
 
 export const createPayment = async (newPayment: PaymentRegister) => {    
     const {clientId, amount, payment_method, saleId, reportId} = newPayment
@@ -33,7 +20,7 @@ export const createPayment = async (newPayment: PaymentRegister) => {
                 saleId: saleId ? saleId : undefined,
                 reportId: reportId ? reportId : undefined,
             })
-            client.balance = client.balance - amount
+            // updateClientBalance(client as DocumentClient, amount, false)
             client.payments.push((await paymentCreated)._id)
             client.save()
             return paymentCreated

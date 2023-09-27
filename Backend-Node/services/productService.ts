@@ -4,30 +4,16 @@ import { BadRequest, ProductAlreadyRegistered, ProductNotFound } from "../errors
 import { errorsPitcher } from "../errors/errorsPitcher";
 import ProductModel from "../models/product";
 import { ProductMongo, ProductRegister } from "../schemas/productSchema";
-import { isEmptyList } from "../utils/emptyValidateUtils";
+import { existsEntity, isEmptyList } from "../utils/existingChecker";
 
 /////////////////////////
 // PRODUCT SERVICE
 ///////////////////////
 
-// function to validate that the same productname is not registered twice
-export const isAProductNameRegistered = async (productName: string) => {
-    let response = false
-    const productId = await ProductModel.exists({productName: productName})
-    if(productId){
-        response = true
-    }
-    return response
-}
-
-
-//////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////
 
 export const createProduct = async (newProduct: ProductRegister) => {
     const {productName, price_cat_1, price_cat_2} = newProduct 
-    if(await isAProductNameRegistered(productName)){ // IF THE PRODUCTNAME HAS ALREADY REGISTERED RUN AN EXCEPTION
+    if(await existsEntity(ProductModel, "productName", productName)){ // IF THE PRODUCTNAME HAS ALREADY REGISTERED RUN AN EXCEPTION
         throw new ResourceAlreadyRegisteredError(ProductAlreadyRegistered)
     }
     try{
@@ -106,7 +92,6 @@ export const deleteProductById = async (productId: string) => {
         if(productSaved && productSaved.is_active){ // IF EXISTS THE PRODUCT THEN MODIFY HIS ATTRIBUTE IS_ACTIVE TO FALSE
             productSaved.is_active = false
         } else {
-            console.log(productSaved);  
             throw new ResourceNotFoundError(ProductNotFound)
         }
         productSaved.save() // SAVE THE PRODUCT INACTIVE NOW

@@ -3,38 +3,16 @@ import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 import { BadRequest, CheckCredentials, InternalServer, UserAlreadyRegistered, UserNotFound } from "../errors/errorMessages"
 import { User, UserMongo } from "../schemas/authSchemas"
-import { AuthenticationError, BadRequestError, InternalServerError, ResourceAlreadyRegisteredError, ResourceNotFoundError } from "../errors/customErrors"
+import { AuthenticationError, BadRequestError, ResourceAlreadyRegisteredError, ResourceNotFoundError } from "../errors/customErrors"
 import { errorsPitcher } from "../errors/errorsPitcher"
+import { existsEntity } from "../utils/existingChecker"
+import ClientModel from "../models/client"
 
 
 /////////////////////////
 // USER SERVICE
 ///////////////////////
 
-// function to validate that the same email is not registered twice
-const existsEmail = async (email: string) => {
-    let response = false
-    const userId = await UserModel.exists({email: email})
-    if(userId){
-        response = true
-    } 
-    return response
-}
-
-// function to check if exists an user
-export const validateUserExists = async (userId: string) => {
-    try{
-        const userExists = await UserModel.exists({_id: userId})
-        userExists? userExists : new ResourceNotFoundError(UserNotFound)
-
-    } catch(error){
-        errorsPitcher(error)
-    }
-}
-
-//////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////
 
 export const loginUser = async (email: string, password: string) => {
     try{
@@ -62,7 +40,7 @@ export const loginUser = async (email: string, password: string) => {
 export const createUser = async (newUser : User) => {
     const {username, email, password, role} = newUser // GET THE ATTRIBUTES SENDED 
     
-    if(await existsEmail(email)){ // IF EMAIL HAS ALREADY BEEN REGISTERED RUN AN EXCEPTION        
+    if(await existsEntity(ClientModel, "email", email)){ // IF EMAIL HAS ALREADY BEEN REGISTERED RUN AN EXCEPTION        
         throw new ResourceAlreadyRegisteredError(UserAlreadyRegistered)
     } else{
         const hashPassword = await bcrypt.hash(password, 8) // PASSWORD TO HASH
