@@ -16,6 +16,9 @@ export const PhoneAlreadyRegistered = "The client phone has already been registe
 export const ProductAlreadyRegistered = "The product name has already been registered"
 export const ProductNotFound = "The product not found"
 
+// PAYMENT ///////////////
+export const PaymentNotFound = "The payment not found"
+
 // GENERAL ///////////////
 export const NotAuthorized = "User not authorized"
 export const BadRequest = "Some data is incorrect or missing"
