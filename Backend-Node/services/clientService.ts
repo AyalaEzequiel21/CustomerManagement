@@ -40,7 +40,7 @@ export const createClient = async (newClient: ClientRegister) => {
         throw new ResourceAlreadyRegisteredError(PhoneAlreadyRegistered) // IF PHONE HAS ALREADY BEEN REGISTERED RUN AN EXCEPTION
     }
     try {
-        const client = ClientModel.create({ // CREATE THE NEW CLIENT AND SEND IT
+        const client = await ClientModel.create({ // CREATE THE NEW CLIENT AND SEND IT
             fullname: fullname, 
             phone: phone, 
             category: category, 

@@ -71,7 +71,6 @@ export const getAllUsers = async (req: Request, res: Response, next: NextFunctio
 export const deleteUser = async (req: Request, res: Response, next: NextFunction) => {
     const userId = req.params.id // GET THE USER ID FROM THE PARAMS
     try{
-        const possibleUser = await authService.validateUserExists(userId)
         await authService.removeUser(userId) // DELETE THE USER WITH AUTHSERVICE
         res.status(204).json({ok: true})
         

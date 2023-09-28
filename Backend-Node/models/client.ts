@@ -1,4 +1,4 @@
-import mongoose, { Document, Types, Schema, model } from "mongoose";
+import mongoose, { Document, Schema, model } from "mongoose";
 import { ECategory } from "../enums/ECategory";
 import { formatDateIso } from "../utils/dateUtils";
 
@@ -17,15 +17,16 @@ const clientSchema = new Schema({
 const ClientModel = model("Client", clientSchema, "clients")
 
 
-export interface DocumentClient extends Document {
+export interface ClientDocument extends Document {
+    _id: mongoose.Types.ObjectId,
     fullname: string,
     phone: string,
     register_date: string,
     category: string,
     balance: number,
-    sales: Array<Types.ObjectId>,
-    payments: Array<Types.ObjectId>,
-    in_delivery: boolean | undefined,
+    sales: Array<mongoose.Types.ObjectId>,
+    payments: Array<mongoose.Types.ObjectId>,
+    in_delivery?: boolean | undefined,
     is_active: boolean | undefined
 }
 

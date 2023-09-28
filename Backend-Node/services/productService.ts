@@ -17,7 +17,7 @@ export const createProduct = async (newProduct: ProductRegister) => {
         throw new ResourceAlreadyRegisteredError(ProductAlreadyRegistered)
     }
     try{
-        const productCreated = ProductModel.create({
+        const productCreated = await ProductModel.create({
             productName: productName,
             price_cat_1: price_cat_1,
             price_cat_2: price_cat_2

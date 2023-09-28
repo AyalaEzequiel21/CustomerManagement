@@ -1,4 +1,4 @@
-import mongoose, { Schema, model } from "mongoose";
+import mongoose, { Document, Schema, model } from "mongoose";
 import { EPaymentMethod } from "../enums/EPaymentMethod";
 import { formatDateIso } from "../utils/dateUtils";
 
@@ -12,5 +12,16 @@ const paymentSchema = new Schema({
 })
 
 const PaymentModel = model("Payment", paymentSchema, "payments")
+
+
+export interface PaymentDocument extends Document{
+    _id: mongoose.Types.ObjectId,
+    payment_date: string;
+    clientId: mongoose.Types.ObjectId;
+    amount: number;
+    payment_method: string;
+    saleId?: mongoose.Types.ObjectId | undefined;
+    reportId?: mongoose.Types.ObjectId | undefined;
+  }
 
 export default PaymentModel

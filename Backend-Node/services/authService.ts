@@ -45,7 +45,7 @@ export const createUser = async (newUser : User) => {
     } else{
         const hashPassword = await bcrypt.hash(password, 8) // PASSWORD TO HASH
         try{
-            const newUser = UserModel.create({ // CREATE THE NEW USER AND SEND IT
+            const newUser = await UserModel.create({ // CREATE THE NEW USER AND SEND IT
                 username: username, 
                 email: email, 
                 password: hashPassword, 
