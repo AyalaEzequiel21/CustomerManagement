@@ -36,10 +36,30 @@ export const getAllPayments = async (req: Request, res: Response, next: NextFunc
 }
 
 export const getPaymentsOfClient = async (req: Request, res: Response, next: NextFunction) => {
-    const clientId = req.body.clientId
+    const clientId = req.params.clientId // GET THE CLIENTID FROM THE PARAMS 
     try {
-        const payments = await paymentService.getPaymentsByClientId(clientId)
-        res.status(200).json({ok: true, data: payments})
+        const payments = await paymentService.getPaymentsByClientId(clientId) // FIND ALL PAYMENTS BY CLIENT ID WITH PAYMENTSERVICE
+        res.status(200).json({ok: true, data: payments}) // RETURN STATUS 200 AND THE PAYMENTS
+    } catch (error){
+        next(error)
+    }
+}
+
+export const getPaymentsOfPaymentMethod = async (req: Request, res: Response, next: NextFunction) => {
+    const paymentMethod = req.params.paymentMethod // GET THE PAYMENTMETHOD FROM THE PARAMS 
+    try {
+        const payments = await paymentService.getPaymentsByPaymentMethod(paymentMethod) // FIND ALL PAYMENTS BY PAYMENT METHOD WITH PAYMENTSERVICE
+        res.status(200).json({ok: true, data: payments}) // RETURN STATUS 200 AND THE PAYMENTS
+    } catch (error){
+        next(error)
+    }
+}
+
+export const getPaymentsOfPaymentDate = async (req: Request, res: Response, next: NextFunction) => {
+    const {date} = req.query // GET THE PAYMENT DATE FROM THE REQUEST 
+    try {
+        const payments = await paymentService.getPaymentsByPaymentDate(date as string) // FIND ALL PAYMENTS BY PAYMENT DATE WITH PAYMENTSERVICE
+        res.status(200).json({ok: true, data: payments}) // RETURN STATUS 200 AND THE PAYMENTS
     } catch (error){
         next(error)
     }

@@ -4,6 +4,7 @@ import { ClientNotFound, InternalServer } from "../../errors/errorMessages"
 import ClientModel, { ClientDocument } from "../../models/client"
 import { PaymentDocument } from "../../models/payment"
 import { errorsPitcher } from "../../errors/errorsPitcher"
+import { EPaymentMethod } from "../../enums/EPaymentMethod"
 
 
 // function to get a client by id
@@ -50,11 +51,14 @@ export const subtractPaymentToClient = async (payment: PaymentDocument) => {
     }
 }
 
-export const validatePaymentId = (paymentId: string) => {
+export const validateId = (Id: string): boolean => {
     let response = false 
-    if(mongoose.Types.ObjectId.isValid(paymentId)){
+    if(mongoose.Types.ObjectId.isValid(Id)){
         response = true
     }
     return response
 }
 
+export const isValidPaymentMethod = (paymentMethod: string): boolean => {
+    return Object.values(EPaymentMethod).includes(paymentMethod as EPaymentMethod)
+}

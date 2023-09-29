@@ -9,3 +9,10 @@ export const formatDateIso = (dateString: Date) => {
     const formattedDate = `${day}/${month}/${year}`
     return formattedDate
 }
+
+
+export const isValidDateFormat = (date: string): boolean => {
+    const dateFormatRegex = /^\d{2}\/\d{2}\/\d{4}$/ // FORMAT MUST BE A DATE 
+
+    return dateFormatRegex.test(date) // CHECK ID THE DATE IS VALID
+}

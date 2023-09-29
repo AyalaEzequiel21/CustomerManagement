@@ -3,8 +3,9 @@ import { BadRequest, PaymentNotFound } from "../errors/errorMessages";
 import { errorsPitcher } from "../errors/errorsPitcher";
 import PaymentModel from "../models/payment";
 import { PaymentRegister } from "../schemas/paymentSchema";
+import { isValidDateFormat } from "../utils/dateUtils";
 import { isEmptyList } from "../utils/existingChecker";
-import { addPaymentToClient, getClientById, subtractPaymentToClient, validatePaymentId } from "../utils/modelUtils/paymentUtil";
+import { addPaymentToClient, getClientById, isValidPaymentMethod, subtractPaymentToClient, validateId } from "../utils/modelUtils/paymentUtil";
 
 /////////////////////////
 // PAYMENT SERVICE
@@ -32,20 +33,19 @@ export const createPayment = async (newPayment: PaymentRegister) => {
 
 
 export const deletePaymentById = async (paymentId: string) => {
-    if (validatePaymentId(paymentId)){ // CHECK IF PAYMENTID IS VALID OR RUN AN EXCEPTION
-        try {
-            const paymentSaved = await PaymentModel.findById(paymentId.toString()) // FIND THE PAYMENT BY HIS ID
-            if(paymentSaved){ // CHECK IF EXISTS OR RUN AN EXCEPTION
-                 await subtractPaymentToClient(paymentSaved) // REMOVE THE PAYMENT FROM TE CLIENT AND UPDATE HIS BALANCE
-                await PaymentModel.findByIdAndDelete(paymentSaved._id) // DELETE THE PAYMENT FROM TO DATA BASE
-            } else {
-                throw new ResourceNotFoundError(PaymentNotFound)
-            }
-        } catch (error){
-            errorsPitcher(error)
-        }
-    } else {
+    if (!validateId(paymentId)){ // CHECK IF PAYMENTID IS VALID OR RUN AN EXCEPTION
         throw new BadRequestError(BadRequest)
+    }
+    try {
+        const paymentSaved = await PaymentModel.findById(paymentId.toString()) // FIND THE PAYMENT BY HIS ID
+        if(paymentSaved){ // CHECK IF EXISTS OR RUN AN EXCEPTION
+             await subtractPaymentToClient(paymentSaved) // REMOVE THE PAYMENT FROM TE CLIENT AND UPDATE HIS BALANCE
+            await PaymentModel.findByIdAndDelete(paymentSaved._id) // DELETE THE PAYMENT FROM TO DATA BASE
+        } else {
+            throw new ResourceNotFoundError(PaymentNotFound)
+        }
+    } catch (error){
+        errorsPitcher(error)
     }
 }
 
@@ -62,10 +62,44 @@ export const allPayments = async () => {
 }
 
 export const getPaymentsByClientId = async (clientId: string) => {
+    if(!validateId(clientId)){
+        throw new BadRequestError(BadRequest)
+    } 
     try {
         const payments = await PaymentModel.find({clientId: clientId}) //  GET ALL PAYMENTS FROM A CLIENT BY HIS ID
-        console.log(payments);
         
+        if(isEmptyList(payments)){ //CHECK IF THE RESPONSE IS EMPTY  AND RUN AN EXCEPTION
+            throw new ResourceNotFoundError(PaymentNotFound)
+        }
+        return payments // RETURN THE PAYMENTS
+    } catch (error){
+        errorsPitcher(error)
+    }
+}
+
+export const getPaymentsByPaymentMethod = async (paymentMethod: string) => {
+    if(!isValidPaymentMethod(paymentMethod)){  // CHECK IF PAYMENTmEHOD IS VALID OR RUN AN EXCEPTION
+        throw new BadRequestError(BadRequest)
+    }
+    try {
+        const payments = await PaymentModel.find({payment_method: paymentMethod}) //  GET ALL PAYMENTS FILTERED BY PAYMENT_METHOD
+        
+        if(isEmptyList(payments)){ //CHECK IF THE RESPONSE IS EMPTY  AND RUN AN EXCEPTION
+            throw new ResourceNotFoundError(PaymentNotFound)
+        }
+        return payments // RETURN THE PAYMENTS
+    } catch (error){
+        errorsPitcher(error)
+    }
+}
+
+export const getPaymentsByPaymentDate = async (paymentDate: string) => {
+    if(!isValidDateFormat(paymentDate)){  // CHECK IF PAYMENTmEHOD IS VALID OR RUN AN EXCEPTION
+        throw new BadRequestError(BadRequest)
+    }
+    try {
+        const payments = await PaymentModel.find({payment_date: paymentDate}) //  GET ALL PAYMENTS FILTERED BY PAYMENT_DATE
+
         if(isEmptyList(payments)){ //CHECK IF THE RESPONSE IS EMPTY  AND RUN AN EXCEPTION
             throw new ResourceNotFoundError(PaymentNotFound)
         }

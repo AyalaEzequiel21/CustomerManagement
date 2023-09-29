@@ -2,7 +2,7 @@ import express from 'express'
 import { authorizeGetAll, validateRoleUser, validateSchemaRequest, validateUser } from '../middlewares/auth.middleware'
 import { ERole } from '../enums/ERole'
 import { paymentRegistrationSchema } from '../schemas/paymentSchema'
-import { getAllPayments, getPaymentsOfClient, registerPayment, removePayment } from '../controllers/paymentController'
+import { getAllPayments, getPaymentsOfClient, getPaymentsOfPaymentDate, getPaymentsOfPaymentMethod, registerPayment, removePayment } from '../controllers/paymentController'
 
 const router = express.Router()
 
@@ -18,9 +18,9 @@ router.use(validateRoleUser([ERole.Admin, ERole.Biller]))
 // PAYMENT REGISTER 
 router.post("/register", validateSchemaRequest(paymentRegistrationSchema), registerPayment)
 // GET PAYMENTS BY PAYMENT METHOD
-router.get("/method/:paymentMethod")
+router.get("/method/:paymentMethod", getPaymentsOfPaymentMethod)
 // GET PAYMENTS BY PAYMENT DATE
-router.get("/date/paymentDate")
+router.get("/payment-date", getPaymentsOfPaymentDate)
 // GET ALL PAYMENTS BY CLIENT ID    
 router.get("/client/:clientId", getPaymentsOfClient)
 // PAYMENT DELETE
