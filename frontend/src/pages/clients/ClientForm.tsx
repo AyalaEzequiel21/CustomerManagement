@@ -6,7 +6,7 @@ import { NextPage } from "next";
 import { useRouter } from "next/router";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import {zodResolver} from '@hookform/resolvers/zod'
+    import {zodResolver} from '@hookform/resolvers/zod'
 import { Button, ButtonGroup } from "@chakra-ui/button";
 import { Select } from "@chakra-ui/select";
 import axios from "axios";
@@ -85,7 +85,7 @@ const ClientForm: NextPage = () => {
                     <ButtonGroup>
                         <Flex gap={2} mt={4}>
                             <Button
-                                colorScheme='green' 
+                                colorScheme='#19323c' 
                                 variant='solid'
                                 type="submit"
                             >Agregar</Button>
