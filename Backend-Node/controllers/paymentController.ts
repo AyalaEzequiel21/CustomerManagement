@@ -10,7 +10,7 @@ export const registerPayment = async (req: Request, res: Response, next: NextFun
     const payment = req.body // GET THE PAYMENT TO CREATE FROM THE REQUEST 
     try{
         const newPayment = await paymentService.createPayment(payment)  // CREATE THE PAYMENT WITH PAYMENTSERVICE
-        res.status(201).json({ok: true, data: newPayment})  // RETURNS STATUS 200 AND THE NEW PAYMENT
+        res.status(201).json({ok: true, data: newPayment})  // RETURNS STATUS 201 AND THE NEW PAYMENT
     } catch(error){
         next(error)
     }

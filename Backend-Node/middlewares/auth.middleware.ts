@@ -22,6 +22,8 @@ export const validateUser = () => {
     return (req: any, res: Response, next: NextFunction) => {
         try {
             const user = getCookiesUser(req)
+            console.log(user);
+            
             req.user = user
             console.log("usuario validado")
             next()
@@ -54,10 +56,11 @@ export const validateSchemaRequest = (schema: z.ZodType<any>) => {
             const validatedData = schema.parse(req.body)
             req.body = validatedData
             next()
-        } catch (error){
+        } catch (error){            
             console.log(error);
             
             if (error instanceof z.ZodError){
+                
                 throw new BadRequestError(BadRequest)
             }            
             throw new InternalServerError(InternalServer)

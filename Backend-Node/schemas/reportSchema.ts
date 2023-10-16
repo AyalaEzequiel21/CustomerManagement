@@ -1,9 +1,12 @@
 import { z } from "zod";
+import { paymentRegistrationSchema } from "./paymentSchema";
+import { paymentDTOSchema } from "./paymentDTOSchema";
 
 // REPORT 
 
 export const reportRegistrationSchema = z.object({
-    payments: z.array(z.string())
+    payments: z.array(paymentRegistrationSchema).optional(), 
+    // payments_dto = z.array(paymentDTOSchema)
 })
 
 export type ReportRegister = z.infer<typeof reportRegistrationSchema>
