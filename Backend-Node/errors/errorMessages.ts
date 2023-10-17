@@ -14,10 +14,13 @@ export const PhoneAlreadyRegistered = "The client phone has already been registe
 
 // PRODUCT ///////////////
 export const ProductAlreadyRegistered = "The product name has already been registered"
-export const ProductNotFound = "The product not found"
+export const ProductNotFound = "Product not found"
 
 // PAYMENT ///////////////
-export const PaymentNotFound = "The payment not found"
+export const PaymentNotFound = "Payment not found"
+
+// REPORT //////////////
+export const ReportNotFound = "Report not found"
 
 // GENERAL ///////////////
 export const NotAuthorized = "User not authorized"

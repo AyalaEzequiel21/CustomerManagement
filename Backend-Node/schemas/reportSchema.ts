@@ -6,7 +6,7 @@ import { paymentDTOSchema } from "./paymentDTOSchema";
 
 export const reportRegistrationSchema = z.object({
     payments: z.array(paymentRegistrationSchema).optional(), 
-    // payments_dto = z.array(paymentDTOSchema)
+    payments_dto : z.array(paymentDTOSchema)
 })
 
 export type ReportRegister = z.infer<typeof reportRegistrationSchema>

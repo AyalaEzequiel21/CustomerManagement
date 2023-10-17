@@ -5,7 +5,7 @@ import { formatDateIso } from "../utils/dateUtils";
 const reportSchema = new Schema({
     report_date: {type: String, default: formatDateIso(new Date())},
     payments: [{type: mongoose.Schema.Types.ObjectId, ref: "Payment", default: []}],
-    payments_dto: [{}],
+    payments_dto: [Schema.Types.Mixed],
     report_status: {type: String, enum: EReportStatus, default: EReportStatus.Pendiente}
 })
 
