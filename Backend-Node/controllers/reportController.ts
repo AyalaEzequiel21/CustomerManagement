@@ -27,10 +27,20 @@ export const getAllReports = async (req: Request, res: Response, next: NextFunct
 export const updateReport = async (req: Request, res: Response, next: NextFunction) => {
     const report = req.body // GET THE REPORT TO UPDATE FROM THE REQUEST
     try{
-        const reportUpdated = await reportService.reportUpdate(report) // UPDATE THE REPORT WITH REPORTSERVICE
+        const reportUpdated = await reportService.getReportUpdated(report) // UPDATE THE REPORT WITH REPORTSERVICE
         res.status(200).json({ok: true, data: reportUpdated})  // RETURNS STATUS 200 AND THE REPROT UPDATED
-    } catch(error){
+    } catch(error){        
         next(error)
     }
+}
+
+export const validateReport = async (req: Request, res: Response, next: NextFunction) => {
+    const reportId = req.params.reportId // GET THE REPORT TO VALIDATE FROM THE REQUEST
+    try{
+        const reportValidated = await reportService.getReportValidated(reportId) // VALIDATE THE REPORT WITH REPORTSERVICE
+        res.status(200).json({ok: true, data: reportValidated}) // RETURNS STATUS 200 AND TH REPORT VALIDATED
+    } catch(error){
+        next(error)
+    } 
 }
 

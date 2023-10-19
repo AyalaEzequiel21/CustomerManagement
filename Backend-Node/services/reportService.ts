@@ -1,11 +1,10 @@
 import { EReportStatus } from "../enums/EReportStatus"
-import { BadRequestError, ResourceNotFoundError } from "../errors/customErrors"
-import { BadRequest, PaymentNotFound, ReportNotFound } from "../errors/errorMessages"
+import { InternalServerError, ResourceNotFoundError } from "../errors/customErrors"
+import { Conflict, PaymentNotFound, ReportNotFound } from "../errors/errorMessages"
 import { errorsPitcher } from "../errors/errorsPitcher"
 import ReportModel from "../models/report"
 import { ReportMongo, ReportRegister } from "../schemas/reportSchema"
-import { isEmptyList } from "../utils/existingChecker"
-import { isValidPaymentDto } from "../utils/modelUtils/reportUtils"
+import { isEmptyList, processPaymentsReport } from "../utils"
 
 /////////////////////////
 // REPORT SERVICE
@@ -38,7 +37,7 @@ export const getReports = async () => {
     }
 }
 
-export const reportUpdate = async (report: ReportMongo) => {
+export const getReportUpdated = async (report: ReportMongo) => {
     try {
         const reportSaved = await ReportModel.findById(report._id)  // GET THE REPORT SAVED BY ID
         if(reportSaved && reportSaved.report_status  === EReportStatus.Pendiente){ // IF THE REPORT EXISTS AND HIS STATUS IS PENDIENTE UPDATE THE REPORT 
@@ -46,9 +45,30 @@ export const reportUpdate = async (report: ReportMongo) => {
         } else {
             throw new ResourceNotFoundError(ReportNotFound)
         }
-        const reportUpdated = await reportSaved.save() // SAVE THE REPORT UPODATED AND RETURN
+        const reportUpdated = await reportSaved.save() // SAVE THE REPORT UPODATED AND RETURN IT
         return reportUpdated
-    } catch(error){
+    } catch(error){        
+        errorsPitcher(error)
+    }
+}
+
+export const getReportValidated = async (reportId: string) => {
+    try{
+        const reportSaved = await ReportModel.findById(reportId) // FIND THE REPORT BY HIS ID
+        if(reportSaved && reportSaved.report_status  === EReportStatus.Pendiente){ // IF THE REPORT EXISTS AND HIS STATUS IS PENDIENTE THEN PROCESS THE PAYMENTS
+            const paymentsProcessed = await processPaymentsReport(reportSaved.payments_dto, reportSaved._id.toString())
+            if(isEmptyList(paymentsProcessed)){
+                throw new InternalServerError(Conflict)
+            }
+            reportSaved.payments = paymentsProcessed
+            reportSaved.payments_dto = [] // RESET THE PAYMENTS_DTO 
+            reportSaved.report_status = EReportStatus.Validado  // MODIFY STATUS TO VALIDATE
+        } else {
+            throw new ResourceNotFoundError(ReportNotFound)
+        }
+        const reportValidated = await reportSaved.save() // SAVE THE REPORT WITH THE PAYMENTS PROCESSED AND RETURN IT
+        return reportValidated
+    }catch(error){
         errorsPitcher(error)
     }
 }

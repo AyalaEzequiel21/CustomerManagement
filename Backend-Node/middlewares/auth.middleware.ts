@@ -54,9 +54,8 @@ export const validateSchemaRequest = (schema: z.ZodType<any>) => {
             const validatedData = schema.parse(req.body)
             req.body = validatedData
             next()
-        } catch (error){                        
+        } catch (error){                                    
             if (error instanceof z.ZodError){
-  
                 throw new BadRequestError(BadRequest)
             }            
             throw new InternalServerError(InternalServer)

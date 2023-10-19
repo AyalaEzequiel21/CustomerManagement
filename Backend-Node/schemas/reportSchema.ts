@@ -16,7 +16,7 @@ export type ReportRegister = z.infer<typeof reportRegistrationSchema>
 export const reportMongoSchema = reportRegistrationSchema.extend({
     _id: z.string(),
     report_date: z.string().optional(),
-    report_status: z.boolean()
+    report_status: z.string()
 })
 
 export type ReportMongo = z.infer<typeof reportMongoSchema>
