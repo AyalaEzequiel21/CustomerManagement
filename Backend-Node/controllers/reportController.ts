@@ -15,10 +15,28 @@ export const registerReport = async (req: Request, res: Response, next: NextFunc
     }
 }
 
-export const getAllReports = async (req: Request, res: Response, next: NextFunction) => {
+export const getAllReports = async (req: any, res: Response, next: NextFunction) => {
     try{
         const reports = await reportService.getReports() // GET THE ALL REPORTS WITH REPORTSERVICE
         res.status(200).json({ok: true, data: reports}) // RETURNS STATUS 200 AND THE REPORTS
+    } catch(error){
+        next(error)
+    }
+}
+
+export const getAllValidatedReports = async (req: any, res: Response, next: NextFunction) => {
+    try {
+        const reportsValidated = await reportService.reportsValidated() // GET THE ALL VALIDATED REPORTS WITH REPORTSERVICE
+        res.status(200).json({ok: true, data: reportsValidated}) // RETURNS STATUS 200 AND THE REPORTS
+    } catch(error){
+        next(error)
+    }
+}
+
+export const getAllPendingReports = async (req: any, res: Response, next: NextFunction) => {
+    try {
+        const reportsPending = await reportService.reportsPending() // GET THE ALL PENDING REPORTS WITH REPORTSERVICE
+        res.status(200).json({ok: true, data: reportsPending}) // RETURNS STATUS 200 AND THE REPORTS
     } catch(error){
         next(error)
     }

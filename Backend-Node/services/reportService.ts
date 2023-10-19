@@ -37,6 +37,30 @@ export const getReports = async () => {
     }
 }
 
+export const reportsValidated = async () => {
+    try {
+        const reportsValidated = await ReportModel.find({report_status: EReportStatus.Validado}) // FIND ALL VALIDATED REPORTS
+        if(isEmptyList(reportsValidated)){
+            throw new ResourceNotFoundError(PaymentNotFound) // IF THE REPORTS SAVED ARE EMPTY RUN AN EXCEPTION
+        }
+        return reportsValidated // RETURN THE REPORTS VALIDATED
+    }catch (error){
+        errorsPitcher(error)
+    }
+}
+
+export const reportsPending = async () => {
+    try {
+        const reportsPending = await ReportModel.find({report_status: EReportStatus.Pendiente}) // FIND ALL PENDING REPORTS
+        if(isEmptyList(reportsPending)){
+            throw new ResourceNotFoundError(PaymentNotFound) // IF THE REPORTS SAVED ARE EMPTY RUN AN EXCEPTION
+        }
+        return reportsPending // RETURN THE REPORTS VALIDATED
+    }catch (error){
+        errorsPitcher(error)
+    }
+}
+
 export const getReportUpdated = async (report: ReportMongo) => {
     try {
         const reportSaved = await ReportModel.findById(report._id)  // GET THE REPORT SAVED BY ID
