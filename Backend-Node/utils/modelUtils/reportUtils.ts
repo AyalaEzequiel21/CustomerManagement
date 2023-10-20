@@ -1,5 +1,5 @@
 import { errorsPitcher } from "../../errors/errorsPitcher"
-import { TypePaymentDto } from "../../schemas/paymentDTOSchema"
+import { TypePaymentDto } from "../../schemas/dtos/paymentDTOSchema"
 import { createPayment } from "../../services/paymentService"
 
 export const processPaymentsReport = async (payments: TypePaymentDto[], reportId: string) => {

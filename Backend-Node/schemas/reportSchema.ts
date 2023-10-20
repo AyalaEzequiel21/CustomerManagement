@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { paymentRegistrationSchema } from "./paymentSchema";
-import { paymentDTOSchema } from "./paymentDTOSchema";
+import { paymentDTOSchema } from "./dtos/paymentDTOSchema";
 
 // REPORT 
 

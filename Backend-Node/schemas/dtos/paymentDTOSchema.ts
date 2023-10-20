@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { EPaymentMethod } from "../enums/EPaymentMethod";
+import { EPaymentMethod } from "../../enums/EPaymentMethod";
 
 export const paymentDTOSchema = z.object({
     clientId: z.string(),
