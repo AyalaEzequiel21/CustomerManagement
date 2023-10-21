@@ -12,8 +12,19 @@ export const detailSaleSchema = z.object({
 
 export const saleRegistrationSchema = z.object({
     clientId: z.string(),
+    clientName: z.string(),
     details: z.array(detailSaleSchema),
     totalSale: z.number(),
-    // payment: z.
-
+    payment: z.string().optional()
 })
+
+export type SaleRegister = z.infer<typeof saleRegistrationSchema>
+
+// SALE MONGO
+
+export const saleMongoSchema = saleRegistrationSchema.extend({
+    _id: z.string(),
+    sale_date: z.string()
+})
+
+export type SaleMongo =z.infer<typeof saleMongoSchema>

@@ -10,6 +10,7 @@ export const detailSaleSchema = new Schema({
 const saleSchema = new Schema({
     sale_date: {type: String, default: formatDateIso(new Date())},
     clientId: {type: mongoose.Schema.Types.ObjectId, ref: "Client", required: true},
+    clientName: {type: String, required: true},
     details: [detailSaleSchema],
     totalSale: {type: Number, min: 0.01, required: true},
     payment: {type: mongoose.Schema.Types.ObjectId, ref: "Payment"}
