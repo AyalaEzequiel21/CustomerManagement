@@ -2,10 +2,11 @@ import mongoose from "mongoose"
 import { ResourceNotFoundError } from "../../errors/customErrors"
 import { ClientNotFound } from "../../errors/errorMessages"
 import { ClientDocument } from "../../models/client"
-import { PaymentDocument } from "../../models/payment"
+import PaymentModel, { PaymentDocument } from "../../models/payment"
 import { errorsPitcher } from "../../errors/errorsPitcher"
 import { EPaymentMethod } from "../../enums/EPaymentMethod"
 import * as clientUtils from "./clientUtils"
+import { TypePaymentDto } from "../../schemas/dtos/paymentDTOSchema"
 
 
 // function to get a client by id
@@ -39,6 +40,21 @@ export const subtractPaymentToClient = async (payment: PaymentDocument) => {
             throw new ResourceNotFoundError(ClientNotFound)
         }
     } catch (error){
+        errorsPitcher(error)
+    }
+}
+
+export const processPayment = async (payment: TypePaymentDto, reportId: string|undefined, saleId: string|undefined) => {
+    try{
+        const newPayment = await PaymentModel.create({
+        clientId: payment.clientId,
+        amount: payment.amount,
+        payment_method: payment.payment_method,
+        reportId: reportId,
+        saleId: saleId
+        })
+        return newPayment
+    }catch(error){
         errorsPitcher(error)
     }
 }

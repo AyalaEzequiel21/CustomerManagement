@@ -1,17 +1,13 @@
 import { errorsPitcher } from "../../errors/errorsPitcher"
 import { TypePaymentDto } from "../../schemas/dtos/paymentDTOSchema"
 import { createPayment } from "../../services/paymentService"
+import { processPayment } from "./paymentUtil"
 
 export const processPaymentsReport = async (payments: TypePaymentDto[], reportId: string) => {
     const paymentsIds = []
     try{
         for(const paymentDto of payments){
-            const newPayment = await createPayment({
-                clientId: paymentDto.clientId,
-                amount: paymentDto.amount,
-                payment_method: paymentDto.payment_method,
-                reportId: reportId
-            })
+            const newPayment = await processPayment(paymentDto, reportId, undefined)
             if(newPayment){
                 paymentsIds.push(newPayment._id)
             }
