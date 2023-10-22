@@ -1,5 +1,5 @@
 export * from './authUtils';
 export * from './clientUtils';
-export * from './paymentUtil';
+export * from './paymentUtils';
 export * from './reportUtils';
 export * from './saleUtils';

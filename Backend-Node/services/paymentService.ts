@@ -5,7 +5,7 @@ import PaymentModel from "../models/payment";
 import { PaymentRegister } from "../schemas/paymentSchema";
 import { isValidDateFormat } from "../utils/dateUtils";
 import { isEmptyList } from "../utils/existingChecker";
-import * as paymentUtils from "../utils/modelUtils/paymentUtil"
+import * as paymentUtils from "../utils/modelUtils/paymentUtils"
 
 /////////////////////////
 // PAYMENT SERVICE

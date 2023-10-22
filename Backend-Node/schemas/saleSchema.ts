@@ -4,10 +4,13 @@ import { paymentDTOSchema } from "./dtos/paymentDTOSchema"
 // DETAIL SALE
 
 export const detailSaleSchema = z.object({
-    productName: z.string(),
+    product: z.string(),
     quantity: z.number().refine( value => value > 0, {message: "The amount must be more that 0"}),
-    partialResult: z.number()
+    partialResult: z.number().refine( value => value > 0, {message: "The amount must be more that 0"})
 })
+
+export type DetailSale = z.infer<typeof detailSaleSchema>
+
 
 // SALE
 
@@ -15,7 +18,7 @@ export const saleRegistrationSchema = z.object({
     clientId: z.string().optional(),
     clientName: z.string(),
     details: z.array(detailSaleSchema),
-    totalSale: z.number(),
+    totalSale: z.number().optional(),
     payment_dto: paymentDTOSchema.optional(),
     payment: z.string().optional()
 })

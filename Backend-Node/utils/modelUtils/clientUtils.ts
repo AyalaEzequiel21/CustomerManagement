@@ -16,6 +16,18 @@ export const getClientById = async (clientId: string | mongoose.Types.ObjectId) 
     }
 }
 
+export const getClientByName = async (clientName: string) => {
+    try{
+        const client = await ClientModel.findOne({fullname: clientName}) // FIND CLIENT BY HIS NAME
+        if(client && client.is_active){  // IF THE CLIENT EXISTS AND IS ACTIVE
+            return client  // RETURN THE CLIENT
+        }
+        throw new ResourceNotFoundError(ClientNotFound)
+    } catch(error){
+        throw new InternalServerError(InternalServer)
+    }
+}
+
 // function to update de client balance
 export const updateClientBalance = async (client: ClientDocument, amount: number, isAdd: boolean) => {
     isAdd ? client.balance += amount : client.balance -= amount // IF ADD IS TRUE THEN ADD THE AMOUNT TO BALANCE, ELSE SUBTRACT AMOUNT TO BALANCE
