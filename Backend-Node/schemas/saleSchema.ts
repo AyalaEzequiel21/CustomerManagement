@@ -1,4 +1,5 @@
-import { z } from "zod"
+import { ZodType, z } from "zod"
+import { paymentDTOSchema } from "./dtos/paymentDTOSchema"
 
 // DETAIL SALE
 
@@ -11,10 +12,11 @@ export const detailSaleSchema = z.object({
 // SALE
 
 export const saleRegistrationSchema = z.object({
-    clientId: z.string(),
+    clientId: z.string().optional(),
     clientName: z.string(),
     details: z.array(detailSaleSchema),
     totalSale: z.number(),
+    payment_dto: paymentDTOSchema.optional(),
     payment: z.string().optional()
 })
 

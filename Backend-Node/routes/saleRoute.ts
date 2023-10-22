@@ -2,7 +2,7 @@ import express from 'express'
 import { validateRoleUser, validateSchemaRequest, validateUser } from '../middlewares/auth.middleware'
 import { authorizeGetAll } from '../middlewares/auth.middleware'
 import { ERole } from '../enums/ERole'
-import { deleteSale, getAllSales, registerSale, updateSale } from '../controllers/salesController'
+import { deleteSale, getAllSales, getSalesByClientName, getSalesBySaleDate, registerSale, updateSale } from '../controllers/saleController'
 import { saleMongoSchema, saleRegistrationSchema } from '../schemas/saleSchema'
 
 const router = express.Router()
@@ -12,6 +12,10 @@ router.use(validateUser())
 
 // GET ALL SALES
 router.get("/", authorizeGetAll(Object.values(ERole)), getAllSales)
+// GET SALES BY NAME CLIENT
+router.get("/client/:clientName", authorizeGetAll(Object.values(ERole)), getSalesByClientName)
+// GET SALES BY DATE
+router.get("/date/:saleDate", authorizeGetAll(Object.values(ERole)), getSalesBySaleDate)
 
 // MIDDLEWARE FOR CHECK IF USER ROLE IS VALID
 router.use(validateRoleUser([ERole.Admin, ERole.Biller]))
