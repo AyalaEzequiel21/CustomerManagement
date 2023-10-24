@@ -37,7 +37,7 @@ export const deletePaymentById = async (paymentId: string) => {
         throw new BadRequestError(BadRequest)
     }
     try {
-        const paymentSaved = await PaymentModel.findById(paymentId.toString()) // FIND THE PAYMENT BY HIS ID
+        const paymentSaved = await PaymentModel.findById(paymentId) // FIND THE PAYMENT BY HIS ID
         if(paymentSaved){ // CHECK IF EXISTS OR RUN AN EXCEPTION
              await paymentUtils.subtractPaymentToClient(paymentSaved) // REMOVE THE PAYMENT FROM TE CLIENT AND UPDATE HIS BALANCE
             await PaymentModel.findByIdAndDelete(paymentSaved._id) // DELETE THE PAYMENT FROM TO DATA BASE

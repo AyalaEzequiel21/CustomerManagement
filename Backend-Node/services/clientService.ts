@@ -22,7 +22,6 @@ export const getAllClients = async (inDelivery: boolean) => {
         if (inDelivery){  // IF INDELIVERY IS TRUE RETURN ONLY THE CLIENTS WITH IN_DELIVERY : TRUE 
                 return clients.filter(client => client.in_delivery)
         }
-
         return clients
     } catch (error){
         errorsPitcher(error)

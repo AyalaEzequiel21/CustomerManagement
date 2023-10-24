@@ -1,6 +1,6 @@
 import { EReportStatus } from "../enums/EReportStatus"
 import { InternalServerError, ResourceNotFoundError } from "../errors/customErrors"
-import { Conflict, PaymentNotFound, ReportNotFound } from "../errors/errorMessages"
+import { Conflict, InternalServer, PaymentNotFound, ReportNotFound } from "../errors/errorMessages"
 import { errorsPitcher } from "../errors/errorsPitcher"
 import ReportModel from "../models/report"
 import { ReportMongo, ReportRegister } from "../schemas/reportSchema"
@@ -19,13 +19,16 @@ export const createReport = async (newReport: ReportRegister) => {
         const reportCreated = await ReportModel.create({ // CREATE THE REPORT
             payments_dto: payments_dto
         })
-        return reportCreated // RETURN THE REPORT CREATED
+        if(reportCreated){
+            return reportCreated // RETURN THE REPORT CREATED
+        }
+        throw new InternalServerError(InternalServer)
     } catch(error){        
         errorsPitcher(error)
     }
 }
 
-export const getReports = async () => {
+export const getReports = async () => { // all reports
     try{
         const reportsSaved = await ReportModel.find() // GET ALL REPORTS
         if(isEmptyList(reportsSaved)){
@@ -37,7 +40,7 @@ export const getReports = async () => {
     }
 }
 
-export const reportsValidated = async () => {
+export const reportsValidated = async () => { // all reports validated
     try {
         const reportsValidated = await ReportModel.find({report_status: EReportStatus.Validado}) // FIND ALL VALIDATED REPORTS
         if(isEmptyList(reportsValidated)){
@@ -49,7 +52,7 @@ export const reportsValidated = async () => {
     }
 }
 
-export const reportsPending = async () => {
+export const reportsPending = async () => { // all reports pending
     try {
         const reportsPending = await ReportModel.find({report_status: EReportStatus.Pendiente}) // FIND ALL PENDING REPORTS
         if(isEmptyList(reportsPending)){
@@ -61,7 +64,7 @@ export const reportsPending = async () => {
     }
 }
 
-export const getReportUpdated = async (report: ReportMongo) => {
+export const getReportUpdated = async (report: ReportMongo) => { // update report
     try {
         const reportSaved = await ReportModel.findById(report._id)  // GET THE REPORT SAVED BY ID
         if(reportSaved && reportSaved.report_status  === EReportStatus.Pendiente){ // IF THE REPORT EXISTS AND HIS STATUS IS PENDIENTE UPDATE THE REPORT 
@@ -76,7 +79,7 @@ export const getReportUpdated = async (report: ReportMongo) => {
     }
 }
 
-export const getReportValidated = async (reportId: string) => {
+export const getReportValidated = async (reportId: string) => { // validate an report
     try{
         const reportSaved = await ReportModel.findById(reportId) // FIND THE REPORT BY HIS ID
         if(reportSaved && reportSaved.report_status  === EReportStatus.Pendiente){ // IF THE REPORT EXISTS AND HIS STATUS IS PENDIENTE THEN PROCESS THE PAYMENTS
@@ -84,9 +87,11 @@ export const getReportValidated = async (reportId: string) => {
             if(isEmptyList(paymentsProcessed)){
                 throw new InternalServerError(Conflict)
             }
-            reportSaved.payments = paymentsProcessed
-            reportSaved.payments_dto = [] // RESET THE PAYMENTS_DTO 
-            reportSaved.report_status = EReportStatus.Validado  // MODIFY STATUS TO VALIDATE
+            if(paymentsProcessed){
+                reportSaved.payments = paymentsProcessed
+                reportSaved.payments_dto = [] // RESET THE PAYMENTS_DTO 
+                reportSaved.report_status = EReportStatus.Validado  // MODIFY STATUS TO VALIDATE
+            }
         } else {
             throw new ResourceNotFoundError(ReportNotFound)
         }

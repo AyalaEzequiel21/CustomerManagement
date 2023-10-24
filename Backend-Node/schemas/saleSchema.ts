@@ -1,4 +1,4 @@
-import { ZodType, z } from "zod"
+import { z } from "zod"
 import { paymentDTOSchema } from "./dtos/paymentDTOSchema"
 
 // DETAIL SALE
@@ -32,4 +32,4 @@ export const saleMongoSchema = saleRegistrationSchema.extend({
     sale_date: z.string()
 })
 
-export type SaleMongo =z.infer<typeof saleMongoSchema>
+export type SaleMongo = z.infer<typeof saleMongoSchema>

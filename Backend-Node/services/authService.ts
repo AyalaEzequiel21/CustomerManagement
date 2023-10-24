@@ -5,7 +5,7 @@ import { BadRequest, CheckCredentials, InternalServer, UserAlreadyRegistered, Us
 import { User, UserMongo } from "../schemas/authSchemas"
 import { AuthenticationError, BadRequestError, ResourceAlreadyRegisteredError, ResourceNotFoundError } from "../errors/customErrors"
 import { errorsPitcher } from "../errors/errorsPitcher"
-import { existsEntity } from "../utils/existingChecker"
+import { existsEntity, isEmptyList } from "../utils/existingChecker"
 import ClientModel from "../models/client"
 
 
@@ -82,12 +82,11 @@ export const updateUser = async (userUpdated: UserMongo) => {
 
 export const getAllUsers = async () => {
     try{
-        const users = await UserModel.find() // GET ALL USERS , IF ARRAY LENGTHS IF MORE THAT 0 RETURN USER ELSE RETURN ERROR
-        if (users.length > 0){
-            return users
-        } else {
+        const users = await UserModel.find() // GET ALL USERS , IF ARRAY IS NOT EMPTY RETURNs USER ELSE RETURN ERROR
+        if (isEmptyList(users)){
             throw new ResourceNotFoundError(UserNotFound)
-        }
+        } 
+        return users
     } catch(error){
         errorsPitcher(error)
     }

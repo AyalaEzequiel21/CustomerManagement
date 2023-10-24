@@ -80,7 +80,7 @@ export const getProductsByName = async (productName: string) => {
         if(isEmptyList(productsFound)){ // IF PRODUCTSFOUND IS EMPTY RUN AN EXCEPTION
             throw new ResourceNotFoundError(ProductNotFound)
         }
-        return productsFound // ELSE RETURN PRODUCTS FOUND
+        return productsFound.filter(product => product.is_active) // ELSE RETURN PRODUCTS FOUND
     } catch (error){
         errorsPitcher(error)
     }

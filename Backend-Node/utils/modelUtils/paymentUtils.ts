@@ -22,7 +22,7 @@ export const getClientById = async (clientId: string | mongoose.Types.ObjectId) 
 export const addPaymentToClient = async (client: ClientDocument, payment: PaymentDocument) => {
     try{
         const updateClient = await clientUtils.updateClientBalance(client, payment.amount, false) // UPDATE THE CLIENT BALANCE
-        updateClient.payments.push(payment._id) // ADD THE PAYMENT TO CLIENT PAYMENTS
+        clientUtils.addNewPayment(updateClient, payment._id) // ADD THE PAYMENT TO CLIENT PAYMENTS
         await updateClient.save() // SAVE THE CLIENT UPDATED
     } catch(error) {
         errorsPitcher(error)
@@ -46,20 +46,24 @@ export const subtractPaymentToClient = async (payment: PaymentDocument) => {
 
 export const processPayment = async (payment: TypePaymentDto, reportId: string|undefined, saleId: string|undefined) => {
     try{
-        const newPayment = await PaymentModel.create({
+        const newPayment = await PaymentModel.create({  // CREATE THE PAYMENT
         clientId: payment.clientId,
         amount: payment.amount,
         payment_method: payment.payment_method,
         reportId: reportId,
         saleId: saleId
         })
+        const client = await getClientById(newPayment.clientId) // GET THE CLIENT BY HIS ID
+        if(client){
+            await addPaymentToClient(client, newPayment) // IF CLIENT EXISTS THEN ADD PAYMENT TO HIS REGISTER AND UPDATE THE CLIENT BALANCE
+        }
         return newPayment
     }catch(error){
         errorsPitcher(error)
     }
 }
 
-export const validateId = (Id: string): boolean => {
+export const validateId = (Id: string): boolean => { // FUNCTION FOR CHECK IF AN ID IS VALID
     let response = false 
     if(mongoose.Types.ObjectId.isValid(Id)){
         response = true
@@ -67,6 +71,6 @@ export const validateId = (Id: string): boolean => {
     return response
 }
 
-export const isValidPaymentMethod = (paymentMethod: string): boolean => {
+export const isValidPaymentMethod = (paymentMethod: string): boolean => { // FUNCTION FOR CHECK IF THE PAYMENT METHOD IS VALID
     return Object.values(EPaymentMethod).includes(paymentMethod as EPaymentMethod)
 }

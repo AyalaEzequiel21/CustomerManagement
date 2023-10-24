@@ -4,7 +4,7 @@ import { formatDateIso } from "../utils/dateUtils";
 export const detailSaleSchema = new Schema({
     product: {type: mongoose.Schema.Types.ObjectId, ref: "Product", required: true},
     quantity: {type: Number, min: 0.01,  required: true},
-    partialResult: {type: Number}
+    partialResult: {type: Number, min: 0.01,  required: true}
 })
 
 const saleSchema = new Schema({

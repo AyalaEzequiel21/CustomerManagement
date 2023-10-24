@@ -5,6 +5,8 @@ import { ClientMongo } from "../schemas/clientSchemas"
 import { PaymentMongo } from "../schemas/paymentSchema"
 import { SaleMongo, SaleRegister } from "../schemas/saleSchema"
 import * as saleUtils from "../utils/modelUtils/saleUtils"
+import { ResourceNotFoundError } from "../errors/customErrors"
+import { ClientNotFound } from "../errors/errorMessages"
 
 /////////////////////////
 // SALE SERVICE
@@ -25,24 +27,29 @@ export const findSalesBySaleDate = async (inDelivery: boolean, saleDate: string)
 export const createSale = async (sale: SaleRegister) => {
     const {clientName, details, payment_dto} = sale  
     try{
-        const client = await saleUtils.getClientByName(clientName) as ClientMongo
+        const client = await saleUtils.getClientByName(clientName)
         const newTotalSale = saleUtils.getTotalSale(details)
-        const saleCreated = await SaleModel.create({
-            clientId: client._id,
-            clientName: client.fullname,
-            details: details,
-            totalSale: newTotalSale,
-        })
-        if(payment_dto){
-            const saleId = saleCreated._id
-            const paymentCreated = await saleUtils.processPaymentSale(payment_dto, saleId.toString()) as PaymentMongo
-            saleCreated.payment = mongoose.Types.ObjectId.createFromHexString(paymentCreated._id)
-            await saleCreated.save()
+        if(client){
+            const saleCreated = await SaleModel.create({
+                clientId: client._id,
+                clientName: client.fullname,
+                details: details,
+                totalSale: newTotalSale,
+            })
+            client.sales.push(saleCreated._id)
+            await saleUtils.updateClientBalance(client, newTotalSale)
+            if(payment_dto){
+                const saleId = saleCreated._id
+                const paymentCreated = await saleUtils.processPaymentSale(payment_dto, saleId.toString())
+                if(paymentCreated){
+                    saleCreated.payment = new mongoose.Types.ObjectId(paymentCreated._id)
+                    await saleCreated.save()
+                }
+            }
+            return saleCreated
         }
-        return saleCreated
+        throw new ResourceNotFoundError(ClientNotFound)
     }catch(error){
-        console.log(error);
-        
         errorsPitcher(error)
     }
 }

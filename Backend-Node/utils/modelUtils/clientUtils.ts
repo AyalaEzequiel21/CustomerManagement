@@ -31,5 +31,18 @@ export const getClientByName = async (clientName: string) => {
 // function to update de client balance
 export const updateClientBalance = async (client: ClientDocument, amount: number, isAdd: boolean) => {
     isAdd ? client.balance += amount : client.balance -= amount // IF ADD IS TRUE THEN ADD THE AMOUNT TO BALANCE, ELSE SUBTRACT AMOUNT TO BALANCE
-    return client.save() // RETURN THE CLIENT UPDATED
+    try{
+        return client.save() // RETURN THE CLIENT UPDATED
+    } catch(error){
+        throw new InternalServerError(InternalServer)
+    }
+}
+
+export const addNewPayment = async (client: ClientDocument, paymentId: string | mongoose.Types.ObjectId) => {
+    client.payments.push(
+        (typeof paymentId == "string") ? 
+            new mongoose.Types.ObjectId(paymentId) 
+        : 
+            paymentId
+    )
 }
