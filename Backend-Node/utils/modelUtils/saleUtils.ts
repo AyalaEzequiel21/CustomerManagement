@@ -2,12 +2,12 @@ import { errorsPitcher } from "../../errors/errorsPitcher"
 import { ClientDocument } from "../../models/client"
 import { TypePaymentDto } from "../../schemas/dtos/paymentDTOSchema"
 import { DetailSale } from "../../schemas/saleSchema"
-import * as clientUtils from "./clientUtils"
-import * as paymentUtils from "./paymentUtils"
+import { getClientByName } from "./clientUtils" //  CLIENT UTILS
+import { processPayment } from "./paymentUtils" //  PAYMENTS UTILS
 
-export const getClientByName = async (clientName: string) => {
+export const findClientByName = async (clientName: string) => {
     try {
-        const client = await clientUtils.getClientByName(clientName) 
+        const client = await getClientByName(clientName) // WITH CLIENT UTILS
         return client
     } catch(error){
         errorsPitcher(error)
@@ -22,14 +22,14 @@ export const getTotalSale = (details: DetailSale[]) => {
     return result
 }
 
-export const updateClientBalance = async (client: ClientDocument, totalSale: number) => {
+export const addTotalSaletoBalance = async (client: ClientDocument, totalSale: number) => {
     client.balance += totalSale
     await client.save()    
 }
 
 export const processPaymentSale = async (payment: TypePaymentDto, saleId: string) => {
     try{
-        const paymentCreated = await paymentUtils.processPayment(payment, undefined, saleId)
+        const paymentCreated = await processPayment(payment, undefined, saleId) // WITH PAYMENTS UTILS
         return paymentCreated
     }catch(error){
         errorsPitcher(error)

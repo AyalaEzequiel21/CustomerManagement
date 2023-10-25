@@ -4,7 +4,8 @@ import { Conflict, InternalServer, PaymentNotFound, ReportNotFound } from "../er
 import { errorsPitcher } from "../errors/errorsPitcher"
 import ReportModel from "../models/report"
 import { ReportMongo, ReportRegister } from "../schemas/reportSchema"
-import { isEmptyList, processPaymentsReport } from "../utils"
+import { isEmptyList } from "../utils/existingChecker"
+import { processPaymentsReport } from "../utils/modelUtils/reportUtils" //  REPORT UTILS
 
 /////////////////////////
 // REPORT SERVICE
@@ -83,7 +84,7 @@ export const getReportValidated = async (reportId: string) => { // validate an r
     try{
         const reportSaved = await ReportModel.findById(reportId) // FIND THE REPORT BY HIS ID
         if(reportSaved && reportSaved.report_status  === EReportStatus.Pendiente){ // IF THE REPORT EXISTS AND HIS STATUS IS PENDIENTE THEN PROCESS THE PAYMENTS
-            const paymentsProcessed = await processPaymentsReport(reportSaved.payments_dto, reportSaved._id.toString())
+            const paymentsProcessed = await processPaymentsReport(reportSaved.payments_dto, reportSaved._id.toString()) // WITH REPORT UTILS
             if(isEmptyList(paymentsProcessed)){
                 throw new InternalServerError(Conflict)
             }

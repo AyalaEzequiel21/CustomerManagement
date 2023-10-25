@@ -3,9 +3,9 @@ import { BadRequest, PaymentNotFound } from "../errors/errorMessages";
 import { errorsPitcher } from "../errors/errorsPitcher";
 import PaymentModel from "../models/payment";
 import { PaymentRegister } from "../schemas/paymentSchema";
+import { addPaymentToClient, findClientById, isValidPaymentMethod, subtractPaymentToClient, validateId } from "../utils/modelUtils/paymentUtils"; // PAYMENTSUTILS
 import { isValidDateFormat } from "../utils/dateUtils";
 import { isEmptyList } from "../utils/existingChecker";
-import * as paymentUtils from "../utils/modelUtils/paymentUtils"
 
 /////////////////////////
 // PAYMENT SERVICE
@@ -14,7 +14,7 @@ import * as paymentUtils from "../utils/modelUtils/paymentUtils"
 export const createPayment = async (newPayment: PaymentRegister) => {    
     const {clientId, amount, payment_method, saleId, reportId} = newPayment // GET ALL ATTRIBUTES TO CREATE A PAYMENT
     try{
-        const client = await paymentUtils.getClientById(clientId) // GET THE CLIENT OF PAYMENT BY HIS ID 
+        const client = await findClientById(clientId) // GET THE CLIENT OF PAYMENT BY HIS ID WITH PAYMENTSUTILS
         if(client){ // IF CLIENT EXISTS THEN CREATED THE PAYMENT
             const paymentCreated = await PaymentModel.create({
                 clientId: clientId, 
@@ -23,7 +23,7 @@ export const createPayment = async (newPayment: PaymentRegister) => {
                 saleId: saleId || undefined,
                 reportId: reportId || undefined,
             })
-            await paymentUtils.addPaymentToClient(client, paymentCreated) // ADD THE PAYMENT TO CLIENT AND UPDATE HIS BALANCE 
+            await addPaymentToClient(client, paymentCreated) // ADD THE PAYMENT TO CLIENT AND UPDATE HIS BALANCE WITH PAYMENTUTILS
             return paymentCreated // RETURNS THE PAYMENT CREATED
         }
     } catch (error){
@@ -33,13 +33,13 @@ export const createPayment = async (newPayment: PaymentRegister) => {
 
 
 export const deletePaymentById = async (paymentId: string) => {
-    if (!paymentUtils.validateId(paymentId)){ // CHECK IF PAYMENTID IS VALID OR RUN AN EXCEPTION
+    if (!validateId(paymentId)){ // CHECK IF PAYMENTID IS VALID WITH PAYMENTUTILS OR RUN AN EXCEPTION
         throw new BadRequestError(BadRequest)
     }
     try {
         const paymentSaved = await PaymentModel.findById(paymentId) // FIND THE PAYMENT BY HIS ID
         if(paymentSaved){ // CHECK IF EXISTS OR RUN AN EXCEPTION
-             await paymentUtils.subtractPaymentToClient(paymentSaved) // REMOVE THE PAYMENT FROM TE CLIENT AND UPDATE HIS BALANCE
+             await subtractPaymentToClient(paymentSaved) // REMOVE THE PAYMENT FROM TE CLIENT AND UPDATE HIS BALANCE WITH PAYMENTUTILS
             await PaymentModel.findByIdAndDelete(paymentSaved._id) // DELETE THE PAYMENT FROM TO DATA BASE
         } else {
             throw new ResourceNotFoundError(PaymentNotFound)
@@ -62,7 +62,7 @@ export const allPayments = async () => {
 }
 
 export const getPaymentsByClientId = async (clientId: string) => {
-    if(!paymentUtils.validateId(clientId)){
+    if(!validateId(clientId)){ // CHECK IF ID IS VALID WITH PAYMENTUTILS
         throw new BadRequestError(BadRequest)
     } 
     try {
@@ -78,7 +78,7 @@ export const getPaymentsByClientId = async (clientId: string) => {
 }
 
 export const getPaymentsByPaymentMethod = async (paymentMethod: string) => {
-    if(!paymentUtils.isValidPaymentMethod(paymentMethod)){  // CHECK IF PAYMENTmEHOD IS VALID OR RUN AN EXCEPTION
+    if(!isValidPaymentMethod(paymentMethod)){  // CHECK IF PAYMENTmEHOD IS VALID WITH PAYMENTUTILS OR RUN AN EXCEPTION 
         throw new BadRequestError(BadRequest)
     }
     try {
