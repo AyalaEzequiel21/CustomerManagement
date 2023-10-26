@@ -10,9 +10,13 @@ async function connectDB() {
         throw new Error("Falta la variable de entorno MONGODB_URL")
     }
     try {
-        await mongoose.connect(process.env.MONGODB_URL)
-
+        await mongoose.connect(process.env.MONGODB_URL, {
+            
+            retryWrites: true,
+            w: "majority",
+        })
         console.log("connection succesful");  
+
     } catch (error) {
         console.log("Error to connect Data Base, " + error);
     }

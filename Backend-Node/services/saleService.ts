@@ -1,4 +1,4 @@
-import mongoose from "mongoose"
+import mongoose, {startSession} from "mongoose"
 import { errorsPitcher } from "../errors/errorsPitcher"
 import SaleModel from "../models/sale"
 import { SaleMongo, SaleRegister } from "../schemas/saleSchema"
@@ -45,6 +45,7 @@ export const findSalesBySaleDate = async (inDelivery: boolean, saleDate: string)
 
 export const createSale = async (sale: SaleRegister) => {
     const {clientName, details, payment_dto} = sale  
+    const session = await startSession()
     try{
         const client = await findClientByName(clientName) // WITH SALE UTILS
         const newTotalSale = getTotalSale(details) // WITH SALE UTILS
