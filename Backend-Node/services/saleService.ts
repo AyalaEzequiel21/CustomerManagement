@@ -1,11 +1,12 @@
-import mongoose, {startSession} from "mongoose"
+import mongoose from "mongoose"
 import { errorsPitcher } from "../errors/errorsPitcher"
 import SaleModel from "../models/sale"
 import { SaleMongo, SaleRegister } from "../schemas/saleSchema"
-import { ResourceNotFoundError } from "../errors/customErrors"
-import { ClientNotFound, SaleNotFound } from "../errors/errorMessages"
+import { InternalServerError, ResourceNotFoundError } from "../errors/customErrors"
+import { ClientNotFound, InternalServer, SaleNotFound } from "../errors/errorMessages"
 import { isEmptyList } from "../utils/existingChecker"
 import { findClientByName, getTotalSale, addTotalSaletoBalance, processPaymentSale } from "../utils/modelUtils/saleUtils" //  SALE UTILS
+import { startSession } from "../db/connect"
 
 
 /////////////////////////
@@ -44,32 +45,42 @@ export const findSalesBySaleDate = async (inDelivery: boolean, saleDate: string)
 }
 
 export const createSale = async (sale: SaleRegister) => {
-    const {clientName, details, payment_dto} = sale  
-    const session = await startSession()
     try{
-        const client = await findClientByName(clientName) // WITH SALE UTILS
-        const newTotalSale = getTotalSale(details) // WITH SALE UTILS
-        if(client){
-            const saleCreated = await SaleModel.create({
-                clientId: client._id,
-                clientName: client.fullname,
-                details: details,
-                totalSale: newTotalSale,
-            })
-            client.sales.push(saleCreated._id)
-            await addTotalSaletoBalance(client, newTotalSale) // WITH SALE UTILS
-            if(payment_dto){
-                const saleId = saleCreated._id
-                const paymentCreated = await processPaymentSale(payment_dto, saleId.toString()) // WITH SALE UTILS
-                if(paymentCreated){
-                    saleCreated.payment = new mongoose.Types.ObjectId(paymentCreated._id)
-                    await saleCreated.save()
+        const {clientName, details, payment_dto} = sale  
+
+        const session = await startSession()
+        session.startTransaction()
+        try{
+            const client = await findClientByName(clientName, session) // WITH SALE UTILS
+            const newTotalSale = getTotalSale(details) // WITH SALE UTILS
+            if(client){
+                const saleCreated = await SaleModel.create({
+                       clientId: client._id,
+                        clientName: client.fullname,
+                        details: details,
+                        totalSale: newTotalSale
+                })
+                client.sales.push(saleCreated._id)
+                 await addTotalSaletoBalance(client, newTotalSale, session) // WITH SALE UTILS
+                if(payment_dto){
+                    const saleId = saleCreated._id
+                    const paymentCreated = await processPaymentSale(payment_dto, saleId.toString(), session) // WITH SALE UTILS
+                    if(paymentCreated){
+                        saleCreated.payment = new mongoose.Types.ObjectId(paymentCreated._id)
+                        await saleCreated.save({session})
+                    }
                 }
+                session.commitTransaction()
+                return saleCreated
             }
-            return saleCreated
-        }
-        throw new ResourceNotFoundError(ClientNotFound)
-    }catch(error){
+            throw new ResourceNotFoundError(ClientNotFound)
+        } catch(error){
+            session.abortTransaction()
+            throw new InternalServerError(InternalServer)
+        } finally {
+            session.endSession()
+        }    
+    } catch(error){
         errorsPitcher(error)
     }
 }

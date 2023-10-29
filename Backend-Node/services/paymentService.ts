@@ -6,6 +6,7 @@ import { PaymentRegister } from "../schemas/paymentSchema";
 import { addPaymentToClient, findClientById, isValidPaymentMethod, subtractPaymentToClient, validateId } from "../utils/modelUtils/paymentUtils"; // PAYMENTSUTILS
 import { isValidDateFormat } from "../utils/dateUtils";
 import { isEmptyList } from "../utils/existingChecker";
+import { startSession } from "../db/connect";
 
 /////////////////////////
 // PAYMENT SERVICE
@@ -13,21 +14,30 @@ import { isEmptyList } from "../utils/existingChecker";
 
 export const createPayment = async (newPayment: PaymentRegister) => {    
     const {clientId, amount, payment_method, saleId, reportId} = newPayment // GET ALL ATTRIBUTES TO CREATE A PAYMENT
+    const session = await startSession() // START A SESSION FOR THE TRANSACTION
     try{
-        const client = await findClientById(clientId) // GET THE CLIENT OF PAYMENT BY HIS ID WITH PAYMENTSUTILS
+        session.startTransaction()
+        const client = await findClientById(clientId, session) // GET THE CLIENT OF PAYMENT BY HIS ID WITH PAYMENTSUTILS
         if(client){ // IF CLIENT EXISTS THEN CREATED THE PAYMENT
-            const paymentCreated = await PaymentModel.create({
+
+            const paymentData = { // CREATE THE PAYMENT DATA
                 clientId: clientId, 
                 amount: amount,
                 payment_method: payment_method, 
                 saleId: saleId || undefined,
-                reportId: reportId || undefined,
-            })
-            await addPaymentToClient(client, paymentCreated) // ADD THE PAYMENT TO CLIENT AND UPDATE HIS BALANCE WITH PAYMENTUTILS
+                reportId: reportId || undefined
+            }
+            const paymentCreated = await PaymentModel.create({paymentData, session}) // CREATE THE PAYMENT WITH PAYMENT DATA AND SESSION
+            
+            await addPaymentToClient(client, paymentCreated, session) // ADD THE PAYMENT TO CLIENT AND UPDATE HIS BALANCE WITH PAYMENTUTILS
+            await session.commitTransaction()
             return paymentCreated // RETURNS THE PAYMENT CREATED
         }
     } catch (error){
+        await session.abortTransaction()
         errorsPitcher(error)
+    } finally{
+        session.endSession()
     }
 }
 

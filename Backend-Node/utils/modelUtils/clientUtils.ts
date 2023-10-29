@@ -4,9 +4,9 @@ import { ClientNotFound, InternalServer } from "../../errors/errorMessages"
 import ClientModel, { ClientDocument } from "../../models/client"
 
 // function to get a client by id
-export const getClientById = async (clientId: string | mongoose.Types.ObjectId) => {
+export const getClientById = async (clientId: string | mongoose.Types.ObjectId, session: mongoose.ClientSession | null = null) => {
     try{
-        const client = await ClientModel.findById(clientId) // FIND CLIENT BY ID
+        const client = await ClientModel.findById(clientId).session(session) // FIND CLIENT BY ID
         if(client && client.is_active){ // IF THE CLIENT EXISTS AND IS ACTIVE
             return client // RETURN THE CLIENT
         }
@@ -16,9 +16,9 @@ export const getClientById = async (clientId: string | mongoose.Types.ObjectId) 
     }
 }
 
-export const getClientByName = async (clientName: string) => {
+export const getClientByName = async (clientName: string, session: mongoose.ClientSession | null = null) => {
     try{
-        const client = await ClientModel.findOne({fullname: clientName}) // FIND CLIENT BY HIS NAME
+        const client = await ClientModel.findOne({fullname: clientName}).session(session) // FIND CLIENT BY HIS NAME
         if(client && client.is_active){  // IF THE CLIENT EXISTS AND IS ACTIVE
             return client  // RETURN THE CLIENT
         }
@@ -29,10 +29,14 @@ export const getClientByName = async (clientName: string) => {
 }
 
 // function to update de client balance
-export const updateClientBalance = async (client: ClientDocument, amount: number, isAdd: boolean) => {
+export const updateClientBalance = async (client: ClientDocument, amount: number, isAdd: boolean, session: mongoose.ClientSession | null = null) => {
     isAdd ? client.balance += amount : client.balance -= amount // IF ADD IS TRUE THEN ADD THE AMOUNT TO BALANCE, ELSE SUBTRACT AMOUNT TO BALANCE
     try{
-        return client.save() // RETURN THE CLIENT UPDATED
+        if(session){
+            return client.save({session}) // RETURN THE CLIENT UPDATED
+        } else {
+            return client.save() // RETURN THE CLIENT UPDATED
+        }
     } catch(error){
         throw new InternalServerError(InternalServer)
     }

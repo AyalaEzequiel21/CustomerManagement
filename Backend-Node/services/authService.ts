@@ -51,7 +51,7 @@ export const createUser = async (newUser : User) => {
                 password: hashPassword, 
                 role: role
             })  
-            return newUser
+            return newUser //  RETURNS THE NEW USER
         } catch (error){
             throw new BadRequestError(BadRequest)
         }
