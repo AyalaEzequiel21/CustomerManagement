@@ -2,6 +2,7 @@ import { AuthenticationError, BadRequestError, InternalServerError, ResourceAlre
 import { InternalServer } from "./errorMessages";
 
 export const errorsPitcher = (error : Error | unknown) => {
+    // console.log(error);
     if (error instanceof Error){
         switch (true) {
             case error instanceof AuthenticationError: 
@@ -16,7 +17,7 @@ export const errorsPitcher = (error : Error | unknown) => {
             default:
                 throw new InternalServerError(InternalServer)
         }
-    } else {
+    } else {        
         throw new InternalServerError(InternalServer)
     }
 }

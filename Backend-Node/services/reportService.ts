@@ -1,3 +1,4 @@
+import { startSession } from "../db/connect"
 import { EReportStatus } from "../enums/EReportStatus"
 import { InternalServerError, ResourceNotFoundError } from "../errors/customErrors"
 import { Conflict, InternalServer, PaymentNotFound, ReportNotFound } from "../errors/errorMessages"
@@ -20,6 +21,7 @@ export const createReport = async (newReport: ReportRegister) => {
         const reportCreated = await ReportModel.create({ // CREATE THE REPORT
             payments_dto: payments_dto
         })
+
         if(reportCreated){
             return reportCreated // RETURN THE REPORT CREATED
         }
@@ -81,10 +83,12 @@ export const getReportUpdated = async (report: ReportMongo) => { // update repor
 }
 
 export const getReportValidated = async (reportId: string) => { // validate an report
+    const session = await startSession()
     try{
-        const reportSaved = await ReportModel.findById(reportId) // FIND THE REPORT BY HIS ID
+        session.startTransaction()
+        const reportSaved = await ReportModel.findById(reportId, {session}) // FIND THE REPORT BY HIS ID
         if(reportSaved && reportSaved.report_status  === EReportStatus.Pendiente){ // IF THE REPORT EXISTS AND HIS STATUS IS PENDIENTE THEN PROCESS THE PAYMENTS
-            const paymentsProcessed = await processPaymentsReport(reportSaved.payments_dto, reportSaved._id.toString()) // WITH REPORT UTILS
+            const paymentsProcessed = await processPaymentsReport(reportSaved.payments_dto, reportSaved._id.toString(), session) // WITH REPORT UTILS
             if(isEmptyList(paymentsProcessed)){
                 throw new InternalServerError(Conflict)
             }
@@ -96,9 +100,12 @@ export const getReportValidated = async (reportId: string) => { // validate an r
         } else {
             throw new ResourceNotFoundError(ReportNotFound)
         }
-        const reportValidated = await reportSaved.save() // SAVE THE REPORT WITH THE PAYMENTS PROCESSED AND RETURN IT
+        const reportValidated = await reportSaved.save({session}) // SAVE THE REPORT WITH THE PAYMENTS PROCESSED AND RETURN IT
+        await session.commitTransaction()
         return reportValidated
     }catch(error){
         errorsPitcher(error)
+        await session.abortTransaction()
     }
+    session.endSession()
 }

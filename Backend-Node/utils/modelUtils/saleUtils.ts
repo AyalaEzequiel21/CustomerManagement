@@ -2,7 +2,7 @@ import mongoose from "mongoose"
 import { errorsPitcher } from "../../errors/errorsPitcher"
 import { ClientDocument } from "../../models/client"
 import { TypePaymentDto } from "../../schemas/dtos/paymentDTOSchema"
-import { DetailSale } from "../../schemas/saleSchema"
+import { DetailSale, SaleMongo } from "../../schemas/saleSchema"
 import { getClientByName } from "./clientUtils" //  CLIENT UTILS
 import { processPayment } from "./paymentUtils" //  PAYMENTS UTILS
 
@@ -33,6 +33,21 @@ export const processPaymentSale = async (payment: TypePaymentDto, saleId: string
         const paymentCreated = await processPayment(payment, undefined, saleId, session) // WITH PAYMENTS UTILS
         return paymentCreated
     }catch(error){
+        errorsPitcher(error)
+    }
+}
+
+export const filterSalesForDelivery = async (sales: SaleMongo[]) => {
+    try{
+        const deliverySales = await Promise.all(sales.map(async (sale) => { // FILTER ALL SALES WITH CLIEN INDELIVERY IS TRUE
+            const client = await findClientByName(sale.clientName); // SEARCH THE CLIENT WITH SALE UTILS
+            if (client && client.in_delivery) {
+                return sale 
+            }
+            return null 
+        }));
+        return deliverySales.filter((sale) => sale !== null) // RETURN ALL SALES OF CLIENT ACTIVES
+    } catch(error){
         errorsPitcher(error)
     }
 }

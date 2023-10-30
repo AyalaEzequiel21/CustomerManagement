@@ -23,7 +23,7 @@ export const addPaymentToClient = async (client: ClientDocument, payment: Paymen
     try{
         const updateClient = await updateClientBalance(client, payment.amount, false, session) // UPDATE THE CLIENT BALANCE WITH CLIENT UTILS
         addNewPayment(updateClient, payment._id) // ADD THE PAYMENT TO CLIENT PAYMENTS WITH CLIENT UTILS
-        await updateClient.save() // SAVE THE CLIENT UPDATED
+        await updateClient.save({session}) // SAVE THE CLIENT UPDATED
     } catch(error) {
         errorsPitcher(error)
     }
@@ -35,7 +35,7 @@ export const subtractPaymentToClient = async (payment: PaymentDocument, session:
         if(client){ // IF THE CLIENT EXISTS
             const clientUpdated = await updateClientBalance(client, payment.amount, true, session) // UPDATE THE CLIENT BALANCE WITH CLIENT UTILS
             client.payments = client.payments.filter(paymentID => paymentID.toString() !== payment._id.toHexString()) // REMOVE THE PAYMENT FROM CLIENT PAYMENTS
-            clientUpdated.save() // SAVE THE CLIENT UPDATED
+            clientUpdated.save({session}) // SAVE THE CLIENT UPDATED
         }else { // IF NOT EXISTS RUN AN EXCEPTION
             throw new ResourceNotFoundError(ClientNotFound)
         }
@@ -46,7 +46,7 @@ export const subtractPaymentToClient = async (payment: PaymentDocument, session:
 
 export const processPayment = async (payment: TypePaymentDto, reportId: string|undefined, saleId: string|undefined, session: mongoose.ClientSession | null = null) => {
     try{
-        const options = session ? {session} : {} // SPECIFY IF THE SESSION  EXISTS
+        // const options = session ? {session} : {} // SPECIFY IF THE SESSION  EXISTS
         const IDclient = new mongoose.Types.ObjectId(payment.clientId) // CONVERT CLIENTID (STRING) TO OBJECTID
 
         const newPaymentData = { // CREATE THE PAYMENT DATA 
@@ -56,12 +56,12 @@ export const processPayment = async (payment: TypePaymentDto, reportId: string|u
             reportId: reportId,
             saleId: saleId
         }
-        const newPayment = await PaymentModel.create({newPaymentData, options})  // CREATE THE PAYMENT WITH PAYMENT DATA AND SESSION IF EXISTS)
+        const newPayment = await PaymentModel.create([newPaymentData], {session})  // CREATE THE PAYMENT WITH PAYMENT DATA AND SESSION IF EXISTS)
         const client = await findClientById(IDclient, session) // GET THE CLIENT BY HIS ID
-        if(client && newPayment){
-            await addPaymentToClient(client, newPayment, session) // IF CLIENT AND NEWPAYMENT EXISTS THEN ADD PAYMENT TO HIS REGISTER AND UPDATE THE CLIENT BALANCE
+        if(client && newPayment.length === 1){
+            await addPaymentToClient(client, newPayment[0], session) // IF CLIENT AND NEWPAYMENT EXISTS THEN ADD PAYMENT TO HIS REGISTER AND UPDATE THE CLIENT BALANCE
         }
-        return newPayment
+        return newPayment[0]
     }catch(error){
         errorsPitcher(error)
     }

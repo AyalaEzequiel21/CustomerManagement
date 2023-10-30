@@ -3,7 +3,7 @@ import { BadRequest, PaymentNotFound } from "../errors/errorMessages";
 import { errorsPitcher } from "../errors/errorsPitcher";
 import PaymentModel from "../models/payment";
 import { PaymentRegister } from "../schemas/paymentSchema";
-import { addPaymentToClient, findClientById, isValidPaymentMethod, subtractPaymentToClient, validateId } from "../utils/modelUtils/paymentUtils"; // PAYMENTSUTILS
+import { addPaymentToClient, findClientById, isValidPaymentMethod, subtractPaymentToClient, validateId } from "../utils/modelUtils/paymentUtils"; // PAYMENTS UTILS
 import { isValidDateFormat } from "../utils/dateUtils";
 import { isEmptyList } from "../utils/existingChecker";
 import { startSession } from "../db/connect";
@@ -17,7 +17,7 @@ export const createPayment = async (newPayment: PaymentRegister) => {
     const session = await startSession() // START A SESSION FOR THE TRANSACTION
     try{
         session.startTransaction()
-        const client = await findClientById(clientId, session) // GET THE CLIENT OF PAYMENT BY HIS ID WITH PAYMENTSUTILS
+        const client = await findClientById(clientId, session) // GET THE CLIENT OF PAYMENT BY HIS ID WITH PAYMENTS UTILS
         if(client){ // IF CLIENT EXISTS THEN CREATED THE PAYMENT
 
             const paymentData = { // CREATE THE PAYMENT DATA
@@ -29,16 +29,15 @@ export const createPayment = async (newPayment: PaymentRegister) => {
             }
             const paymentCreated = await PaymentModel.create({paymentData, session}) // CREATE THE PAYMENT WITH PAYMENT DATA AND SESSION
             
-            await addPaymentToClient(client, paymentCreated, session) // ADD THE PAYMENT TO CLIENT AND UPDATE HIS BALANCE WITH PAYMENTUTILS
+            await addPaymentToClient(client, paymentCreated, session) // ADD THE PAYMENT TO CLIENT AND UPDATE HIS BALANCE WITH PAYMENT UTILS
             await session.commitTransaction()
             return paymentCreated // RETURNS THE PAYMENT CREATED
         }
     } catch (error){
-        await session.abortTransaction()
         errorsPitcher(error)
-    } finally{
-        session.endSession()
-    }
+        await session.abortTransaction()
+    } 
+    session.endSession()
 }
 
 
@@ -46,11 +45,13 @@ export const deletePaymentById = async (paymentId: string) => {
     if (!validateId(paymentId)){ // CHECK IF PAYMENTID IS VALID WITH PAYMENTUTILS OR RUN AN EXCEPTION
         throw new BadRequestError(BadRequest)
     }
+    const session = await startSession() // START A SESSION FOR THE TRANSACTION
     try {
+        session.startTransaction()
         const paymentSaved = await PaymentModel.findById(paymentId) // FIND THE PAYMENT BY HIS ID
         if(paymentSaved){ // CHECK IF EXISTS OR RUN AN EXCEPTION
-             await subtractPaymentToClient(paymentSaved) // REMOVE THE PAYMENT FROM TE CLIENT AND UPDATE HIS BALANCE WITH PAYMENTUTILS
-            await PaymentModel.findByIdAndDelete(paymentSaved._id) // DELETE THE PAYMENT FROM TO DATA BASE
+            await subtractPaymentToClient(paymentSaved, session) // REMOVE THE PAYMENT FROM TE CLIENT AND UPDATE HIS BALANCE WITH PAYMENTUTILS
+            await PaymentModel.findByIdAndDelete(paymentSaved._id, {session}) // DELETE THE PAYMENT FROM TO DATA BASE
         } else {
             throw new ResourceNotFoundError(PaymentNotFound)
         }

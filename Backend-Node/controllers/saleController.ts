@@ -17,7 +17,7 @@ export const getAllSales = async (req: any, res: Response, next: NextFunction) =
 
 export const getSalesByClientName = async (req: any, res: Response, next: NextFunction) => {
     const inDelivery = req.filterDelivery // CHECK IF THE FILTER IN_DELIVERY IS ACTIVE
-    const clientName = req.params.clientNamen // GET THE CLIENT NAME FROM THE REQUEST PARAMS
+    const clientName = req.params.clientName // GET THE CLIENT NAME FROM THE REQUEST PARAMS    
     try {
         const sales = await saleService.findSalesByClientName(inDelivery, clientName) // FIND ALL SALES BY CLIENT NAME WITH SALE SERVICE
         res.status(200).json({ok: true, data: sales})  // RETURN STATUS 200 AND THE SALES
@@ -27,12 +27,12 @@ export const getSalesByClientName = async (req: any, res: Response, next: NextFu
 }
 
 export const getSalesBySaleDate = async (req: any, res: Response, next: NextFunction) => {
-    const inDelivery = req.filterDelivery // CHECK IF THE FILTER IN_DELIVERY IS ACTIVE
-    const saleDate = req.params.saleDate // GET THE SALE DATE FROM THE REQUEST PARAMS
+    const inDelivery: boolean = req.filterDelivery // CHECK IF THE FILTER IN_DELIVERY IS ACTIVE
+    const {date} = req.query // GET THE SALE DATE FROM THE REQUEST PARAMS        
     try{
-        const sales = await saleService.findSalesBySaleDate(inDelivery, saleDate) // FIND ALL SALES BY SALE DATE WITH SALE SERVICE
+        const sales = await saleService.findSalesBySaleDate(inDelivery, date) // FIND ALL SALES BY SALE DATE WITH SALE SERVICE
         res.status(200).json({ok: true, data: sales})  // RETURN STATUS 200 AND THE SALES
-    } catch(error){
+    } catch(error){        
         next(error)
     }
 }

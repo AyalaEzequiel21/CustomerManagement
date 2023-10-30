@@ -120,7 +120,7 @@ export const deleteClientById = async (clientId: string) => {
         }else {
             throw new ResourceNotFoundError(ClientNotFound)
         }
-        clientSaved.save()
+        clientSaved.save() // SAVE THE CLIENT INACTIVE
     } catch(error){
         errorsPitcher(error)
     }
