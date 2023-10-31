@@ -6,13 +6,13 @@ import ClientModel, { ClientDocument } from "../../models/client"
 // function to get a client by id
 export const getClientById = async (clientId: string | mongoose.Types.ObjectId, session: mongoose.ClientSession | null = null) => {
     try{
-        const client = await ClientModel.findById(clientId, {session}) // FIND CLIENT BY ID
+        const client = await ClientModel.findById(clientId).session(session) // FIND CLIENT BY ID
         if(client && client.is_active){ // IF THE CLIENT EXISTS AND IS ACTIVE
             return client // RETURN THE CLIENT
         }
         throw new ResourceNotFoundError(ClientNotFound)
     }catch (error){
-        throw new InternalServerError(InternalServer)
+        throw new InternalServerError(`${InternalServer} - ${error}`)
     }
 }
 
@@ -26,7 +26,7 @@ export const getClientByName = async (clientName: string, session: mongoose.Clie
     } catch(error){
         console.log(error);
         
-        throw new InternalServerError(InternalServer)
+        throw new InternalServerError(`${InternalServer} - ${error}`)
     }
 }
 
@@ -36,7 +36,7 @@ export const updateClientBalance = async (client: ClientDocument, amount: number
     try{
         return client.save({session}) // RETURN THE CLIENT UPDATED
     } catch(error){
-        throw new InternalServerError(InternalServer)
+        throw new InternalServerError(`${InternalServer} - ${error}`)
     }
 }
 

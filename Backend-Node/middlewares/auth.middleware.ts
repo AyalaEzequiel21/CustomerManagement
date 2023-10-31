@@ -58,7 +58,7 @@ export const validateSchemaRequest = (schema: z.ZodType<any>) => {
             if (error instanceof z.ZodError){
                 throw new BadRequestError(BadRequest)
             }            
-            throw new InternalServerError(InternalServer)
+            throw new InternalServerError(`${InternalServer} - ${error}`)
         }
     }
 }

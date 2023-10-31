@@ -1,7 +1,7 @@
 import UserModel from "../models/user"
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
-import { BadRequest, CheckCredentials, InternalServer, UserAlreadyRegistered, UserNotFound } from "../errors/errorMessages"
+import { BadRequest, CheckCredentials, UserAlreadyRegistered, UserNotFound } from "../errors/errorMessages"
 import { User, UserMongo } from "../schemas/authSchemas"
 import { AuthenticationError, BadRequestError, ResourceAlreadyRegisteredError, ResourceNotFoundError } from "../errors/customErrors"
 import { errorsPitcher } from "../errors/errorsPitcher"
@@ -39,50 +39,44 @@ export const loginUser = async (email: string, password: string) => {
 
 export const createUser = async (newUser : User) => {
     const {username, email, password, role} = newUser // GET THE ATTRIBUTES SENDED 
-    
-    if(await existsEntity(ClientModel, "email", email)){ // IF EMAIL HAS ALREADY BEEN REGISTERED RUN AN EXCEPTION        
-        throw new ResourceAlreadyRegisteredError(UserAlreadyRegistered)
-    } else{
+    try{
+        if(await existsEntity(ClientModel, "email", email)){ // IF EMAIL HAS ALREADY BEEN REGISTERED RUN AN EXCEPTION        
+            throw new ResourceAlreadyRegisteredError(UserAlreadyRegistered)
+        } 
         const hashPassword = await bcrypt.hash(password, 8) // PASSWORD TO HASH
-        try{
-            const newUser = await UserModel.create({ // CREATE THE NEW USER AND SEND IT
-                username: username, 
-                email: email, 
-                password: hashPassword, 
-                role: role
-            })  
-            return newUser //  RETURNS THE NEW USER
-        } catch (error){
-            throw new BadRequestError(BadRequest)
-        }
-    } 
+        const newUser = await UserModel.create({ // CREATE THE NEW USER AND SEND IT
+            username: username, 
+            email: email, 
+            password: hashPassword, 
+            role: role
+        })  
+        return newUser //  RETURNS THE NEW USER
+    } catch(error){
+        throw new BadRequestError(BadRequest)
+    }
 }
 
 export const updateUser = async (userUpdated: UserMongo) => {
     const {_id, username, email, password, role} = userUpdated // GET THE ATTRIBUTES SENDED
-    
-    const existingUser = await UserModel.findById(_id) // CHECK THAT EXISTS THE USER SENDED
-
-    if(existingUser){ // IF EXISTS THEN UPDATE
-        existingUser.username = username
+    try{
+        const existingUser = await UserModel.findById(_id) // CHECK THAT EXISTS THE USER SENDED
+        if(!existingUser){ // IF USER NOT EXISTS RUN AN EXCEPTION
+            throw new ResourceNotFoundError(UserNotFound)
+        } 
+        existingUser.username = username // ELSE UPDATE THE USER 
         existingUser.email = email
         existingUser.password = bcrypt.hashSync(password, 8)
         existingUser.role = role
-
-        try{
-            const updatedUser = await existingUser.save() // SAVE THE USER UPDATED AND SEND IT
-            return updatedUser
-        } catch (error){
-            throw new BadRequestError(InternalServer)
-        }
-    } else{
-        throw new ResourceNotFoundError(UserNotFound)
+        const updatedUser = await existingUser.save() // SAVE THE USER UPDATED AND RETURN
+        return updatedUser
+    } catch (error){
+        throw new BadRequestError(BadRequest)
     }
 }
 
 export const getAllUsers = async () => {
     try{
-        const users = await UserModel.find() // GET ALL USERS , IF ARRAY IS NOT EMPTY RETURNs USER ELSE RETURN ERROR
+        const users = await UserModel.find() // GET ALL USERS , IF ARRAY IS NOT EMPTY RETURNS USER ELSE RETURN ERROR
         if (isEmptyList(users)){
             throw new ResourceNotFoundError(UserNotFound)
         } 
@@ -95,11 +89,11 @@ export const getAllUsers = async () => {
 
 export const removeUser = async (userId: string) => {
     try{
-        const userSaved = await UserModel.findById(userId) // CHECK IF EXISTS TH CLIENT 
+        const userSaved = await UserModel.exists({_id: userId}) // CHECK IF EXISTS TH CLIENT 
         if(!userSaved){
             throw new ResourceNotFoundError(UserNotFound)
         }
-        await UserModel.findByIdAndDelete(userId) // IF EXISTS, THEN DELETE IT
+        await UserModel.deleteOne({_id: userId}) // IF EXISTS, THEN DELETE IT
     } catch (error){ 
         errorsPitcher(error)
     }

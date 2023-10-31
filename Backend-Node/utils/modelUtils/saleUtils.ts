@@ -3,8 +3,8 @@ import { errorsPitcher } from "../../errors/errorsPitcher"
 import { ClientDocument } from "../../models/client"
 import { TypePaymentDto } from "../../schemas/dtos/paymentDTOSchema"
 import { DetailSale, SaleMongo } from "../../schemas/saleSchema"
-import { getClientByName } from "./clientUtils" //  CLIENT UTILS
-import { processPayment } from "./paymentUtils" //  PAYMENTS UTILS
+import { getClientByName, updateClientBalance } from "./clientUtils" //  CLIENT UTILS
+import { destroyPayment, processPayment } from "./paymentUtils" //  PAYMENTS UTILS
 
 export const findClientByName = async (clientName: string, session: mongoose.ClientSession | null = null) => {
     try {
@@ -50,4 +50,17 @@ export const filterSalesForDelivery = async (sales: SaleMongo[]) => {
     } catch(error){
         errorsPitcher(error)
     }
+}
+
+export const updateBalance = async (clientName: string, totalSale: number, session: mongoose.ClientSession | null = null) => {
+    try {
+        const client = await findClientByName(clientName, session) // FIND CLIENT WITH HIS NAME
+        await updateClientBalance(client as ClientDocument, totalSale, false, session) // UPDATE BALANCE OF CLIENT FOUND
+    } catch(error){
+        errorsPitcher(error)
+    }
+}
+
+export const deletePayment = async (paymentId: string, session: mongoose.ClientSession | null = null) => {
+    await destroyPayment(paymentId, session)
 }

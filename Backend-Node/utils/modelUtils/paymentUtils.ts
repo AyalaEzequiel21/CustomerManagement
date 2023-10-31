@@ -1,6 +1,6 @@
 import mongoose from "mongoose"
 import { ResourceNotFoundError } from "../../errors/customErrors"
-import { ClientNotFound } from "../../errors/errorMessages"
+import { ClientNotFound, PaymentNotFound } from "../../errors/errorMessages"
 import { ClientDocument } from "../../models/client"
 import PaymentModel, { PaymentDocument } from "../../models/payment"
 import { errorsPitcher } from "../../errors/errorsPitcher"
@@ -63,6 +63,19 @@ export const processPayment = async (payment: TypePaymentDto, reportId: string|u
         }
         return newPayment[0]
     }catch(error){
+        errorsPitcher(error)
+    }
+}
+
+export const destroyPayment = async (paymentId: string, session: mongoose.ClientSession | null = null) => {
+    try{
+        const payment = await PaymentModel.findById([paymentId], {session}) as PaymentDocument
+        if(!payment){
+            throw new ResourceNotFoundError(PaymentNotFound)
+        }
+        await subtractPaymentToClient(payment, session)
+        await PaymentModel.deleteOne([{_id: paymentId}], {session}) // DELETE A PAYMENT IN A SESSION
+    } catch(error){
         errorsPitcher(error)
     }
 }

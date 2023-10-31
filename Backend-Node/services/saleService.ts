@@ -5,7 +5,7 @@ import { SaleMongo, SaleRegister } from "../schemas/saleSchema"
 import { BadRequestError, InternalServerError, ResourceNotFoundError } from "../errors/customErrors"
 import { BadRequest, ClientNotFound, InternalServer, SaleNotFound } from "../errors/errorMessages"
 import { isEmptyList } from "../utils/existingChecker"
-import { findClientByName, getTotalSale, addTotalSaletoBalance, processPaymentSale, filterSalesForDelivery } from "../utils/modelUtils/saleUtils" //  SALE UTILS
+import { findClientByName, getTotalSale, addTotalSaletoBalance, processPaymentSale, filterSalesForDelivery, updateBalance, deletePayment } from "../utils/modelUtils/saleUtils" //  SALE UTILS
 import { startSession } from "../db/connect"
 import { isValidDateFormat } from "../utils/dateUtils"
 
@@ -75,6 +75,7 @@ export const createSale = async (sale: SaleRegister) => {
         session.startTransaction()
         const client = await findClientByName(clientName, session) // WITH SALE UTILS
         const newTotalSale = getTotalSale(details) // WITH SALE UTILS
+        console.log(client)
         if(!client){   // IF CLIENT NOT EXISTS RUN AN EXCEPTION
             throw new ResourceNotFoundError(ClientNotFound)
         }
@@ -84,6 +85,7 @@ export const createSale = async (sale: SaleRegister) => {
             details: details,
             totalSale: newTotalSale
         }], {session})
+        console.log(saleCreated)
 
         if(saleCreated.length === 1){
             client.sales.push(saleCreated[0]._id) // AD SALE CREATED TO CLIENT
@@ -91,6 +93,8 @@ export const createSale = async (sale: SaleRegister) => {
             if(payment_dto){ // CHECK IF EXISTS A PAYMENT, THEN CREATE THE PAYMENT 
                 const saleId = saleCreated[0]._id
                 const paymentCreated = await processPaymentSale(payment_dto, saleId.toString(), session) // WITH SALE UTILS
+                console.log(paymentCreated)
+
                 if(paymentCreated){ // IF THE PAYMENT WAS CREATED CORRECTLY, ADD THE ID TO THE SALE
                     saleCreated[0].payment = new mongoose.Types.ObjectId(paymentCreated._id)
                     await saleCreated[0].save({session})
@@ -100,6 +104,8 @@ export const createSale = async (sale: SaleRegister) => {
         session.commitTransaction() // COMMIT TRANSACTION
         return saleCreated // RETURNS THE SALE CREATED
     } catch(error){
+        console.log(error);
+        
         session.abortTransaction()
         throw new InternalServerError(InternalServer)
     }
@@ -113,5 +119,21 @@ export const getSaleUpdated = async (sale: SaleMongo) => {
 }
 
 export const removeSale = async (saleId: string) => {
-
+    const session = await startSession() // INIT A SESSION
+    try{
+        session.startTransaction() // INIT A TRANSACTION 
+        const sale = await SaleModel.findById(saleId) // SEARCH THE SALE WITH HER ID 
+        if(!sale){ // IF THE SALE NOT EXISTS RUN AN EXCEPTION
+            throw new ResourceNotFoundError(SaleNotFound)
+        }
+        await updateBalance(sale.clientName, sale.totalSale, session)
+        if(sale.payment){ // IF THE SALE HAVE A PAYMENT, THEN DELETE PAYMENT 
+            await deletePayment(sale.payment._id.toString(), session)
+        }
+        await session.commitTransaction() // CONFIRM TRANSACTION
+    }catch(error){
+        await session.abortTransaction() // IF AN ERROR OCCURS, ABORT TRANSACTION
+        errorsPitcher(error)
+    }
+    session.endSession() // END SESSION
 }

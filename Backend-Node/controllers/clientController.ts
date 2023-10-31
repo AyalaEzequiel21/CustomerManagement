@@ -69,7 +69,7 @@ export const getAllClientsWithCategory = async (req: Request, res: Response, nex
 
 
 export const deleteClient = async (req: Request, res: Response, next: NextFunction) => {
-    const clientId = req.params.id // GET THE CLIENT ID FROM THE PARAMS
+    const clientId = req.params.clientId // GET THE CLIENT ID FROM THE PARAMS
     try {
         await clientService.deleteClientById(clientId) // DELETE THE CLIENT WITH CLIENTSERVICE
         res.status(204).json({ok: true})
