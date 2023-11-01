@@ -20,7 +20,7 @@ router.post("/register", validateSchemaRequest(clientRegistrationSchema), regist
 // CLIENT UPDATE
 router.put("/update", validateSchemaRequest(clientMongoSchema), updateClient)
 // GET CLIENTS BY NAME
-router.get("/:name", getAllClientsWithName)
+router.get("/clientName/:name", getAllClientsWithName)
 // GET CLIENTS BY CATEGORY
 router.get("/category/:category", getAllClientsWithCategory)
 // GET ALL INACTIVE CLIENTS

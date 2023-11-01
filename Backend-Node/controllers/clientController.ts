@@ -41,7 +41,7 @@ export const getAllClients = async (req: any, res: Response, next: NextFunction)
 export const getAllInactiveClients = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const inactiveClients = await clientService.getClientsInactives() // GET ALL INACTIVE CLIENTS AND RETUN STATSU 200 AND THE CLIENTS
-        res.status(200).json({ok: true, data: inactiveClients})
+        res.status(200).json({ok: true, data: inactiveClients})// RETURN STATUS 200 AND THE CLIENTS
     } catch (error) {
         next(error)
     }

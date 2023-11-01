@@ -22,7 +22,7 @@ export const getAllClients = async (inDelivery: boolean) => {
         if (inDelivery){  // IF INDELIVERY IS TRUE RETURN ONLY THE CLIENTS WITH IN_DELIVERY : TRUE 
                 return clients.filter(client => client.in_delivery)
         }
-        return clients
+        return clients // ELSE RETURN ALL ACTIVES CLIENTS
     } catch (error){
         errorsPitcher(error)
     }
@@ -31,54 +31,58 @@ export const getAllClients = async (inDelivery: boolean) => {
 
 export const createClient = async (newClient: ClientRegister) => {
     const {fullname, phone, category, in_delivery} = newClient
-
-    if(await existsEntity(ClientModel,"fullname", fullname)){ // IF FULLNAME HAS ALREADY BEEN REGISTERED RUN AN EXCEPTION
-        throw new ResourceAlreadyRegisteredError(ClientAlreadyRegistered)
-    } 
-    if(await existsEntity(ClientModel,"phone", phone)){
-        throw new ResourceAlreadyRegisteredError(PhoneAlreadyRegistered) // IF PHONE HAS ALREADY BEEN REGISTERED RUN AN EXCEPTION
-    }
-    try {
-        const client = await ClientModel.create({ // CREATE THE NEW CLIENT AND SEND IT
+    try{
+        if(await existsEntity(ClientModel,"fullname", fullname)){ // IF FULLNAME HAS ALREADY BEEN REGISTERED RUN AN EXCEPTION
+            throw new ResourceAlreadyRegisteredError(ClientAlreadyRegistered)
+        } 
+        if(await existsEntity(ClientModel,"phone", phone)){
+            throw new ResourceAlreadyRegisteredError(PhoneAlreadyRegistered) // IF PHONE HAS ALREADY BEEN REGISTERED RUN AN EXCEPTION
+        }
+        const client = await ClientModel.create({ // CREATE THE NEW CLIENT 
             fullname: fullname, 
             phone: phone, 
             category: category, 
             in_delivery: in_delivery
         })
-        return client
+        if(!client){ // IF CANNOT SAVE THE CLIENT RUN AN EXCEPTION
+            throw new BadRequestError(BadRequest)
+        }
+        return client // ELSE RETURN THE CLIENT
     } catch(error){
-        throw new BadRequestError(BadRequest)
+        errorsPitcher(error)
     }
 }
 
 export const updateClient = async (client: ClientMongo) => {
     try{
         const clientSaved = await ClientModel.findById(client._id) // GET THE CLIENT SAVED
-        if (clientSaved){ // IF THE CLIENT EXIS THEN UPDATE 
-            clientSaved.fullname = client.fullname
-            clientSaved.phone = client.phone
-            if(client.balance !== undefined) clientSaved.balance = client.balance
-            clientSaved.category = client.category
-            clientSaved.in_delivery = client.in_delivery
-            clientSaved.is_active = client.is_active
-        } else {
+        if (!clientSaved){ // IF NOT EXISTS THE CLIENT RUN AN EXCEPTION
             throw new ResourceNotFoundError(ClientNotFound)
-        }
+        } 
+        clientSaved.fullname = client.fullname // ELSE UPDATE THE CLIENT
+        clientSaved.phone = client.phone
+        if(client.balance !== undefined) clientSaved.balance = client.balance
+        clientSaved.category = client.category
+        clientSaved.in_delivery = client.in_delivery
+        clientSaved.is_active = client.is_active
         const clientUpdated = await clientSaved.save() // SAVE THE UPDATE AND RETURN 
+        if(!clientUpdated){
+            throw new BadRequestError(BadRequest)
+        }
         return clientUpdated
     } catch (error){
-        throw new BadRequestError(BadRequest)
+        errorsPitcher(error)
     }
 }
 
 
 export const getClientsInactives = async () => {
     try {
-        const clientsInactive = await ClientModel.find({is_active: false}) // GET ALL CLIENTS WITH IS_ACTIVE: FALSE
+        const clientsInactive = await ClientModel.find({is_active: false}) // GET ALL CLIENTS WITH IS_ACTIVE: FALSE      
         if(isEmptyList(clientsInactive)){ // IF THE RESPONSE HAVE NOT CLIENTS RUN AN EXCEPTION
             throw new ResourceNotFoundError(ClientNotFound)
         } 
-        return clientsInactive
+        return clientsInactive // RETURN ALL INACTIVES CLIENT 
     } catch (error){        
         errorsPitcher(error)
     }
@@ -86,7 +90,7 @@ export const getClientsInactives = async () => {
 
 export const getClientsByName = async (clientName: string) => {
     try{ 
-        const clientsFound = await ClientModel.find({ fullname: { $regex: clientName, $options: 'i' } }) // GET ALL CLIENTS WITH FULLANME CONTAINS CLIENTNAME
+        const clientsFound = await ClientModel.find({ fullname: { $regex: clientName, $options: 'i' }, is_active: true }) // GET ALL CLIENTS WITH FULLANME CONTAINS CLIENTNAME
         if(isEmptyList(clientsFound)){ // IF CLIENTSFOUND IS EMPTY RUN AN EXCEPTION
             throw new ResourceNotFoundError(ClientNotFound)
         }
@@ -99,27 +103,25 @@ export const getClientsByName = async (clientName: string) => {
 export const getClientsByCategory = async (category: string) => {
     if(Object.values(ECategory).some((enumCategory) => enumCategory === category)){ // CHECK IF CATEGORY IS VALID
         try{        
-            const clientsFound = await ClientModel.find({category: category}) // GET ALL CLIENTS WITH THE SAME CATEGORY
-            if (isEmptyList(clientsFound)){
+            const clientsFound = await ClientModel.find({category: category, is_active: true}) // GET ALL CLIENTS WITH THE SAME CATEGORY AND ACTIVE
+            if (isEmptyList(clientsFound)){ // IF CLIENTSFOUND IS EMPTY RUN AN EXCEPTION
                 throw new ResourceNotFoundError(ClientNotFound)
             }
             return clientsFound // RETURNS THE CLIENTS FOUND
         } catch (error){
             errorsPitcher(error)
         }
-    }else{
-        throw new BadRequestError(BadRequest)
     }
+    throw new BadRequestError(BadRequest)
 }
 
 export const deleteClientById = async (clientId: string) => {
     try {
         const clientSaved = await ClientModel.findById(clientId) // GET THE CLIENT BY THE ID
-        if(clientSaved && clientSaved.is_active){ // IF EXISTS THE CLIENT THEN MODIFY HIS ATTRIBUTE IS_ACTIVE TO FALSE
-            clientSaved.is_active = false
-        }else {
+        if(!clientSaved || !clientSaved.is_active){ // IF NOT EXISTS THE CLIENT RUN AN EXCEPTION
             throw new ResourceNotFoundError(ClientNotFound)
         }
+        clientSaved.is_active = false // ELSE CHENGE THE STATUS TO INACTIVE
         clientSaved.save() // SAVE THE CLIENT INACTIVE
     } catch(error){
         errorsPitcher(error)

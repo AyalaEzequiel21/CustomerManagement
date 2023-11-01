@@ -50,9 +50,12 @@ export const createUser = async (newUser : User) => {
             password: hashPassword, 
             role: role
         })  
+        if(!newUser){
+            throw new BadRequestError(BadRequest)
+        }
         return newUser //  RETURNS THE NEW USER
     } catch(error){
-        throw new BadRequestError(BadRequest)
+        errorsPitcher(error)
     }
 }
 
@@ -68,9 +71,12 @@ export const updateUser = async (userUpdated: UserMongo) => {
         existingUser.password = bcrypt.hashSync(password, 8)
         existingUser.role = role
         const updatedUser = await existingUser.save() // SAVE THE USER UPDATED AND RETURN
+        if(!updateUser){
+            throw new BadRequestError(BadRequest)
+        }
         return updatedUser
     } catch (error){
-        throw new BadRequestError(BadRequest)
+        errorsPitcher(error)
     }
 }
 
