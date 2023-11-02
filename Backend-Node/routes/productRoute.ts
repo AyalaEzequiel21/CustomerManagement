@@ -16,7 +16,7 @@ router.get("/", authorizeGetAll(Object.values(ERole)), getAllProducts)
 router.use(validateRoleUser([ERole.Admin, ERole.Biller]))
 
 // GET PRODUCTS BY NAME
-router.get("/:productName", getAllProductsWithName)
+router.get("/name/:productName", getAllProductsWithName)
 //GET ALL INACTIVE PRODUCTS
 router.get("/inactives", getAllInactivesProducts)
 // PRODUCT REGISTER

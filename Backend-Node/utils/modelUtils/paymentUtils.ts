@@ -31,14 +31,13 @@ export const addPaymentToClient = async (client: ClientDocument, payment: Paymen
 
 export const subtractPaymentToClient = async (payment: PaymentDocument, session: mongoose.ClientSession | null = null) => {
     try{
-        const client = await getClientById(payment.clientId, session) // FIND CLIENT BY HIS ID WITH CLIENT UTILS
-        if(client){ // IF THE CLIENT EXISTS
-            const clientUpdated = await updateClientBalance(client, payment.amount, true, session) // UPDATE THE CLIENT BALANCE WITH CLIENT UTILS
-            client.payments = client.payments.filter(paymentID => paymentID.toString() !== payment._id.toHexString()) // REMOVE THE PAYMENT FROM CLIENT PAYMENTS
-            clientUpdated.save({session}) // SAVE THE CLIENT UPDATED
-        }else { // IF NOT EXISTS RUN AN EXCEPTION
+        const client = await getClientById(payment.clientId, session) // SEARCH CLIENT BY HIS ID WITH CLIENT UTILS
+        if(!client){ // IF THE CLIENT NOT EXISTS THEN RUN AN EXCEPTION
             throw new ResourceNotFoundError(ClientNotFound)
         }
+        const clientUpdated = await updateClientBalance(client, payment.amount, true, session) // UPDATE THE CLIENT BALANCE WITH CLIENT UTILS
+        client.payments = client.payments.filter(paymentID => paymentID.toString() !== payment._id.toString()) // REMOVE THE PAYMENT FROM CLIENT PAYMENTS
+        clientUpdated.save({session}) // SAVE THE CLIENT UPDATED
     } catch (error){
         errorsPitcher(error)
     }

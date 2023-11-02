@@ -20,7 +20,6 @@ export const createPayment = async (newPayment: PaymentRegister) => {
         session.startTransaction()
         const client = await findClientById(clientId, session) // GET THE CLIENT OF PAYMENT BY HIS ID WITH PAYMENTS UTILS
         if(client){ // IF CLIENT EXISTS THEN CREATED THE PAYMENT
-
             const paymentData = { // CREATE THE PAYMENT DATA
                 clientId: clientId, 
                 amount: amount,
@@ -29,16 +28,18 @@ export const createPayment = async (newPayment: PaymentRegister) => {
                 reportId: reportId || undefined
             }
             const paymentCreated = await PaymentModel.create([paymentData], {session}) // CREATE THE PAYMENT WITH PAYMENT DATA AND SESSION
-            
+            if(!paymentCreated[0]){ // We use position 0 because only one payment will be created
+                throw new BadRequestError(BadRequest) // IF PAMETN NOT EXISTS RUN AN EXCEPTION
+            }
             await addPaymentToClient(client, paymentCreated[0], session) // ADD THE PAYMENT TO CLIENT AND UPDATE HIS BALANCE WITH PAYMENT UTILS
-            await session.commitTransaction()
+            await session.commitTransaction() // CONFIRM TRANSACTION
             return paymentCreated // RETURNS THE PAYMENT CREATED
         }
     } catch (error){
         await session.abortTransaction()
         errorsPitcher(error)
     } 
-    session.endSession()
+    session.endSession() // END THE SESSION
 }
 
 
@@ -47,16 +48,15 @@ export const deletePaymentById = async (paymentId: string) => {
         throw new BadRequestError(BadRequest)
     }
     const session = await startSession() // START A SESSION FOR THE TRANSACTION
-    
+
     try {
         session.startTransaction()
-        const paymentSaved = await PaymentModel.findById({paymentId}, {session}) // FIND THE PAYMENT BY HIS ID
+        const paymentSaved = await PaymentModel.findById(paymentId).session(session) // FIND THE PAYMENT BY HIS ID
         if(paymentSaved){ // CHECK IF EXISTS OR RUN AN EXCEPTION
             await subtractPaymentToClient(paymentSaved, session) // REMOVE THE PAYMENT FROM TE CLIENT AND UPDATE HIS BALANCE WITH PAYMENTUTILS
             await PaymentModel.deleteOne({_id: paymentSaved._id}, {session}) // DELETE THE PAYMENT FROM TO DATA BASE
-        } else {
-            throw new ResourceNotFoundError(PaymentNotFound)
         }
+        throw new ResourceNotFoundError(PaymentNotFound)
     } catch (error){
         errorsPitcher(error)
     }

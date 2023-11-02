@@ -2,6 +2,7 @@ import mongoose from "mongoose"
 import { InternalServerError, ResourceNotFoundError } from "../../errors/customErrors"
 import { ClientNotFound, InternalServer } from "../../errors/errorMessages"
 import ClientModel, { ClientDocument } from "../../models/client"
+import { errorsPitcher } from "../../errors/errorsPitcher"
 
 // function to get a client by id
 export const getClientById = async (clientId: string | mongoose.Types.ObjectId, session: mongoose.ClientSession | null = null) => {
@@ -12,7 +13,7 @@ export const getClientById = async (clientId: string | mongoose.Types.ObjectId, 
         }
         throw new ResourceNotFoundError(ClientNotFound)
     }catch (error){
-        throw new InternalServerError(`${InternalServer} - ${error}`)
+        errorsPitcher(error)
     }
 }
 
@@ -24,9 +25,7 @@ export const getClientByName = async (clientName: string, session: mongoose.Clie
         }
         throw new ResourceNotFoundError(ClientNotFound)
     } catch(error){
-        console.log(error);
-        
-        throw new InternalServerError(`${InternalServer} - ${error}`)
+        errorsPitcher(error)
     }
 }
 
