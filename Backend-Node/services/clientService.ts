@@ -117,7 +117,7 @@ export const getClientsByCategory = async (category: string) => {
 
 export const deleteClientById = async (clientId: string) => {
     try {
-        const clientSaved = await ClientModel.findById(clientId) // GET THE CLIENT BY THE ID
+        const clientSaved = await ClientModel.findById(clientId).exec() // GET THE CLIENT BY THE ID
         if(!clientSaved || !clientSaved.is_active){ // IF NOT EXISTS THE CLIENT RUN AN EXCEPTION
             throw new ResourceNotFoundError(ClientNotFound)
         }

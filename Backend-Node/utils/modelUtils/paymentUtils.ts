@@ -3,7 +3,6 @@ import { ResourceNotFoundError } from "../../errors/customErrors"
 import { ClientNotFound, PaymentNotFound } from "../../errors/errorMessages"
 import { ClientDocument } from "../../models/client"
 import PaymentModel, { PaymentDocument } from "../../models/payment"
-import { errorsPitcher } from "../../errors/errorsPitcher"
 import { EPaymentMethod } from "../../enums/EPaymentMethod"
 import { TypePaymentDto } from "../../schemas/dtos/paymentDTOSchema"
 import { addNewPayment, getClientById, updateClientBalance } from "./clientUtils" // CLIENT UTILS
@@ -15,7 +14,7 @@ export const findClientById = async (clientId: string | mongoose.Types.ObjectId,
         const client = await getClientById(clientId, session) // FIND CLIENT BY ID WITH CLIENT UTILS
         return client // RETURN THE CLIENT
     }catch (error){
-        errorsPitcher(error)
+        throw error
     }
 }
 
@@ -25,7 +24,7 @@ export const addPaymentToClient = async (client: ClientDocument, payment: Paymen
         addNewPayment(updateClient, payment._id) // ADD THE PAYMENT TO CLIENT PAYMENTS WITH CLIENT UTILS
         await updateClient.save({session}) // SAVE THE CLIENT UPDATED
     } catch(error) {
-        errorsPitcher(error)
+        throw error
     }
 }
 
@@ -37,9 +36,10 @@ export const subtractPaymentToClient = async (payment: PaymentDocument, session:
         }
         const clientUpdated = await updateClientBalance(client, payment.amount, true, session) // UPDATE THE CLIENT BALANCE WITH CLIENT UTILS
         client.payments = client.payments.filter(paymentID => paymentID.toString() !== payment._id.toString()) // REMOVE THE PAYMENT FROM CLIENT PAYMENTS
-        clientUpdated.save({session}) // SAVE THE CLIENT UPDATED
+        const finalClient = await clientUpdated.save({session}) // SAVE THE CLIENT UPDATED
+        return finalClient
     } catch (error){
-        errorsPitcher(error)
+        throw error
     }
 }
 
@@ -62,7 +62,7 @@ export const processPayment = async (payment: TypePaymentDto, reportId: string|u
         }
         return newPayment[0]
     }catch(error){
-        errorsPitcher(error)
+        throw error
     }
 }
 
@@ -75,7 +75,7 @@ export const destroyPayment = async (paymentId: string, session: mongoose.Client
         await subtractPaymentToClient(payment, session)
         await PaymentModel.deleteOne([{_id: paymentId}], {session}) // DELETE A PAYMENT IN A SESSION
     } catch(error){
-        errorsPitcher(error)
+        throw error
     }
 }
 

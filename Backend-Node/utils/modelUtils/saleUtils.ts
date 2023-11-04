@@ -1,5 +1,4 @@
 import mongoose from "mongoose"
-import { errorsPitcher } from "../../errors/errorsPitcher"
 import { ClientDocument } from "../../models/client"
 import { TypePaymentDto } from "../../schemas/dtos/paymentDTOSchema"
 import { DetailSale, SaleMongo } from "../../schemas/saleSchema"
@@ -11,7 +10,7 @@ export const findClientByName = async (clientName: string, session: mongoose.Cli
         const client = await getClientByName(clientName, session) // WITH CLIENT UTILS
         return client
     } catch(error){
-        errorsPitcher(error)
+        throw error
     }
 }
 
@@ -33,7 +32,7 @@ export const processPaymentSale = async (payment: TypePaymentDto, saleId: string
         const paymentCreated = await processPayment(payment, undefined, saleId, session) // WITH PAYMENTS UTILS
         return paymentCreated
     }catch(error){
-        errorsPitcher(error)
+        throw error
     }
 }
 
@@ -48,7 +47,7 @@ export const filterSalesForDelivery = async (sales: SaleMongo[]) => {
         }));
         return deliverySales.filter((sale) => sale !== null) // RETURN ALL SALES OF CLIENT ACTIVES
     } catch(error){
-        errorsPitcher(error)
+        throw error
     }
 }
 
@@ -57,7 +56,7 @@ export const updateBalance = async (clientName: string, totalSale: number, sessi
         const client = await findClientByName(clientName, session) // FIND CLIENT WITH HIS NAME
         await updateClientBalance(client as ClientDocument, totalSale, false, session) // UPDATE BALANCE OF CLIENT FOUND
     } catch(error){
-        errorsPitcher(error)
+        throw error
     }
 }
 

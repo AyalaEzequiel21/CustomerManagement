@@ -48,15 +48,14 @@ export const deletePaymentById = async (paymentId: string) => {
         throw new BadRequestError(BadRequest)
     }
     const session = await startSession() // START A SESSION FOR THE TRANSACTION
-
     try {
         session.startTransaction()
-        const paymentSaved = await PaymentModel.findById(paymentId).session(session) // FIND THE PAYMENT BY HIS ID
-        if(paymentSaved){ // CHECK IF EXISTS OR RUN AN EXCEPTION
-            await subtractPaymentToClient(paymentSaved, session) // REMOVE THE PAYMENT FROM TE CLIENT AND UPDATE HIS BALANCE WITH PAYMENTUTILS
-            await PaymentModel.deleteOne({_id: paymentSaved._id}, {session}) // DELETE THE PAYMENT FROM TO DATA BASE
+        const paymentSaved = await PaymentModel.findById(paymentId, null, {session}).exec() // FIND THE PAYMENT BY HIS ID        
+        if(!paymentSaved){ // CHECK IF EXISTS OR RUN AN EXCEPTION
+            throw new ResourceNotFoundError(PaymentNotFound)
         }
-        throw new ResourceNotFoundError(PaymentNotFound)
+        const payment = await subtractPaymentToClient(paymentSaved, session) // REMOVE THE PAYMENT FROM TE CLIENT AND UPDATE HIS BALANCE WITH PAYMENTUTILS
+        await PaymentModel.deleteOne({_id: payment._id}, {session}) // DELETE THE PAYMENT FROM TO DATA BASE
     } catch (error){
         errorsPitcher(error)
     }

@@ -1,5 +1,4 @@
 import mongoose from "mongoose"
-import { errorsPitcher } from "../../errors/errorsPitcher"
 import { TypePaymentDto } from "../../schemas/dtos/paymentDTOSchema"
 import { processPayment } from "./paymentUtils"
 
@@ -14,6 +13,6 @@ export const processPaymentsReport = async (payments: TypePaymentDto[], reportId
         }
         return paymentsIds
     } catch(error){
-        errorsPitcher(error)
+        throw error
     }
 }
