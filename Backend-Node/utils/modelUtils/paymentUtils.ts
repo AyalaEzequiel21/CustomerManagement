@@ -5,7 +5,7 @@ import { ClientDocument } from "../../models/client"
 import PaymentModel, { PaymentDocument } from "../../models/payment"
 import { EPaymentMethod } from "../../enums/EPaymentMethod"
 import { TypePaymentDto } from "../../schemas/dtos/paymentDTOSchema"
-import { addNewPayment, getClientById, updateClientBalance } from "./clientUtils" // CLIENT UTILS
+import { addNewPayment, getClientById, removePaymentfromClient, updateClientBalance } from "./clientUtils" // CLIENT UTILS
 
 
 // function to get a client by id
@@ -28,20 +28,19 @@ export const addPaymentToClient = async (client: ClientDocument, payment: Paymen
     }
 }
 
-export const subtractPaymentToClient = async (payment: PaymentDocument, session: mongoose.ClientSession | null = null) => {
+export const subtractPaymentToClient = async (client: ClientDocument, paymentId: string, session: mongoose.ClientSession | null = null) => {
     try{
-        const client = await getClientById(payment.clientId, session) // SEARCH CLIENT BY HIS ID WITH CLIENT UTILS
-        if(!client){ // IF THE CLIENT NOT EXISTS THEN RUN AN EXCEPTION
-            throw new ResourceNotFoundError(ClientNotFound)
-        }
-        const clientUpdated = await updateClientBalance(client, payment.amount, true, session) // UPDATE THE CLIENT BALANCE WITH CLIENT UTILS
-        client.payments = client.payments.filter(paymentID => paymentID.toString() !== payment._id.toString()) // REMOVE THE PAYMENT FROM CLIENT PAYMENTS
-        const finalClient = await clientUpdated.save({session}) // SAVE THE CLIENT UPDATED
-        return finalClient
+        const payment = await PaymentModel.findById(paymentId, null, {session}).exec()
+        if(!payment){
+            throw new ResourceNotFoundError(PaymentNotFound)
+        }          
+        removePaymentfromClient(client, paymentId)        
+        const clientUpdated = await updateClientBalance(client, payment.amount, true, session) // UPDATE THE CLIENT BALANCE WITH CLIENT UTILS        
     } catch (error){
         throw error
     }
 }
+
 
 export const processPayment = async (payment: TypePaymentDto, reportId: string|undefined, saleId: string|undefined, session: mongoose.ClientSession | null = null) => {
     try{
@@ -72,7 +71,11 @@ export const destroyPayment = async (paymentId: string, session: mongoose.Client
         if(!payment){
             throw new ResourceNotFoundError(PaymentNotFound)
         }
-        await subtractPaymentToClient(payment, session)
+        const client = await findClientById(payment.clientId)
+        if(!client){
+            throw new ResourceNotFoundError(ClientNotFound)
+        }
+        await subtractPaymentToClient(client, paymentId, session)
         await PaymentModel.deleteOne([{_id: paymentId}], {session}) // DELETE A PAYMENT IN A SESSION
     } catch(error){
         throw error

@@ -11,7 +11,7 @@ export const getClientById = async (clientId: string | mongoose.Types.ObjectId, 
             return client // RETURN THE CLIENT
         }
         throw new ResourceNotFoundError(ClientNotFound)
-    }catch (error){
+    }catch (error){ 
         throw error
     }
 }
@@ -38,11 +38,22 @@ export const updateClientBalance = async (client: ClientDocument, amount: number
     }
 }
 
-export const addNewPayment = async (client: ClientDocument, paymentId: string | mongoose.Types.ObjectId) => {
+export const addNewPayment = (client: ClientDocument, paymentId: string | mongoose.Types.ObjectId) => {
     client.payments.push(
         (typeof paymentId == "string") ? 
             new mongoose.Types.ObjectId(paymentId) 
         : 
             paymentId
     )
+}
+
+export const removePaymentfromClient = (client: ClientDocument, paymentId: string | mongoose.Types.ObjectId) => {
+    const newPayments: mongoose.Types.ObjectId[] = []
+    client.payments.forEach(payment => {
+        if(payment._id != paymentId){
+            console.log(payment._id !== paymentId)
+            newPayments.push(payment._id)
+        }
+    })
+    client.payments = newPayments    
 }

@@ -1,5 +1,5 @@
 import { BadRequestError, ResourceNotFoundError } from "../errors/customErrors";
-import { BadRequest, PaymentNotFound } from "../errors/errorMessages";
+import { BadRequest, ClientNotFound, PaymentNotFound } from "../errors/errorMessages";
 import { errorsPitcher } from "../errors/errorsPitcher";
 import PaymentModel from "../models/payment";
 import { PaymentRegister } from "../schemas/paymentSchema";
@@ -7,7 +7,6 @@ import { addPaymentToClient, findClientById, isValidPaymentMethod, subtractPayme
 import { isValidDateFormat } from "../utils/dateUtils";
 import { isEmptyList } from "../utils/existingChecker";
 import { startSession } from "../db/connect";
-import mongoose from "mongoose";
 
 /////////////////////////
 // PAYMENT SERVICE
@@ -50,12 +49,17 @@ export const deletePaymentById = async (paymentId: string) => {
     const session = await startSession() // START A SESSION FOR THE TRANSACTION
     try {
         session.startTransaction()
-        const paymentSaved = await PaymentModel.findById(paymentId, null, {session}).exec() // FIND THE PAYMENT BY HIS ID        
-        if(!paymentSaved){ // CHECK IF EXISTS OR RUN AN EXCEPTION
+        const existsPayment = await PaymentModel.findById(paymentId).exec()
+        if(!existsPayment){ // CHECK IF EXISTS OR RUN AN EXCEPTION
             throw new ResourceNotFoundError(PaymentNotFound)
         }
-        const payment = await subtractPaymentToClient(paymentSaved, session) // REMOVE THE PAYMENT FROM TE CLIENT AND UPDATE HIS BALANCE WITH PAYMENTUTILS
-        await PaymentModel.deleteOne({_id: payment._id}, {session}) // DELETE THE PAYMENT FROM TO DATA BASE
+        const client = await findClientById(existsPayment.clientId)
+        if(!client){
+            throw new ResourceNotFoundError(ClientNotFound)
+        }
+        await subtractPaymentToClient(client, paymentId, session) // REMOVE THE PAYMENT FROM TE CLIENT AND UPDATE HIS BALANCE WITH PAYMENTUTILS
+        await PaymentModel.findByIdAndDelete(paymentId).session(session) // DELETE THE PAYMENT FROM TO DATA BASE
+        await session.commitTransaction()
     } catch (error){
         errorsPitcher(error)
     }

@@ -1,4 +1,5 @@
 
+import mongoose from "mongoose"
 import { ECategory } from "../enums/ECategory"
 import { BadRequestError, ResourceAlreadyRegisteredError, ResourceNotFoundError } from "../errors/customErrors"
 import { BadRequest, ClientAlreadyRegistered, ClientNotFound, PhoneAlreadyRegistered } from "../errors/errorMessages"
@@ -62,6 +63,7 @@ export const updateClient = async (client: ClientMongo) => {
         clientSaved.fullname = client.fullname // ELSE UPDATE THE CLIENT
         clientSaved.phone = client.phone
         if(client.balance !== undefined) clientSaved.balance = client.balance
+        if(client.payments !== undefined) clientSaved.payments = client.payments.map(payment => new mongoose.Types.ObjectId(payment))
         clientSaved.category = client.category
         clientSaved.in_delivery = client.in_delivery
         clientSaved.is_active = client.is_active
