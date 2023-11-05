@@ -62,3 +62,13 @@ export const validateReport = async (req: Request, res: Response, next: NextFunc
     } 
 }
 
+export const deleteReport = async (req: Request, res: Response, next: NextFunction) => {
+    const reportId = req.params.reportId // GET THE REPORT TO VALIDATE FROM THE REQUEST
+    try{
+        await reportService.destroyReport(reportId) // DELETE REPORT WITH REPORT SERVICE
+        res.status(204).json({ok: true}) // RETURNS STATUS 204 AND OK: TRUE
+    } catch(error){
+        next(error)
+    } 
+}
+

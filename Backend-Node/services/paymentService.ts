@@ -49,17 +49,17 @@ export const deletePaymentById = async (paymentId: string) => {
     const session = await startSession() // START A SESSION FOR THE TRANSACTION
     try {
         session.startTransaction()
-        const existsPayment = await PaymentModel.findById(paymentId).exec()
+        const existsPayment = await PaymentModel.findById(paymentId).exec() // SEARCH THE PAYMENT
         if(!existsPayment){ // CHECK IF EXISTS OR RUN AN EXCEPTION
             throw new ResourceNotFoundError(PaymentNotFound)
         }
-        const client = await findClientById(existsPayment.clientId)
-        if(!client){
+        const client = await findClientById(existsPayment.clientId) // SEARCH THE CLIENT OF PAYMENT
+        if(!client){ // IF NOT EXIST RUN AN EXCEPTION
             throw new ResourceNotFoundError(ClientNotFound)
         }
         await subtractPaymentToClient(client, paymentId, session) // REMOVE THE PAYMENT FROM TE CLIENT AND UPDATE HIS BALANCE WITH PAYMENTUTILS
         await PaymentModel.findByIdAndDelete(paymentId).session(session) // DELETE THE PAYMENT FROM TO DATA BASE
-        await session.commitTransaction()
+        await session.commitTransaction() // CONFIRM TRANSACTION
     } catch (error){
         errorsPitcher(error)
     }

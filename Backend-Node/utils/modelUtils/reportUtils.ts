@@ -2,7 +2,7 @@ import mongoose from "mongoose"
 import { TypePaymentDto } from "../../schemas/dtos/paymentDTOSchema"
 import { processPayment } from "./paymentUtils"
 
-export const processPaymentsReport = async (payments: TypePaymentDto[], reportId: string, session: mongoose.ClientSession | null = null) => {
+export const processPaymentsReport = async (payments: TypePaymentDto[], reportId: mongoose.Types.ObjectId, session: mongoose.ClientSession | null = null) => {
     const paymentsIds: mongoose.Types.ObjectId[]   = [] // created an array for add the payments
     try{
         for(const paymentDto of payments){ // all paymentsDto are processed 

@@ -29,7 +29,7 @@ export const addTotalSaletoBalance = async (client: ClientDocument, totalSale: n
 
 export const processPaymentSale = async (payment: TypePaymentDto, saleId: string, session: mongoose.ClientSession | null = null) => {
     try{
-        const paymentCreated = await processPayment(payment, undefined, saleId, session) // WITH PAYMENTS UTILS
+        const paymentCreated = await processPayment(payment, undefined, new mongoose.Types.ObjectId(saleId), session) // WITH PAYMENTS UTILS
         return paymentCreated
     }catch(error){
         throw error

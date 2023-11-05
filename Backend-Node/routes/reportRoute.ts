@@ -2,7 +2,7 @@ import express from 'express'
 import { authorizeGetAll, validateRoleUser, validateSchemaRequest, validateUser } from '../middlewares/auth.middleware'
 import { ERole } from '../enums/ERole'
 import { reportMongoSchema, reportRegistrationSchema } from '../schemas/reportSchema'
-import { getAllPendingReports, getAllReports, getAllValidatedReports, registerReport, updateReport, validateReport } from '../controllers/reportController'
+import { deleteReport, getAllPendingReports, getAllReports, getAllValidatedReports, registerReport, updateReport, validateReport } from '../controllers/reportController'
 
 const router = express.Router()
 
@@ -25,5 +25,7 @@ router.use(validateRoleUser([ERole.Admin, ERole.Biller]))
 router.put("/update", validateSchemaRequest(reportMongoSchema), updateReport)
 // VALIDATE REPORT
 router.put("/validate/:reportId", validateReport)
+// DELETE REPORT
+router.delete("/delete/:reportId", deleteReport)
 
 export default router
