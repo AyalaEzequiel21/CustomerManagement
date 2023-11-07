@@ -7,6 +7,7 @@ import { addPaymentToClient, findClientById, isValidPaymentMethod, subtractPayme
 import { isValidDateFormat } from "../utils/dateUtils";
 import { isEmptyList } from "../utils/existingChecker";
 import { startSession } from "../db/connect";
+import mongoose from "mongoose";
 
 /////////////////////////
 // PAYMENT SERVICE
@@ -57,8 +58,8 @@ export const deletePaymentById = async (paymentId: string) => {
         if(!client){ // IF NOT EXIST RUN AN EXCEPTION
             throw new ResourceNotFoundError(ClientNotFound)
         }
-        await subtractPaymentToClient(client, paymentId, session) // REMOVE THE PAYMENT FROM TE CLIENT AND UPDATE HIS BALANCE WITH PAYMENTUTILS
-        await PaymentModel.findByIdAndDelete(paymentId).session(session) // DELETE THE PAYMENT FROM TO DATA BASE
+        await subtractPaymentToClient(client, existsPayment._id, session) // REMOVE THE PAYMENT FROM TE CLIENT AND UPDATE HIS BALANCE WITH PAYMENTUTILS
+        await PaymentModel.findByIdAndDelete(existsPayment._id).session(session) // DELETE THE PAYMENT FROM TO DATA BASE
         await session.commitTransaction() // CONFIRM TRANSACTION
     } catch (error){
         errorsPitcher(error)

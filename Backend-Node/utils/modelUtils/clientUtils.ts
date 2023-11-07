@@ -48,12 +48,18 @@ export const addNewPayment = (client: ClientDocument, paymentId: string | mongoo
 }
 
 export const removePaymentfromClient = (client: ClientDocument, paymentId: string | mongoose.Types.ObjectId) => {
-    const newPayments: mongoose.Types.ObjectId[] = []
-    client.payments.forEach(payment => {
-        if(payment._id != paymentId){
-            console.log(payment._id !== paymentId)
-            newPayments.push(payment._id)
-        }
-    })
-    client.payments = newPayments    
+    client.payments = client.payments.filter(payment => payment._id.toString() !== paymentId.toString())
+}
+
+export const addNewSale = (client: ClientDocument, saleId: string | mongoose.Types.ObjectId) => {
+    client.sales.push(
+        (typeof saleId == "string") ? 
+            new mongoose.Types.ObjectId(saleId) 
+        : 
+            saleId
+    )
+}
+
+export const removeSalefromClient = (client: ClientDocument, saleId: string | mongoose.Types.ObjectId) => {
+    client.sales = client.sales.filter(sale => sale._id.toString() !== saleId.toString())  
 }

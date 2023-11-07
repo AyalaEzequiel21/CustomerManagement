@@ -28,7 +28,7 @@ export const addPaymentToClient = async (client: ClientDocument, payment: Paymen
     }
 }
 
-export const subtractPaymentToClient = async (client: ClientDocument, paymentId: string, session: mongoose.ClientSession | null = null) => {
+export const subtractPaymentToClient = async (client: ClientDocument, paymentId: mongoose.Types.ObjectId, session: mongoose.ClientSession | null = null) => {
     try{
         const payment = await PaymentModel.findById(paymentId, null, {session}).exec() // SEARCH THE PAYMENT BY HIS ID
         if(!payment){ // IF NOT EXISTS RUN AN EXCEPTION
@@ -65,9 +65,9 @@ export const processPayment = async (payment: TypePaymentDto, reportId: Types.Ob
     }
 }
 
-export const destroyPayment = async (paymentId: string, session: mongoose.ClientSession | null = null) => {
+export const destroyPayment = async (paymentId: mongoose.Types.ObjectId, session: mongoose.ClientSession | null = null) => {
     try{
-        const payment = await PaymentModel.findById([paymentId], {session}) as PaymentDocument
+        const payment = await PaymentModel.findById([paymentId], {session}).exec() as PaymentDocument // SEARCH THE PAYMENT 
         if(!payment){
             throw new ResourceNotFoundError(PaymentNotFound)
         }
@@ -75,8 +75,9 @@ export const destroyPayment = async (paymentId: string, session: mongoose.Client
         if(!client){
             throw new ResourceNotFoundError(ClientNotFound)
         }
-        await subtractPaymentToClient(client, paymentId, session)
-        await PaymentModel.deleteOne([{_id: paymentId}], {session}) // DELETE A PAYMENT IN A SESSION
+        removePaymentfromClient(client, paymentId) // ELSE REMOVE THE PAYMENT FROM THE CLIENT WITH CLIENT UTILS
+        const clientUpdated = await updateClientBalance(client, payment.amount, true, session) // UPDATE THE CLIENT BALANCE WITH CLIENT UTILS        
+        await PaymentModel.findByIdAndDelete(paymentId).session(session) // DELETE A PAYMENT IN A SESSION
     } catch(error){
         throw error
     }

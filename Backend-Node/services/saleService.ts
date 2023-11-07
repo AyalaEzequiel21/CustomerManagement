@@ -1,11 +1,10 @@
-import mongoose from "mongoose"
 import { errorsPitcher } from "../errors/errorsPitcher"
 import SaleModel from "../models/sale"
 import { SaleMongo, SaleRegister } from "../schemas/saleSchema"
 import { BadRequestError, InternalServerError, ResourceNotFoundError } from "../errors/customErrors"
 import { BadRequest, ClientNotFound, InternalServer, SaleNotFound } from "../errors/errorMessages"
 import { isEmptyList } from "../utils/existingChecker"
-import { findClientByName, getTotalSale, addTotalSaletoBalance, processPaymentSale, filterSalesForDelivery, updateBalance, deletePayment } from "../utils/modelUtils/saleUtils" //  SALE UTILS
+import { findClientByName, getTotalSale, processPaymentSale, filterSalesForDelivery, updateBalanceAfterDelete, addSaleToClient, deletePaymentFromSale } from "../utils/modelUtils/saleUtils" //  SALE UTILS
 import { startSession } from "../db/connect"
 import { isValidDateFormat } from "../utils/dateUtils"
 
@@ -72,10 +71,9 @@ export const createSale = async (sale: SaleRegister) => {
     const {clientName, details, payment_dto} = sale  // GET THE DATA TO CREATE SALE
     const session = await startSession() // INIT A SESSION
     try{
-        session.startTransaction()
-        const client = await findClientByName(clientName, session) // WITH SALE UTILS
-        const newTotalSale = getTotalSale(details) // WITH SALE UTILS
-        console.log(client)
+        session.startTransaction() // INIT A TRANSACTION 
+        const client = await findClientByName(clientName, session) //FIND THE CLIENT BY HIS ID WITH SALE UTILS
+        const newTotalSale = getTotalSale(details) //GET THE TOTAL SALE WITH SALE UTILS
         if(!client){   // IF CLIENT NOT EXISTS RUN AN EXCEPTION
             throw new ResourceNotFoundError(ClientNotFound)
         }
@@ -85,28 +83,25 @@ export const createSale = async (sale: SaleRegister) => {
             details: details,
             totalSale: newTotalSale
         }], {session})
-        console.log(saleCreated)
 
-        if(saleCreated.length === 1){
-            client.sales.push(saleCreated[0]._id) // AD SALE CREATED TO CLIENT
-            await addTotalSaletoBalance(client, newTotalSale, session) // WITH SALE UTILS
-            if(payment_dto){ // CHECK IF EXISTS A PAYMENT, THEN CREATE THE PAYMENT 
-                const saleId = saleCreated[0]._id
-                const paymentCreated = await processPaymentSale(payment_dto, saleId.toString(), session) // WITH SALE UTILS
-                console.log(paymentCreated)
-
-                if(paymentCreated){ // IF THE PAYMENT WAS CREATED CORRECTLY, ADD THE ID TO THE SALE
-                    saleCreated[0].payment = new mongoose.Types.ObjectId(paymentCreated._id)
-                    await saleCreated[0].save({session})
-                }
-            }
+        if(saleCreated.length !== 1){
+            throw new BadRequestError(BadRequest)
         }
-        session.commitTransaction() // COMMIT TRANSACTION
+        await addSaleToClient(client, saleCreated[0]._id, newTotalSale, session) // AD SALE CREATED TO CLIENT
+        if(payment_dto && payment_dto.clientId === client._id.toString()){ // CHECK IF EXISTS A PAYMENT, THEN CREATE THE PAYMENT 
+            const saleId = saleCreated[0]._id
+            const paymentCreated = await processPaymentSale(payment_dto, saleId, session) // WITH SALE UTILS
+            if(!paymentCreated){ // IF THE PAYMENT WAS CREATED CORRECTLY, ADD THE ID TO THE SALE
+                throw new BadRequestError(BadRequest)
+            }
+            saleCreated[0].payment = paymentCreated._id
+            await saleCreated[0].save({session})
+        }
+        await session.commitTransaction() // COMMIT TRANSACTION
         return saleCreated // RETURNS THE SALE CREATED
-    } catch(error){
-        console.log(error);
-        
-        session.abortTransaction()
+
+    } catch(error){        
+        await session.abortTransaction()
         throw new InternalServerError(InternalServer)
     }
     finally{
@@ -122,14 +117,15 @@ export const removeSale = async (saleId: string) => {
     const session = await startSession() // INIT A SESSION
     try{
         session.startTransaction() // INIT A TRANSACTION 
-        const sale = await SaleModel.findById(saleId) // SEARCH THE SALE WITH HER ID 
+        const sale = await SaleModel.findById(saleId).exec() // SEARCH THE SALE WITH HER ID 
         if(!sale){ // IF THE SALE NOT EXISTS RUN AN EXCEPTION
             throw new ResourceNotFoundError(SaleNotFound)
         }
-        await updateBalance(sale.clientName, sale.totalSale, session)
+        await updateBalanceAfterDelete(sale.clientName, sale.totalSale, session)
         if(sale.payment){ // IF THE SALE HAVE A PAYMENT, THEN DELETE PAYMENT 
-            await deletePayment(sale.payment._id.toString(), session)
+            await deletePaymentFromSale(sale.payment._id, session)
         }
+        await SaleModel.findByIdAndDelete(saleId).session(session)
         await session.commitTransaction() // CONFIRM TRANSACTION
     }catch(error){
         await session.abortTransaction() // IF AN ERROR OCCURS, ABORT TRANSACTION
