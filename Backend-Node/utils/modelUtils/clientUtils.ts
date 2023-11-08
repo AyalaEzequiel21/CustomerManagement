@@ -6,7 +6,7 @@ import ClientModel, { ClientDocument } from "../../models/client"
 // function to get a client by id
 export const getClientById = async (clientId: string | mongoose.Types.ObjectId, session: mongoose.ClientSession | null = null) => {
     try{
-        const client = await ClientModel.findById(clientId, null, {session}).exec() // FIND CLIENT BY ID
+        const client = await ClientModel.findOne({_id: clientId}).session(session) // FIND CLIENT BY ID
         if(client && client.is_active){ // IF THE CLIENT EXISTS AND IS ACTIVE
             return client // RETURN THE CLIENT
         }

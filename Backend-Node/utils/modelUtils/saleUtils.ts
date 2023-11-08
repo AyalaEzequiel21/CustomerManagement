@@ -1,8 +1,8 @@
-import mongoose from "mongoose"
+import mongoose, { Types } from "mongoose"
 import { ClientDocument } from "../../models/client"
 import { TypePaymentDto } from "../../schemas/dtos/paymentDTOSchema"
 import { DetailSale, SaleMongo } from "../../schemas/saleSchema"
-import { addNewSale, getClientByName, updateClientBalance } from "./clientUtils" //  CLIENT UTILS
+import { addNewSale, getClientByName, removeSalefromClient, updateClientBalance } from "./clientUtils" //  CLIENT UTILS
 import { destroyPayment, processPayment } from "./paymentUtils" //  PAYMENTS UTILS
 
 export const findClientByName = async (clientName: string, session: mongoose.ClientSession | null = null) => {
@@ -53,10 +53,21 @@ export const filterSalesForDelivery = async (sales: SaleMongo[]) => {
     }
 }
 
-export const updateBalanceAfterDelete = async (clientName: string, totalSale: number, session: mongoose.ClientSession | null = null) => {
+export const updateClientAfterDelete = async (clientName: string, saleId: mongoose.Types.ObjectId, totalSale: number, session: mongoose.ClientSession | null = null) => {
     try {
         const client = await findClientByName(clientName, session) // FIND CLIENT WITH HIS NAME
-        await updateClientBalance(client as ClientDocument, totalSale, false, session) // UPDATE BALANCE OF CLIENT FOUND
+        removeSalefromClient(client, saleId)
+        await updateClientBalance(client, totalSale, false, session) // UPDATE BALANCE OF CLIENT FOUND
+    } catch(error){
+        throw error
+    }
+}
+
+export const updateClientAfterUpdate = async (clientName: string, oldTotalSale: number, newTotalSale: number, session: mongoose.ClientSession | null = null) => {
+    try {
+        const client = await findClientByName(clientName, session) // FIND CLIENT WITH HIS NAME
+        await updateClientBalance(client, oldTotalSale, false, session) // UPDATE BALANCE OF CLIENT FOUND
+        await updateClientBalance(client, newTotalSale, true, session) // UPDATE BALANCE OF CLIENT FOUND
     } catch(error){
         throw error
     }
@@ -65,3 +76,12 @@ export const updateBalanceAfterDelete = async (clientName: string, totalSale: nu
 export const deletePaymentFromSale = async (paymentId: mongoose.Types.ObjectId, session: mongoose.ClientSession | null = null) => {
     await destroyPayment(paymentId, session)
 }
+
+
+export const convertDetails = (oldDetails: DetailSale[]) => {
+    return oldDetails.map(item => ({
+        product: new Types.ObjectId(item.product),
+        quantity: item.quantity,
+        partialResult: item.partialResult
+    }))
+};

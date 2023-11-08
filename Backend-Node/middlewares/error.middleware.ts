@@ -18,7 +18,7 @@ export const errorHandler = (error: Error, req: Request, res: Response, next: Ne
                 break;
 
             default:
-                res.status(500).json({ok: false, message: `${InternalServer} + ${error.message}`})
+                res.status(500).json({ok: false, message: ` ${error.message}`})
         }
 }
 

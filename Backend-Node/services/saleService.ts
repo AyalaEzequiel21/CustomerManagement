@@ -4,9 +4,10 @@ import { SaleMongo, SaleRegister } from "../schemas/saleSchema"
 import { BadRequestError, InternalServerError, ResourceNotFoundError } from "../errors/customErrors"
 import { BadRequest, ClientNotFound, InternalServer, SaleNotFound } from "../errors/errorMessages"
 import { isEmptyList } from "../utils/existingChecker"
-import { findClientByName, getTotalSale, processPaymentSale, filterSalesForDelivery, updateBalanceAfterDelete, addSaleToClient, deletePaymentFromSale } from "../utils/modelUtils/saleUtils" //  SALE UTILS
+import { findClientByName, getTotalSale, processPaymentSale, filterSalesForDelivery, addSaleToClient, deletePaymentFromSale, updateClientAfterDelete, convertDetails, updateClientAfterUpdate } from "../utils/modelUtils/saleUtils" //  SALE UTILS
 import { startSession } from "../db/connect"
 import { isValidDateFormat } from "../utils/dateUtils"
+import { Types } from "mongoose"
 
 
 /////////////////////////
@@ -105,12 +106,34 @@ export const createSale = async (sale: SaleRegister) => {
         throw new InternalServerError(InternalServer)
     }
     finally{
-        session.endSession() // FINALLY END THE SESSION
+        await session.endSession() // FINALLY END THE SESSION
     }
 }
 
 export const getSaleUpdated = async (sale: SaleMongo) => {
-
+    const {_id, details, clientName} = sale // GET THE PROPERTIES TO UPDATE SALE
+    const session = await startSession() // INIT A SESSION
+    try{
+        session.startTransaction() // INIT A TRANSACTION
+        const saleSaved = await SaleModel.findById(_id).exec() // SEARCH THE SALE BY HIS ID
+        if(!saleSaved){ // IF THE SALE NOT EXISTS RUN AN EXCEPTION
+            throw new ResourceNotFoundError(SaleNotFound)
+        }
+        const lastTotal = saleSaved.totalSale
+        saleSaved.details = convertDetails(details) as Types.DocumentArray<{
+            product: Types.ObjectId;
+            quantity: number;
+            partialResult: number;
+        }>;
+        saleSaved.totalSale = getTotalSale(details)
+        await updateClientAfterUpdate(saleSaved.clientName, lastTotal, saleSaved.totalSale, session)
+        await saleSaved.save({session})
+        await session.commitTransaction()
+    }catch(error){
+        await session.abortTransaction()
+        errorsPitcher(error)
+    }
+    await session.endSession()
 }
 
 export const removeSale = async (saleId: string) => {
@@ -121,15 +144,15 @@ export const removeSale = async (saleId: string) => {
         if(!sale){ // IF THE SALE NOT EXISTS RUN AN EXCEPTION
             throw new ResourceNotFoundError(SaleNotFound)
         }
-        await updateBalanceAfterDelete(sale.clientName, sale.totalSale, session)
         if(sale.payment){ // IF THE SALE HAVE A PAYMENT, THEN DELETE PAYMENT 
             await deletePaymentFromSale(sale.payment._id, session)
         }
+        await updateClientAfterDelete(sale.clientName, sale._id, sale.totalSale, session)
         await SaleModel.findByIdAndDelete(saleId).session(session)
         await session.commitTransaction() // CONFIRM TRANSACTION
     }catch(error){
         await session.abortTransaction() // IF AN ERROR OCCURS, ABORT TRANSACTION
         errorsPitcher(error)
     }
-    session.endSession() // END SESSION
+    await session.endSession() // END SESSION
 }

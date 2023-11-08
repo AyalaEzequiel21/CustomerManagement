@@ -105,7 +105,7 @@ export const getReportValidated = async (reportId: string) => { // validate an r
         await session.abortTransaction()
         errorsPitcher(error)
     }
-    session.endSession()
+    await session.endSession()
 }
 
 export const destroyReport = async (reportId: string) => {

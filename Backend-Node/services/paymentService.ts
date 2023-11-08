@@ -7,7 +7,7 @@ import { addPaymentToClient, findClientById, isValidPaymentMethod, subtractPayme
 import { isValidDateFormat } from "../utils/dateUtils";
 import { isEmptyList } from "../utils/existingChecker";
 import { startSession } from "../db/connect";
-import mongoose from "mongoose";
+
 
 /////////////////////////
 // PAYMENT SERVICE
@@ -39,7 +39,7 @@ export const createPayment = async (newPayment: PaymentRegister) => {
         await session.abortTransaction()
         errorsPitcher(error)
     } 
-    session.endSession() // END THE SESSION
+    await session.endSession() // END THE SESSION
 }
 
 
@@ -62,8 +62,10 @@ export const deletePaymentById = async (paymentId: string) => {
         await PaymentModel.findByIdAndDelete(existsPayment._id).session(session) // DELETE THE PAYMENT FROM TO DATA BASE
         await session.commitTransaction() // CONFIRM TRANSACTION
     } catch (error){
+        await session.abortTransaction()
         errorsPitcher(error)
     }
+    await session.endSession()
 }
 
 export const allPayments = async () => {

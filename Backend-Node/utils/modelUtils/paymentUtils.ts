@@ -67,7 +67,7 @@ export const processPayment = async (payment: TypePaymentDto, reportId: Types.Ob
 
 export const destroyPayment = async (paymentId: mongoose.Types.ObjectId, session: mongoose.ClientSession | null = null) => {
     try{
-        const payment = await PaymentModel.findById([paymentId], {session}).exec() as PaymentDocument // SEARCH THE PAYMENT 
+        const payment = await PaymentModel.findOne({_id: paymentId}).session(session) // SEARCH THE PAYMENT 
         if(!payment){
             throw new ResourceNotFoundError(PaymentNotFound)
         }

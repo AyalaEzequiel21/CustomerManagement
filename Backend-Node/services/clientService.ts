@@ -64,6 +64,7 @@ export const updateClient = async (client: ClientMongo) => {
         clientSaved.phone = client.phone
         if(client.balance !== undefined) clientSaved.balance = client.balance
         if(client.payments !== undefined) clientSaved.payments = client.payments.map(payment => new mongoose.Types.ObjectId(payment))
+        if (client.sales !== undefined) clientSaved.sales = client.sales.map(sale => new mongoose.Types.ObjectId(sale))
         clientSaved.category = client.category
         clientSaved.in_delivery = client.in_delivery
         clientSaved.is_active = client.is_active
