@@ -66,8 +66,9 @@ export const updateClientAfterDelete = async (clientName: string, saleId: mongoo
 export const updateClientAfterUpdate = async (clientName: string, oldTotalSale: number, newTotalSale: number, session: mongoose.ClientSession | null = null) => {
     try {
         const client = await findClientByName(clientName, session) // FIND CLIENT WITH HIS NAME
-        await updateClientBalance(client, oldTotalSale, false, session) // UPDATE BALANCE OF CLIENT FOUND
-        await updateClientBalance(client, newTotalSale, true, session) // UPDATE BALANCE OF CLIENT FOUND
+        // await updateClientBalance(client, oldTotalSale, false, session) // UPDATE BALANCE OF CLIENT FOUND
+        
+        await updateClientBalance(client, newTotalSale - oldTotalSale, true, session) // UPDATE BALANCE OF CLIENT FOUND
     } catch(error){
         throw error
     }

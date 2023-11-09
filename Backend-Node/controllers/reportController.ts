@@ -42,6 +42,16 @@ export const getAllPendingReports = async (req: any, res: Response, next: NextFu
     }
 }
 
+export const getReportsByDate = async (req: any, res: Response, next: NextFunction) => {
+    const {date} = req.query // GET THE REPORT DATE FROM THE PARAMS QUERY
+    try {
+        const reports = await reportService.searchReportByDate(date) // GET ALL REPORTS FROM THAT DATE
+        res.status(200).json({ok: true, data: reports}) // RETURNS STATUS 200 AND THE REPORTS
+    } catch(error){
+        next(error)
+    }
+}
+
 export const updateReport = async (req: Request, res: Response, next: NextFunction) => {
     const report = req.body // GET THE REPORT TO UPDATE FROM THE REQUEST
     try{
@@ -63,7 +73,7 @@ export const validateReport = async (req: Request, res: Response, next: NextFunc
 }
 
 export const deleteReport = async (req: Request, res: Response, next: NextFunction) => {
-    const reportId = req.params.reportId // GET THE REPORT TO VALIDATE FROM THE REQUEST
+    const reportId = req.params.reportId // GET THE REPORT TO DELETE FROM THE REQUEST
     try{
         await reportService.destroyReport(reportId) // DELETE REPORT WITH REPORT SERVICE
         res.status(204).json({ok: true}) // RETURNS STATUS 204 AND OK: TRUE

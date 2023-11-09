@@ -5,6 +5,7 @@ import { BadRequest, Conflict, InternalServer, PaymentNotFound, ReportNotFound }
 import { errorsPitcher } from "../errors/errorsPitcher"
 import ReportModel from "../models/report"
 import { ReportMongo, ReportRegister } from "../schemas/reportSchema"
+import { isValidDateFormat } from "../utils/dateUtils"
 import { isEmptyList } from "../utils/existingChecker"
 import { processPaymentsReport } from "../utils/modelUtils/reportUtils" //  REPORT UTILS
 
@@ -62,6 +63,20 @@ export const reportsPending = async () => { // all reports pending
         }
         return reportsPending // RETURN THE REPORTS VALIDATED
     }catch (error){
+        errorsPitcher(error)
+    }
+}
+export const searchReportByDate = async (reportDate: string) => {
+    if(!isValidDateFormat(reportDate)){ // CHECK IF DATE IS VALID OR RUN AN EXCEPTION
+        throw new BadRequestError(BadRequest)
+    }
+    try{
+        const reports = await ReportModel.find({report_date: reportDate}).exec() // SEARCH REPORTS WITH THE SAME REPORT DATE
+        if(isEmptyList(reports)){ // IF REPORTS IS EMPTY RUN AN EXCEPTION
+            throw new ResourceNotFoundError(ReportNotFound)
+        }
+        return reports // RETURNS THE REPORTS
+    }catch(error){
         errorsPitcher(error)
     }
 }
