@@ -25,6 +25,9 @@ export const ReportNotFound = "Report not found"
 // SALE ///////////////
 export const SaleNotFound = "Sale not found"
 
+// ORDER ///////////////
+export const OrderNotFound = "Order List not found"
+
 // GENERAL ///////////////
 export const NotAuthorized = "User not authorized"
 export const BadRequest = "Some data is incorrect or missing"

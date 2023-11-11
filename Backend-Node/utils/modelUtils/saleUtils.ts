@@ -4,6 +4,7 @@ import { TypePaymentDto } from "../../schemas/dtos/paymentDTOSchema"
 import { DetailSale, SaleMongo } from "../../schemas/saleSchema"
 import { addNewSale, getClientByName, removeSalefromClient, updateClientBalance } from "./clientUtils" //  CLIENT UTILS
 import { destroyPayment, processPayment } from "./paymentUtils" //  PAYMENTS UTILS
+import SaleModel from "../../models/sale"
 
 export const findClientByName = async (clientName: string, session: mongoose.ClientSession | null = null) => {
     try {
@@ -86,3 +87,15 @@ export const convertDetails = (oldDetails: DetailSale[]) => {
         partialResult: item.partialResult
     }))
 };
+
+export const existsSaleById = async (saleId: string) => {
+    return await SaleModel.exists({_id: saleId})
+}
+
+export const validateIdSale = (Id: string): boolean => { // FUNCTION FOR CHECK IF AN ID IS VALID
+    let response = false 
+    if(mongoose.Types.ObjectId.isValid(Id)){
+        response = true
+    }
+    return response
+}

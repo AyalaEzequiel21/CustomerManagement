@@ -2,8 +2,16 @@ import { z } from "zod";
 
 // ORDER LIST
 
+const detailOrder = z.object({
+    saleId: z.string(),
+    clientName: z.string(),
+    totalSale: z.number().min(0.01)
+})
+
+export type DetailOrder = z.infer<typeof detailOrder>
+
 export const orderListRegistrationSchema = z.object({
-    sales: z.array(z.string())
+    sales: z.array(detailOrder)
 })
 
 export type OrderListRegister = z.infer<typeof orderListRegistrationSchema>
