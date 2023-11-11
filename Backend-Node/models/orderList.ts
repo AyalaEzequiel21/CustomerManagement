@@ -5,7 +5,7 @@ import { EOrderSatus } from "../enums/EOrderStatus";
 export const detailOrderSchema = new Schema({
     saleId: {type: mongoose.Schema.Types.ObjectId, ref: "Sale", required: true},
     clientName: {type: String, required: true},
-    totalSale: {type: Number, min: 0.01, required: true}
+    totalSale: {type: Number, min: 0.01}
 })
 
 const orderListSchema = new Schema({

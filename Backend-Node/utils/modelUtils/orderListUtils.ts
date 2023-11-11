@@ -1,3 +1,4 @@
+import { Types } from "mongoose";
 import { BadRequestError } from "../../errors/customErrors";
 import { BadRequest } from "../../errors/errorMessages";
 import { DetailOrder } from "../../schemas/orderListSchema"
@@ -20,4 +21,19 @@ export const validateSales = async (sales: DetailOrder[]) => {
     } catch(error){
         throw error
     }
+}
+
+interface detailSale {
+    saleId: Types.ObjectId,
+    clientName: string,
+    totalSale: number
+}
+
+export const convertDetailsSale = (sales: DetailOrder[]): Types.DocumentArray<detailSale> => {
+    return new Types.DocumentArray(sales.map(item => ({
+        saleId: new Types.ObjectId(item.saleId),
+        clientName: item.clientName,
+        totalSale: item.totalSale
+        }))
+    )
 }

@@ -1,3 +1,4 @@
+import mongoose, { Types } from "mongoose";
 import { EOrderSatus } from "../enums/EOrderStatus";
 import { BadRequestError, InternalServerError, ResourceNotFoundError } from "../errors/customErrors";
 import { BadRequest, Conflict, OrderNotFound } from "../errors/errorMessages";
@@ -6,7 +7,7 @@ import OrderListModel from "../models/orderList";
 import { OrderListMongo, OrderListRegister } from "../schemas/orderListSchema";
 import { isValidDateFormat } from "../utils/dateUtils";
 import { isEmptyList } from "../utils/existingChecker";
-import { validateSales } from "../utils/modelUtils/orderListUtils";
+import { convertDetailsSale, validateSales } from "../utils/modelUtils/orderListUtils";
 
 /////////////////////////
 // ORDER LIST SERVICE
@@ -18,25 +19,39 @@ export const createOrderList = async (newOrder: OrderListRegister) => {
         throw new BadRequestError(BadRequest)
     }
     try{
-        const verificationSales = await validateSales(sales)
-        if(!verificationSales){
+        const verificationSales = await validateSales(sales) // CHECK IF ALL SALES ARE VALID
+        if(!verificationSales){ // IF ANY IS INVALID RUN AN EXCEPTION
             throw new BadRequestError(BadRequest)
         }
-
-        const orderCreated = await OrderListModel.create({
+        const orderCreated = await OrderListModel.create({ // CREATE THE ORDER
             sales: sales
         })
         if(!orderCreated){
             throw new InternalServerError(Conflict)
         }
-        return orderCreated
+        return orderCreated // RETURN THE ORDER
     } catch(error){ 
         errorsPitcher(error)
     }
 }
 
 export const getOrderUpdated = async (order: OrderListMongo) => {
+    const {_id, sales, order_status} = order // GET ATTRIBUTES NECESARY FOR UPDATE 
+    try{
+        const orderSaved = await OrderListModel.findOne({_id: _id}) // SEARCH A ORDER WITH THE SAME ID
+        if(!orderSaved || orderSaved.order_status === EOrderSatus.Completo){ // IF ORDER NOT EXISTS OR HIS STATUS IS COMPLETED THEN RUN AN EXCEPTION
+            throw new ResourceNotFoundError(OrderNotFound)
+        }
+        if(!await validateSales(sales)){ // CHECK IF ALL SALES ARE VALID
+            throw new BadRequestError(BadRequest)
+        }
+        orderSaved.sales = convertDetailsSale(sales) // THEN UPDATE THE ORDER
+        orderSaved.order_status = order_status
 
+        await orderSaved.save() // SAVE THE ORDER UPDATED
+    } catch(error){
+        errorsPitcher(error)
+    }
 }
 
 export const searchAllOrders = async () => {
@@ -91,5 +106,13 @@ export const searchByDate = async (orderDate: string) => {
 }
 
 export const destroyOrder = async (orderId: string) => {
-    
+    try{
+        const orderSaved = await OrderListModel.findOne({_id: orderId})
+        if(!orderSaved){
+            throw new ResourceNotFoundError(OrderNotFound)
+        }
+        await OrderListModel.deleteOne({_id: orderId})
+    } catch(error){
+        errorsPitcher(error)
+    }
 }
