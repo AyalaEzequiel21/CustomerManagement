@@ -6,6 +6,9 @@
   "author": "Ayala Ezequiel",
   "license": "MIT",
   "private": false,
+  "engines": {
+    "node": ">=16.20.1"
+  },
   "scripts": {
     "dev": "nodemon index.ts",
     "build": "tsc",
