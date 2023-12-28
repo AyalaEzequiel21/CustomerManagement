@@ -23,7 +23,6 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
     } catch (error){
         next(error)
     }
-    
 }
 
 export const logout = (req: Request, res: Response, next: NextFunction) => {
