@@ -1,20 +1,25 @@
 import express from "express"
 import routes from './routes'
 import {connectDB} from "./db/connect"
-import cors from 'cors'
+// import cors from 'cors'
 import cookieParser from 'cookie-parser'
 import { errorHandler } from "./middlewares/error.middleware"
 
 // initialize the app
 
+const cors = require('cors')
 const app = express()
 
-const urlList = ['http://localhost:5173']
+// const urlList = ['http://localhost:5173']
 
 app.use(cookieParser())
 app.use(express.json())
 app.disable('x-powered-by')
-app.use(cors(
+app.use(cors({
+    origin: 'http://localhost:5173',
+    credentials: true,
+  }));
+// app.use(cors(
 //     {
 //     origin: (origin, callback)=> {
 //         if(!origin || urlList.includes(origin)){
@@ -25,7 +30,7 @@ app.use(cors(
 //     }, 
 //     credentials: true
 // }
-))
+// ))
 app.options('*', cors());
 app.use(errorHandler)
 app.use('/praderaAPI', routes)
