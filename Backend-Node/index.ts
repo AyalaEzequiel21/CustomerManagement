@@ -15,7 +15,8 @@ app.use(cookieParser())
 app.use(express.json())
 app.disable('x-powered-by')
 app.use(cors({
-    origin: process.env.API_URL,
+    origin: 'http://localhost:5173',
+    // process.env.API_URL,
     credentials: true,
   }));
 // app.use(cors(
@@ -30,9 +31,9 @@ app.use(cors({
 //     credentials: true
 // }
 // ))
-app.options('*', cors());
-app.use(errorHandler)
 app.use('/praderaAPI', routes)
+app.use(errorHandler)
+app.options('*', cors());
 
 // connect to Data Base
 connectDB().then(() => {
