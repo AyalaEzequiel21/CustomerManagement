@@ -14,16 +14,18 @@ const urlList = ['http://localhost:5173']
 app.use(cookieParser())
 app.use(express.json())
 app.disable('x-powered-by')
-app.use(cors({
-    origin: (origin, callback)=> {
-        if(!origin || urlList.includes(origin)){
-            callback(null, true)
-        } else {
-            callback(new Error('Not allowed by Cors'))
-        }
-    }, 
-    credentials: true
-}))
+app.use(cors(
+//     {
+//     origin: (origin, callback)=> {
+//         if(!origin || urlList.includes(origin)){
+//             callback(null, true)
+//         } else {
+//             callback(new Error('Not allowed by Cors'))
+//         }
+//     }, 
+//     credentials: true
+// }
+))
 app.options('*', cors());
 app.use(errorHandler)
 app.use('/praderaAPI', routes)
