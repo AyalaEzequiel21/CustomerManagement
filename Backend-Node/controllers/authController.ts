@@ -7,9 +7,9 @@ import * as authService from '../services/authService'
 ///////////////////////
 
 export const login = async (req: Request, res: Response, next: NextFunction) => {
-    const {email, password} = req.body // GET THE EMAIL AND PASSWORD FROM THE REQUEST
+    const {username, password} = req.body // GET THE EMAIL AND PASSWORD FROM THE REQUEST
     try{
-        const token = await authService.loginUser(email, password) // GET THE TOKEN FROM THE AUTHSERVICE
+        const token = await authService.loginUser(username, password) // GET THE TOKEN FROM THE AUTHSERVICE
         if (token){ // IF TOKEN EXISTS THEN SET THE COOKIE IN THE RESPONSE
             res
                 .cookie("jwt", token,{
@@ -18,7 +18,7 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
                     httpOnly: true //  the cookie is not reachable from client side
                 })
                 .status(200)
-                .json({ok: true, message: "Login successful"})
+                .json({ok: true, message: "Login successful", user: username})
         } 
     } catch (error){
         next(error)

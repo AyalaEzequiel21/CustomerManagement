@@ -14,9 +14,9 @@ import ClientModel from "../models/client"
 ///////////////////////
 
 
-export const loginUser = async (email: string, password: string) => {
+export const loginUser = async (username: string, password: string) => {
     try{
-        const user = await UserModel.findOne({email: email})
+        const user = await UserModel.findOne({username: username})
 
         if(!user) { // IF CAN NOT FOUND THE USER RUN AN EXCEPTION
             throw new ResourceNotFoundError(UserNotFound);
@@ -38,15 +38,15 @@ export const loginUser = async (email: string, password: string) => {
 
 
 export const createUser = async (newUser : User) => {
-    const {username, email, password, role} = newUser // GET THE ATTRIBUTES SENDED 
+    const {username, password, role} = newUser // GET THE ATTRIBUTES SENDED 
     try{
-        if(await existsEntity(ClientModel, "email", email)){ // IF EMAIL HAS ALREADY BEEN REGISTERED RUN AN EXCEPTION        
+        if(await existsEntity(ClientModel, "username", username)){ // IF EMAIL HAS ALREADY BEEN REGISTERED RUN AN EXCEPTION        
             throw new ResourceAlreadyRegisteredError(UserAlreadyRegistered)
         } 
         const hashPassword = await bcrypt.hash(password, 8) // PASSWORD TO HASH
         const newUser = await UserModel.create({ // CREATE THE NEW USER AND SEND IT
             username: username, 
-            email: email, 
+            // email: email, 
             password: hashPassword, 
             role: role
         })  
@@ -60,14 +60,14 @@ export const createUser = async (newUser : User) => {
 }
 
 export const updateUser = async (userUpdated: UserMongo) => {
-    const {_id, username, email, password, role} = userUpdated // GET THE ATTRIBUTES SENDED
+    const {_id, username, password, role} = userUpdated // GET THE ATTRIBUTES SENDED
     try{
         const existingUser = await UserModel.findById(_id) // CHECK THAT EXISTS THE USER SENDED
         if(!existingUser){ // IF USER NOT EXISTS RUN AN EXCEPTION
             throw new ResourceNotFoundError(UserNotFound)
         } 
         existingUser.username = username // ELSE UPDATE THE USER 
-        existingUser.email = email
+        // existingUser.email = email
         existingUser.password = bcrypt.hashSync(password, 8)
         existingUser.role = role
         const updatedUser = await existingUser.save() // SAVE THE USER UPDATED AND RETURN
