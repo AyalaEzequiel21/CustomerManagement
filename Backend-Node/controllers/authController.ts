@@ -9,16 +9,20 @@ import * as authService from '../services/authService'
 export const login = async (req: Request, res: Response, next: NextFunction) => {
     const {username, password} = req.body // GET THE EMAIL AND PASSWORD FROM THE REQUEST
     try{
-        const token = await authService.loginUser(username, password) // GET THE TOKEN FROM THE AUTHSERVICE
-        if (token){ // IF TOKEN EXISTS THEN SET THE COOKIE IN THE RESPONSE
+        const response = await authService.loginUser(username, password) // GET THE TOKEN FROM THE AUTHSERVICE
+        if (response){ // IF TOKEN EXISTS THEN SET THE COOKIE IN THE RESPONSE
+            const infoResponse = {
+                username: response.user.username,
+                role: response.user.role
+            }
             res
-                .cookie("jwt", token,{
+                .cookie("jwt", response.token,{
                     //       1s    1m   1h   1d
                     maxAge: 1000 * 60 * 60 * 24, // TIME EXPIRATION
                     httpOnly: true //  the cookie is not reachable from client side
                 })
                 .status(200)
-                .json({ok: true, message: "Login successful", user: username})
+                .json({ok: true, message: "Login successful", data: infoResponse})
         } 
     } catch (error){
         next(error)

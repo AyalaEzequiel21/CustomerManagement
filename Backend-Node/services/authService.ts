@@ -30,7 +30,7 @@ export const loginUser = async (username: string, password: string) => {
             process.env.SECRET_KEY_SIGN as string
         )
 
-        return token
+        return {token, user}
     } catch (error){
         errorsPitcher(error)
     }
