@@ -73,6 +73,7 @@ export const allPayments = async () => {
         const payments = await PaymentModel.find() //  GET ALL PAYMENTS
         if(isEmptyList(payments)){ // CHECK IF THE RESPONSE IS EMPTY AND RUN AN EXCEPTION
             throw new ResourceNotFoundError(PaymentNotFound)
+            // return []
         }
         return payments // RETURN THE PAYMENTS
     } catch (error){
