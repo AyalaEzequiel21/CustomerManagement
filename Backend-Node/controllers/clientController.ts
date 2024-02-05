@@ -38,6 +38,17 @@ export const getAllClients = async (req: any, res: Response, next: NextFunction)
     }
 }
 
+export const getClientById = async (req: Request, res: Response, next: NextFunction) => {
+    const clientId = req.params.clientId // GET THE CLIENT ID FROM THE PARAMS    
+    try {
+        const client = await clientService.getClientById(clientId) // GET THE CLIENT BY ID
+        res.status(200).json({ok: true, data: client}) // RETURN STATUS 200 AND THE CLIENT
+    } catch(error){
+        next(error)
+    }
+
+}
+
 export const getAllInactiveClients = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const inactiveClients = await clientService.getClientsInactives() // GET ALL INACTIVE CLIENTS AND RETUN STATSU 200 AND THE CLIENTS

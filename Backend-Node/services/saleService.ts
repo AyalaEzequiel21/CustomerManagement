@@ -17,9 +17,9 @@ import { Types } from "mongoose"
 export const getSales = async (inDelivery: boolean) => {
     try{
         const sales = await SaleModel.find() as SaleMongo[]// FIND ALL SALES 
-        if(isEmptyList(sales)){
-            throw new ResourceNotFoundError(SaleNotFound)
-        }
+        // if(isEmptyList(sales)){
+        //     throw new ResourceNotFoundError(SaleNotFound)
+        // }
         if(inDelivery){
             const deliverySales = await filterSalesForDelivery(sales) // IF INDELIVERY IS TRUE THEN FILTER SALES
             return deliverySales
@@ -33,14 +33,14 @@ export const getSales = async (inDelivery: boolean) => {
 export const findSalesByClientName = async (inDelivery: boolean, clientName: string) => {
     try{
         const sales = await SaleModel.find({ clientName: { $regex: clientName, $options: 'i' } }) as SaleMongo[]
-        if(isEmptyList(sales)){
-            throw new ResourceNotFoundError(SaleNotFound)
-        }
+        // if(isEmptyList(sales)){
+        //     throw new ResourceNotFoundError(SaleNotFound)
+        // }
         if(inDelivery){
             const deliverySales = await filterSalesForDelivery(sales)
-            if(isEmptyList(deliverySales)){
-                throw new ResourceNotFoundError(SaleNotFound)
-            }
+            // if(isEmptyList(deliverySales)){
+            //     throw new ResourceNotFoundError(SaleNotFound)
+            // }
             return deliverySales
         }
         return sales
@@ -55,9 +55,9 @@ export const findSalesBySaleDate = async (inDelivery: boolean, saleDate: string)
     }
     try{
         const sales = await SaleModel.find({sale_date: saleDate}) as SaleMongo[] // SEARCH ALL SALES FROM THAT DATE
-        if(isEmptyList(sales)){ // CHECK IF SALES IS EMPTY AND TUN AN EXCEPTION
-            throw new ResourceNotFoundError(SaleNotFound)
-        }
+        // if(isEmptyList(sales)){ // CHECK IF SALES IS EMPTY AND TUN AN EXCEPTION
+        //     throw new ResourceNotFoundError(SaleNotFound)
+        // }
         if(inDelivery){
             const deliverySales = await filterSalesForDelivery(sales)
             return deliverySales

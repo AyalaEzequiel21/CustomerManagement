@@ -57,9 +57,9 @@ export const getOrderUpdated = async (order: OrderListMongo) => {
 export const searchAllOrders = async () => {
     try{
         const orders = await OrderListModel.find() // GET ALL ORDERS SAVED
-        if(isEmptyList(orders)){ // CHECK IF ORDERS IS EMPTY THEN RUN AN EXCEPTION
-            throw new ResourceNotFoundError(OrderNotFound)
-        }
+        // if(isEmptyList(orders)){ // CHECK IF ORDERS IS EMPTY THEN RUN AN EXCEPTION
+        //     throw new ResourceNotFoundError(OrderNotFound)
+        // }
         return orders // RETURN ORDERS
     } catch(error){
         errorsPitcher(error)
@@ -69,9 +69,9 @@ export const searchAllOrders = async () => {
 export const searchAllCompleted = async () => {
     try{
         const ordersCompleted = await OrderListModel.find({order_status: EOrderSatus.Completo}) // GET ALL COMPLETED ORDERS SAVED
-        if(isEmptyList(ordersCompleted)){ // CHECK IF ORDERS IS EMPTY THEN RUN AN EXCEPTION
-            throw new ResourceNotFoundError(OrderNotFound)
-        }
+        // if(isEmptyList(ordersCompleted)){ // CHECK IF ORDERS IS EMPTY THEN RUN AN EXCEPTION
+        //     throw new ResourceNotFoundError(OrderNotFound)
+        // }
         return ordersCompleted // RETURN ORDERS
     } catch(error){
         errorsPitcher(error)
@@ -81,9 +81,9 @@ export const searchAllCompleted = async () => {
 export const searchAllPending = async () => {
     try{
         const ordersPending = await OrderListModel.find({order_status: EOrderSatus.Pendiente}) // GET ALL COMPLETED ORDERS SAVED
-        if(isEmptyList(ordersPending)){ // CHECK IF ORDERS IS EMPTY THEN RUN AN EXCEPTION
-            throw new ResourceNotFoundError(OrderNotFound)
-        }
+        // if(isEmptyList(ordersPending)){ // CHECK IF ORDERS IS EMPTY THEN RUN AN EXCEPTION
+        //     throw new ResourceNotFoundError(OrderNotFound)
+        // }
         return ordersPending // RETURN ORDERS
     } catch(error){
         errorsPitcher(error)
@@ -96,9 +96,9 @@ export const searchByDate = async (orderDate: string) => {
     }
     try{
         const orders = await OrderListModel.find({order_date: orderDate}) // GET ALL  ORDERS SAVED
-        if(isEmptyList(orders)){ // CHECK IF ORDERS IS EMPTY THEN RUN AN EXCEPTION
-            throw new ResourceNotFoundError(OrderNotFound)
-        }
+        // if(isEmptyList(orders)){ // CHECK IF ORDERS IS EMPTY THEN RUN AN EXCEPTION
+        //     throw new ResourceNotFoundError(OrderNotFound)
+        // }
         return orders // RETURN ORDERS
     } catch(error){
         errorsPitcher(error)

@@ -54,9 +54,9 @@ export const updateProduct = async (product: ProductMongo) => {
 export const getAllProducts = async (inDelivery: boolean) => {
     try {
         const products = await ProductModel.find({is_active: true}) // GET ALL ACTIVE PRODUCTS
-        if(isEmptyList(products)){ // IF THE PRODUCTS IS EMPTY RUN AN EXCEPTION
-            throw new ResourceNotFoundError(ProductNotFound)
-        }
+        // if(isEmptyList(products)){ // IF THE PRODUCTS IS EMPTY RUN AN EXCEPTION
+        //     throw new ResourceNotFoundError(ProductNotFound)
+        // }
         if(inDelivery){ // IF IN DELIVERY IS TRUE RETURN A PRODUCTDTO FOR ANY PRODUCT
             return products.map(product => new ProductDto(product.productName, product.price_cat_2))
         }
@@ -69,9 +69,9 @@ export const getAllProducts = async (inDelivery: boolean) => {
 export const getInactiveProducts = async () => {
     try {
         const inactivesProducts = await ProductModel.find({is_active: false}) // GET ALL INACTIVES PRODUCTS
-        if(isEmptyList(inactivesProducts)){ // IF INACTIVE CLIENTS IS EMPTY RUN AN EXCEPTION
-            throw new ResourceNotFoundError(ProductNotFound)
-        }
+        // if(isEmptyList(inactivesProducts)){ // IF INACTIVE CLIENTS IS EMPTY RUN AN EXCEPTION
+        //     throw new ResourceNotFoundError(ProductNotFound)
+        // }
         return inactivesProducts // ELSE RETURNS INACTIVE CLIENTS
     } catch (error){
         errorsPitcher(error)
@@ -81,13 +81,13 @@ export const getInactiveProducts = async () => {
 export const getProductsByName = async (productName: string) => {
     try {
         const productsFound = await ProductModel.find({productName: { $regex: productName, $options: 'i' }}) // GET ALL PRODUCTS WITH PRODUCTNAME IS EQUALS TO PARAM
-        if(isEmptyList(productsFound)){ // IF PRODUCTSFOUND IS EMPTY RUN AN EXCEPTION
-            throw new ResourceNotFoundError(ProductNotFound)
-        }
+        // if(isEmptyList(productsFound)){ // IF PRODUCTSFOUND IS EMPTY RUN AN EXCEPTION
+        //     throw new ResourceNotFoundError(ProductNotFound)
+        // }
         const productsFiltered = productsFound.filter(product => product.is_active) // FILTER ACTIVE PRODUCTS
-        if(isEmptyList(productsFiltered)){
-            throw new ResourceNotFoundError(ProductNotFound)
-        }
+        // if(isEmptyList(productsFiltered)){
+        //     throw new ResourceNotFoundError(ProductNotFound)
+        // }
         return productsFiltered // RETURN PRODUCTS FILTERED
     } catch (error){
         errorsPitcher(error)

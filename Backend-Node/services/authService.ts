@@ -26,11 +26,12 @@ export const loginUser = async (username: string, password: string) => {
             throw new AuthenticationError(CheckCredentials)
         }
         const token = jwt.sign(
-            {sub: user._id, role: user.role}, 
-            process.env.SECRET_KEY_SIGN as string
+            {sub: user.username, role: user.role}, 
+            process.env.SECRET_KEY_SIGN as string,
+            { algorithm: 'HS256'}
         )
 
-        return {token, user}
+        return token
     } catch (error){
         errorsPitcher(error)
     }
@@ -83,9 +84,9 @@ export const updateUser = async (userUpdated: UserMongo) => {
 export const getAllUsers = async () => {
     try{
         const users = await UserModel.find() // GET ALL USERS , IF ARRAY IS NOT EMPTY RETURNS USER ELSE RETURN ERROR
-        if (isEmptyList(users)){
-            throw new ResourceNotFoundError(UserNotFound)
-        } 
+        // if (isEmptyList(users)){
+        //     throw new ResourceNotFoundError(UserNotFound)
+        // } 
         return users
     } catch(error){
         errorsPitcher(error)

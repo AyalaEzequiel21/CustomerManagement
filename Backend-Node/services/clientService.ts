@@ -16,9 +16,9 @@ import { existsEntity, isEmptyList } from "../utils/existingChecker"
 export const getAllClients = async (inDelivery: boolean) => {
     try{
         const clients = await ClientModel.find({is_active: true}) // GET ALL ACTIVE CLIENTS
-        if(isEmptyList(clients)){ // IF THE CLIENTS IS EMPTY RUN AN EXCEPTION
-            throw new ResourceNotFoundError(ClientNotFound)
-        } 
+        // if(isEmptyList(clients)){ // IF THE CLIENTS IS EMPTY RUN AN EXCEPTION
+        //     throw new ResourceNotFoundError(ClientNotFound)
+        // } 
 
         if (inDelivery){  // IF INDELIVERY IS TRUE RETURN ONLY THE CLIENTS WITH IN_DELIVERY : TRUE 
                 return clients.filter(client => client.in_delivery)
@@ -82,9 +82,9 @@ export const updateClient = async (client: ClientMongo) => {
 export const getClientsInactives = async () => {
     try {
         const clientsInactive = await ClientModel.find({is_active: false}) // GET ALL CLIENTS WITH IS_ACTIVE: FALSE      
-        if(isEmptyList(clientsInactive)){ // IF THE RESPONSE HAVE NOT CLIENTS RUN AN EXCEPTION
-            throw new ResourceNotFoundError(ClientNotFound)
-        } 
+        // if(isEmptyList(clientsInactive)){ // IF THE RESPONSE HAVE NOT CLIENTS RUN AN EXCEPTION
+        //     throw new ResourceNotFoundError(ClientNotFound)
+        // } 
         return clientsInactive // RETURN ALL INACTIVES CLIENT 
     } catch (error){        
         errorsPitcher(error)
@@ -94,11 +94,23 @@ export const getClientsInactives = async () => {
 export const getClientsByName = async (clientName: string) => {
     try{ 
         const clientsFound = await ClientModel.find({ fullname: { $regex: clientName, $options: 'i' }, is_active: true }) // GET ALL CLIENTS WITH FULLANME CONTAINS CLIENTNAME
-        if(isEmptyList(clientsFound)){ // IF CLIENTSFOUND IS EMPTY RUN AN EXCEPTION
-            throw new ResourceNotFoundError(ClientNotFound)
-        }
+        // if(isEmptyList(clientsFound)){ // IF CLIENTSFOUND IS EMPTY RUN AN EXCEPTION
+        //     throw new ResourceNotFoundError(ClientNotFound)
+        // }
         return clientsFound // RETURN THE CLIENTS FOUND
     } catch (error){        
+        errorsPitcher(error)
+    }
+}
+
+export const getClientById = async (clientId: string) => {
+    try{
+        const client = await ClientModel.findById(clientId).exec()
+        if(!client) {
+            throw new ResourceNotFoundError(ClientNotFound)
+        }
+        return client
+    } catch (error){
         errorsPitcher(error)
     }
 }
@@ -107,9 +119,9 @@ export const getClientsByCategory = async (category: string) => {
     if(Object.values(ECategory).some((enumCategory) => enumCategory === category)){ // CHECK IF CATEGORY IS VALID
         try{        
             const clientsFound = await ClientModel.find({category: category, is_active: true}) // GET ALL CLIENTS WITH THE SAME CATEGORY AND ACTIVE
-            if (isEmptyList(clientsFound)){ // IF CLIENTSFOUND IS EMPTY RUN AN EXCEPTION
-                throw new ResourceNotFoundError(ClientNotFound)
-            }
+            // if (isEmptyList(clientsFound)){ // IF CLIENTSFOUND IS EMPTY RUN AN EXCEPTION
+            //     throw new ResourceNotFoundError(ClientNotFound)
+            // }
             return clientsFound // RETURNS THE CLIENTS FOUND
         } catch (error){
             errorsPitcher(error)

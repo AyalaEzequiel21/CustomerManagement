@@ -34,9 +34,9 @@ export const createReport = async (newReport: ReportRegister) => {
 export const getReports = async () => { // all reports
     try{
         const reportsSaved = await ReportModel.find() // GET ALL REPORTS
-        if(isEmptyList(reportsSaved)){
-            throw new ResourceNotFoundError(ReportNotFound) // IF THE REPORTS SAVED ARE EMPTY RUN AN EXCEPTION
-        }
+        // if(isEmptyList(reportsSaved)){
+        //     throw new ResourceNotFoundError(ReportNotFound) // IF THE REPORTS SAVED ARE EMPTY RUN AN EXCEPTION
+        // }
         return reportsSaved // RETURN THE REPORTS SAVED
     } catch(error){
         errorsPitcher(error)
@@ -46,9 +46,9 @@ export const getReports = async () => { // all reports
 export const reportsValidated = async () => { // all reports validated
     try {
         const reportsValidated = await ReportModel.find({report_status: EReportStatus.Validado}) // FIND ALL VALIDATED REPORTS
-        if(isEmptyList(reportsValidated)){
-            throw new ResourceNotFoundError(ReportNotFound) // IF THE REPORTS SAVED ARE EMPTY RUN AN EXCEPTION
-        }
+        // if(isEmptyList(reportsValidated)){
+        //     throw new ResourceNotFoundError(ReportNotFound) // IF THE REPORTS SAVED ARE EMPTY RUN AN EXCEPTION
+        // }
         return reportsValidated // RETURN THE REPORTS VALIDATED
     }catch (error){
         errorsPitcher(error)
@@ -58,9 +58,9 @@ export const reportsValidated = async () => { // all reports validated
 export const reportsPending = async () => { // all reports pending
     try {
         const reportsPending = await ReportModel.find({report_status: EReportStatus.Pendiente}) // FIND ALL PENDING REPORTS
-        if(isEmptyList(reportsPending)){
-            throw new ResourceNotFoundError(ReportNotFound) // IF THE REPORTS SAVED ARE EMPTY RUN AN EXCEPTION
-        }
+        // if(isEmptyList(reportsPending)){
+        //     throw new ResourceNotFoundError(ReportNotFound) // IF THE REPORTS SAVED ARE EMPTY RUN AN EXCEPTION
+        // }
         return reportsPending // RETURN THE REPORTS VALIDATED
     }catch (error){
         errorsPitcher(error)
@@ -72,9 +72,9 @@ export const searchReportByDate = async (reportDate: string) => {
     }
     try{
         const reports = await ReportModel.find({report_date: reportDate}).exec() // SEARCH REPORTS WITH THE SAME REPORT DATE
-        if(isEmptyList(reports)){ // IF REPORTS IS EMPTY RUN AN EXCEPTION
-            throw new ResourceNotFoundError(ReportNotFound)
-        }
+        // if(isEmptyList(reports)){ // IF REPORTS IS EMPTY RUN AN EXCEPTION
+        //     throw new ResourceNotFoundError(ReportNotFound)
+        // }
         return reports // RETURNS THE REPORTS
     }catch(error){
         errorsPitcher(error)

@@ -71,10 +71,10 @@ export const deletePaymentById = async (paymentId: string) => {
 export const allPayments = async () => {
     try{
         const payments = await PaymentModel.find() //  GET ALL PAYMENTS
-        if(isEmptyList(payments)){ // CHECK IF THE RESPONSE IS EMPTY AND RUN AN EXCEPTION
-            throw new ResourceNotFoundError(PaymentNotFound)
-            // return []
-        }
+        // if(isEmptyList(payments)){ // CHECK IF THE RESPONSE IS EMPTY AND RUN AN EXCEPTION
+        //     throw new ResourceNotFoundError(PaymentNotFound)
+        //     // return []
+        // }
         return payments // RETURN THE PAYMENTS
     } catch (error){
         errorsPitcher(error)
@@ -88,9 +88,9 @@ export const getPaymentsByClientId = async (clientId: string) => {
     try {
         const payments = await PaymentModel.find({clientId: clientId}) //  GET ALL PAYMENTS FROM A CLIENT BY HIS ID
         
-        if(isEmptyList(payments)){ //CHECK IF THE RESPONSE IS EMPTY  AND RUN AN EXCEPTION
-            throw new ResourceNotFoundError(PaymentNotFound)
-        }
+        // if(isEmptyList(payments)){ //CHECK IF THE RESPONSE IS EMPTY  AND RUN AN EXCEPTION
+        //     throw new ResourceNotFoundError(PaymentNotFound)
+        // }
         return payments // RETURN THE PAYMENTS
     } catch (error){
         errorsPitcher(error)
@@ -104,9 +104,9 @@ export const getPaymentsByPaymentMethod = async (paymentMethod: string) => {
     try {
         const payments = await PaymentModel.find({payment_method: paymentMethod}) //  GET ALL PAYMENTS FILTERED BY PAYMENT_METHOD
         
-        if(isEmptyList(payments)){ //CHECK IF THE RESPONSE IS EMPTY  AND RUN AN EXCEPTION
-            throw new ResourceNotFoundError(PaymentNotFound)
-        }
+        // if(isEmptyList(payments)){ //CHECK IF THE RESPONSE IS EMPTY  AND RUN AN EXCEPTION
+        //     throw new ResourceNotFoundError(PaymentNotFound)
+        // }
         return payments // RETURN THE PAYMENTS
     } catch (error){
         errorsPitcher(error)
@@ -120,9 +120,9 @@ export const getPaymentsByPaymentDate = async (paymentDate: string) => {
     try {
         const payments = await PaymentModel.find({payment_date: paymentDate}) //  GET ALL PAYMENTS FILTERED BY PAYMENT_DATE
 
-        if(isEmptyList(payments)){ //CHECK IF THE RESPONSE IS EMPTY  AND RUN AN EXCEPTION
-            throw new ResourceNotFoundError(PaymentNotFound)
-        }
+        // if(isEmptyList(payments)){ //CHECK IF THE RESPONSE IS EMPTY  AND RUN AN EXCEPTION
+        //     throw new ResourceNotFoundError(PaymentNotFound)
+        // }
         return payments // RETURN THE PAYMENTS
     } catch (error){
         errorsPitcher(error)
